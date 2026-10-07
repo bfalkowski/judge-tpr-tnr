@@ -1,0 +1,35 @@
+name: collect
+# Download the artifacts of one `judge` workflow run and commit them to the
+# `data` branch, next to earlier runs.
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: "Actions run ID of the `judge` workflow"
+        required: true
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run download ${{ inputs.source_run_id }} -D downloaded
+      - name: Commit to data branch
+        run: |
+          mkdir -p /tmp/runs
+          for d in downloaded/run-*; do id=${d#downloaded/run-}; mkdir -p /tmp/runs/$id; cp -r $d/. /tmp/runs/$id/; done
+          git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
+          git fetch origin data || true
+          if git rev-parse --verify origin/data >/dev/null 2>&1; then git checkout -B data origin/data; else git checkout --orphan data; git rm -rf . >/dev/null; fi
+          rm -rf downloaded
+          mkdir -p runs; cp -r /tmp/runs/. runs/
+          git add runs
+          git commit -m "collect ${{ inputs.source_run_id }}" || echo "nothing new"
+          git push origin data

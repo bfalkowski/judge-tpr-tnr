@@ -1,0 +1,150 @@
+{
+ "source": {
+  "repo": "https://github.com/bfalkowski/eval-run-validity",
+  "data_commit": "da1d6ae7a77f64d4c7cdc6a43d47b1eb08e02038",
+  "runs": [
+   "gh37012503737-v2-clean-loud-none",
+   "gh37014038090-v2-clean-loud-none-r1",
+   "gh37014038090-v2-clean-loud-none-r2",
+   "gh37014038090-v2-clean-loud-none-r3",
+   "gh37014038090-v2-clean-loud-none-r4",
+   "gh37014038090-v2-clean-loud-none-r5",
+   "gh37014574123-v2-clean-loud-none-r1",
+   "gh37014574123-v2-clean-loud-none-r2",
+   "gh37019134878-v2-clean-loud-none-r3",
+   "gh37019134878-v2-clean-loud-none-r4"
+  ],
+  "rows": 600,
+  "sha256": "0356ab8ea98c886220421275c260cac0d2e452eb9922ff047fbed13bba74716e"
+ },
+ "items": 600,
+ "runs": 10,
+ "tickets": 60,
+ "distinct_ticket_action_pairs": 66,
+ "tickets_ever_wrong": 13,
+ "first_vote": {
+  "tp": 435,
+  "fn": 63,
+  "fp": 84,
+  "tn": 18,
+  "n": 600,
+  "tpr": 0.8734939759036144,
+  "tnr": 0.17647058823529413,
+  "youden": 0.049964564138908596
+ },
+ "true_pass_rate": 0.83,
+ "judge_pass_rate": 0.865,
+ "in_sample_corrected": 0.8300000000000003,
+ "repeat": {
+  "votes_differ": 21,
+  "votes_differ_share": 0.035,
+  "items_with_a_wrong_vote": 158,
+  "of_those_votes_differ": 21
+ },
+ "judge_errors_by_ticket": {
+  "tickets_with_any_error": 19,
+  "tickets_wrong_every_run": 11,
+  "counts": {
+   "V004": 10,
+   "V005": 10,
+   "V011": 10,
+   "V019": 10,
+   "V023": 10,
+   "V025": 10,
+   "V026": 10,
+   "V031": 10,
+   "V032": 10,
+   "V034": 10,
+   "V055": 10,
+   "V002": 9,
+   "V035": 9,
+   "V038": 9,
+   "V024": 4,
+   "V017": 2,
+   "V033": 2,
+   "V030": 1,
+   "V040": 1
+  }
+ },
+ "by_tag": {
+  "boundary": {
+   "tp": 31,
+   "fp": 21,
+   "fn": 8
+  },
+  "claim": {
+   "tp": 29,
+   "fn": 18,
+   "fp": 33,
+   "tn": 10
+  },
+  "demand": {
+   "tn": 8,
+   "tp": 76,
+   "fp": 20,
+   "fn": 26
+  },
+  "indirect": {
+   "tp": 170,
+   "fn": 10
+  },
+  "limit": {
+   "tp": 90,
+   "fp": 10
+  },
+  "pending": {
+   "tp": 39,
+   "fn": 1
+  }
+ },
+ "split_experiment": {
+  "splits": 2000,
+  "undefined": 670,
+  "undefined_share": 0.335,
+  "median_abs_error_raw": 0.046666666666666634,
+  "median_abs_error_corrected": 0.19333333333333336,
+  "corrected_worse_than_raw_share": 0.9278195488721804,
+  "corrected_error_deciles": [
+   0.08,
+   0.124,
+   0.146,
+   0.168,
+   0.193,
+   0.223,
+   0.353,
+   0.631,
+   0.843
+  ],
+  "denominator_deciles": [
+   -0.11,
+   -0.064,
+   -0.017,
+   0.024,
+   0.054,
+   0.08,
+   0.112,
+   0.148,
+   0.196
+  ]
+ },
+ "interval_coverage": {
+  "splits": 200,
+  "iterations": 2000,
+  "labeled_tickets": 30,
+  "run_items": 30,
+  "ticket": {
+   "estimates": 128,
+   "no_estimate": 72,
+   "coverage": 0.9609375,
+   "median_width": 1.0,
+   "median_undefined_share": 0.43925000000000003
+  },
+  "judgy": {
+   "estimates": 128,
+   "no_estimate": 72,
+   "coverage": 0.4375,
+   "median_width": 0.5420614612757562,
+   "median_dropped_share": 0.03075
+  }
+ }
+}

@@ -1,0 +1,5 @@
+# The judge, estimator and analysis use only the Python standard library.
+# judgy (and its numpy) is used to cross-check the estimator against the
+# course's reference implementation. Paper runs use requirements.lock.
+judgy>=0.1.0
+pytest>=8

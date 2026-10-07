@@ -1,0 +1,59 @@
+name: judge
+# Run one judge variant over one split, by hand. Results are uploaded as an
+# artifact; `collect` commits them to the `data` branch.
+on:
+  workflow_dispatch:
+    inputs:
+      variant:
+        default: p2
+      dataset:
+        default: v2
+      split:
+        type: choice
+        options: [dev, train, test]
+        default: dev
+      repeats:
+        default: "2"
+      backend:
+        type: choice
+        options: [stub, api]
+        default: stub
+      max_spend_usd:
+        default: "1"
+
+jobs:
+  judge:
+    runs-on: ubuntu-latest
+    env:
+      RUN_ID: gh${{ github.run_id }}-${{ inputs.variant }}-${{ inputs.dataset }}-${{ inputs.split }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.lock
+      - name: Run judge
+        env:
+          TYPESAFE_API_KEY: ${{ secrets.TYPESAFE_API_KEY }}
+          JEV_BACKEND: ${{ inputs.backend == 'stub' && 'stub' || '' }}
+          MAX_SPEND_USD: ${{ inputs.max_spend_usd }}
+        run: |
+          python run_judge.py --variant ${{ inputs.variant }} --dataset ${{ inputs.dataset }} \
+            --split ${{ inputs.split }} --repeats ${{ inputs.repeats }} --run-id $RUN_ID
+      - name: Rates
+        if: always()
+        run: python analysis/rates.py runs/$RUN_ID | tee -a $GITHUB_STEP_SUMMARY
+      - name: No secrets in run outputs
+        if: always()
+        env:
+          TYPESAFE_API_KEY: ${{ secrets.TYPESAFE_API_KEY }}
+        run: |
+          if [ -n "$TYPESAFE_API_KEY" ] && grep -rqF "$TYPESAFE_API_KEY" runs 2>/dev/null; then
+            echo "the API key appears in the run outputs; not uploading"; exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: run-${{ env.RUN_ID }}
+          path: runs/${{ env.RUN_ID }}
+          if-no-files-found: warn
