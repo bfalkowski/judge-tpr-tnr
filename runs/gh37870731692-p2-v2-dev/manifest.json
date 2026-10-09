@@ -1,0 +1,19 @@
+{
+ "run_id": "gh37870731692-p2-v2-dev",
+ "variant": "p2",
+ "fingerprint": "96d1bb29eb343d55",
+ "model": "jev-latest",
+ "backend": "stub",
+ "dataset": "v2",
+ "split": "dev",
+ "repeats": 2,
+ "n_items": 204,
+ "items_sha256": "9d023d0253604a1ae0fa79aed1468a99cb1164a9783666c52153e1b04826a413",
+ "split_sha256": "5049219d5daf61967b8b2119e465152ce3903132da7980ba42d1e98fc33e2b7b",
+ "git_commit": "f2434b27856ad8e148a980600b4982635469260a",
+ "frozen": null,
+ "started_at": "2026-10-09T01:38:23Z",
+ "finished_at": "2026-10-09T01:38:23Z",
+ "errored_calls": 0,
+ "spend_usd": 0.005467
+}
