@@ -2,15 +2,19 @@
 
 Working title: **Is This Judge Valid? Following the Course Method for an LLM Judge, With Ground Truth to Check It**
 
-The paper follows the judge workflow taught in AI Evaluation for Engineers and PMs (Husain and Shankar), Module 2:
-error analysis, a judge prompt per failure mode, train/dev/test splits of labeled traces, iterative refinement
-on dev until TPR and TNR pass a target, a single run on test, then the Rogan-Gladen correction (Rogan and
-Gladen 1978) on unlabeled traces with a bootstrap interval. What this study adds is a ground truth that is not
+The paper follows the judge workflow taught in AI Evaluation for Engineers and PMs (Husain and Shankar):
+iterative prompt refinement for the judge (course reader, Section 2.12) and the statistical foundations behind
+it (Appendix A: data splits, TPR and TNR, correcting the pass rate). In short: labeled traces split into
+train, dev and test; refine the judge on dev until TPR and TNR pass a target; run it once on test; then
+correct its pass rate on unlabeled traces with the Rogan-Gladen estimator (Rogan and Gladen 1978) and a
+bootstrap interval (Efron and Tibshirani 1993). What this study adds is a ground truth that is not
 subjective: the support policy is code, so every label is known, every step of the refinement can be checked
 against it, and the corrected pass rate can be compared with the true one.
 
-The course reader is marked not for sharing. The paper cites the course and its public material (the judgy
-library, the evals-skills repo) and does not quote the reader.
+The course reader is marked not for sharing. The paper does not quote it. It describes the method in its own
+words, cites the course by name, and points to public sources for each technical piece: Rogan and Gladen
+(1978) for the correction, Efron and Tibshirani (1993) for the bootstrap, the standard definitions of
+sensitivity and specificity for TPR and TNR, and the public judgy library for the reference implementation.
 
 ## The method, step by step, and where this study stands
 
@@ -21,7 +25,7 @@ library, the evals-skills repo) and does not quote the reader.
 | 3. Split by ticket: train 10 to 20%, dev and test 40 to 45% each, 30 to 50 Pass and 30 to 50 Fail in each of dev and test | v2 tickets for train and dev; v3, new tickets written before any judge sees them, for test | v2 split built; v3 not written |
 | 4. Judge prompt with the four parts: one failure mode, Pass/Fail definitions, few-shot examples from train, structured output with reasoning | p2 (paper 2's judge) is the baseline and has none of the four. Each later version adds one | p2 measured on dev |
 | 5. Refine on dev, inspect false passes and false fails, stop at TPR and TNR above 0.9 | The hill climb: one logged dev run per version, every step reported including ones that made it worse | Not started |
-| 6. If it stalls: a more capable model, decompose the criterion, better labels or examples | Planned in that order. The course also says the judge should be a different LLM from the application's; p2 uses Jev for both | Not started |
+| 6. If it stalls: a more capable model, decompose the criterion, better labels or examples | Planned in that order. The judge should also be a different LLM from the application's; p2 uses Jev for both. Second judge: Claude, through an Anthropic key, pinned to a dated model ID | Key to be added |
 | 7. Freeze, run once on test, get TPR and TNR | `freeze.py` and the test gate exist | Not run |
 | 8. Correct the judge's pass rate on unlabeled traces (Rogan-Gladen), bootstrap over the test set for a 95% interval | Agent runs at several true pass rates; compare the corrected rate and its interval with the truth | Estimator built |
 | 9. Production: re-measure TPR and TNR on fresh labels periodically; pin a dated model ID rather than an alias | Paper 2 used the alias `jev-latest`. Record the dated ID if TypeSafe exposes one | Open |
@@ -58,6 +62,6 @@ actions the agent actually made. Not held out.
 
 ## Open decisions
 
-- **Judge model.** The course says to use a model distinct from the application's. Which second model, and whether Jev can return a reasoning field with its verdict.
+- **Judge model.** Claude via the Anthropic API for the judge (decided 2026-10-09). Still open: whether Jev can return a reasoning field, so the Jev-judge steps of the climb can use all four prompt parts.
 - **More real failures.** How many extra agent runs, and with which configs, to reach 30 to 50 Fail traces in each of dev and test.
 - **Constructed items.** Keep the all-actions items only as a secondary set, to show the TNR gap, not as the labeled data the judge is tuned on.
