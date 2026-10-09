@@ -156,3 +156,11 @@ def test_test_split_refused_without_a_matching_freeze(tmp_path):
     p = run(["--split", "test", "--run-id", "t2"], tmp_path)
     assert p.returncode != 0 and "freeze.json" in p.stderr
     assert not (tmp_path / "t2").exists()
+
+
+def test_api_backend_without_a_key_stops_before_writing(tmp_path):
+    env = {k: v for k, v in os.environ.items() if k not in ("TYPESAFE_API_KEY", "JEV_BACKEND")}
+    p = subprocess.run([sys.executable, "run_judge.py", "--out", str(tmp_path), "--split", "dev",
+                        "--run-id", "t3"], cwd=ROOT, env=env, capture_output=True, text=True)
+    assert p.returncode != 0 and "TYPESAFE_API_KEY" in p.stderr
+    assert not (tmp_path / "t3").exists()

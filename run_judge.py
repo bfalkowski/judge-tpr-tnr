@@ -70,6 +70,9 @@ def main():
     ap.add_argument("--out", default=os.path.join(ROOT, "runs"))
     a = ap.parse_args()
 
+    if os.environ.get("JEV_BACKEND") != "stub" and not os.environ.get("TYPESAFE_API_KEY"):
+        sys.exit("TYPESAFE_API_KEY is not set: add it to .env, or as a repository secret for the "
+                 "judge workflow, or use JEV_BACKEND=stub")
     frozen = check_frozen(a.variant) if a.split == "test" else None
     if a.split == "all" and "test" in set(data.load_split(a.dataset).values()):
         sys.exit("--split all would include test tickets; run the splits separately")

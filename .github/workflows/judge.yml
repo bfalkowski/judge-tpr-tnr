@@ -1,6 +1,6 @@
 name: judge
-# Run one judge variant over one split, by hand. Results are uploaded as an
-# artifact; `collect` commits them to the `data` branch.
+# Run one judge variant over one split, by hand. The run folder is uploaded
+# as an artifact and committed to the `data` branch (runs/<run_id>/).
 on:
   workflow_dispatch:
     inputs:
@@ -20,6 +20,9 @@ on:
         default: stub
       max_spend_usd:
         default: "1"
+
+permissions:
+  contents: write
 
 jobs:
   judge:
@@ -41,7 +44,7 @@ jobs:
           python run_judge.py --variant ${{ inputs.variant }} --dataset ${{ inputs.dataset }} \
             --split ${{ inputs.split }} --repeats ${{ inputs.repeats }} --run-id $RUN_ID
       - name: Rates
-        if: always()
+        if: always() && hashFiles(format('runs/{0}/judgments.jsonl', env.RUN_ID)) != ''
         run: python analysis/rates.py runs/$RUN_ID | tee -a $GITHUB_STEP_SUMMARY
       - name: No secrets in run outputs
         if: always()
@@ -51,9 +54,29 @@ jobs:
           if [ -n "$TYPESAFE_API_KEY" ] && grep -rqF "$TYPESAFE_API_KEY" runs 2>/dev/null; then
             echo "the API key appears in the run outputs; not uploading"; exit 1
           fi
+          echo "SECRETS_OK=1" >> $GITHUB_ENV
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: run-${{ env.RUN_ID }}
           path: runs/${{ env.RUN_ID }}
           if-no-files-found: warn
+      - name: Commit to data branch
+        if: always() && env.SECRETS_OK == '1' && hashFiles(format('runs/{0}/judgments.jsonl', env.RUN_ID)) != ''
+        run: |
+          mv runs/$RUN_ID /tmp/$RUN_ID
+          git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
+          for attempt in 1 2 3; do
+            git fetch origin data || true
+            if git rev-parse --verify origin/data >/dev/null 2>&1; then
+              git checkout -f -B data origin/data
+            else
+              git checkout -f --orphan data; git rm -rf -q . ; git clean -fdq
+            fi
+            mkdir -p runs; rm -rf runs/$RUN_ID; cp -r /tmp/$RUN_ID runs/$RUN_ID
+            git add runs/$RUN_ID
+            git commit -q -m "judge run $RUN_ID" || { echo "nothing new"; exit 0; }
+            git push origin data && exit 0
+            sleep 5
+          done
+          exit 1
