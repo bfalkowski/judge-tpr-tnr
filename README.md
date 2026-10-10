@@ -1,89 +1,72 @@
 # judge-tpr-tnr
 
-Code and data for a planned paper on measuring an LLM judge's true positive rate (TPR) and true negative rate (TNR) against labeled data it has not seen, and using them to correct the pass rate the judge reports.
+Code and data for a worked example of improving an LLM judge by hill climbing on its true positive rate (TPR) and true negative rate (TNR), with an answer key for every trace.
 
-It follows the method taught in [AI Evaluation for Engineers and PMs](https://maven.com/parlance-labs/evals) (Hamel Husain and Shreya Shankar) and applies it to the judge from my previous paper, [Is This Run Valid?](https://bfalkowski.github.io/writing/run-valid.html) ([code](https://github.com/bfalkowski/eval-run-validity)). That eval has something most evals lack: a deterministic reference for every item. So the corrected pass rate can be checked against the true pass rate, not just reported.
+The judge decides whether a support agent's resolution follows a support policy. The agent and the policy come from my previous paper, [Is This Run Valid?](https://bfalkowski.github.io/writing/run-valid.html) ([code](https://github.com/bfalkowski/eval-run-validity)). The policy is written as code, so every label is known, and each step of the judge's refinement can be checked against the truth instead of against one person's judgment.
 
-## Phase 0: what the paper 2 judge already shows
+The method follows the judge-validation loop taught in AI Evaluation for Engineers and PMs (Husain and Shankar), as published in Hamel Husain's [LLM-as-a-judge guide](https://hamel.dev/blog/posts/llm-judge/) and the [`validate-evaluator`](https://github.com/ai-evals-course/evals-skills) skill. Paper plan and sources: [`paper/outline.md`](paper/outline.md).
 
-`analysis/phase0.py` reads the paper 2 judge's votes on the 600 items of its 10 clean runs (60 tickets x 10 runs) and compares the first vote with the deterministic score. Full output: [`phase0/RESULTS.md`](phase0/RESULTS.md).
+## The climb so far (dev)
 
-| | Judge PASS | Judge FAIL |
-|---|---|---|
-| Correct (498) | 435 | 63 |
-| Wrong (102) | 84 | 18 |
+| Step | Change | Model | TPR | TNR |
+|---|---|---|---|---|
+| 0 | Paper 2's judge: one sentence, no definitions or examples | Jev | 0.84 | 0.52 |
+| 1 | Precise Pass/Fail definitions from step 0's errors | Jev | 0.94 | 0.73 |
+| 2 | Four train examples with critiques at the day cutoffs | Jev | 0.91 | 0.82 |
+| 3 | Same definitions and examples on Claude, reasoning then answer | Claude Haiku 4.5 | pending | pending |
 
-TPR is 0.873 and TNR is 0.176. The judge passed 84 of the 102 wrong resolutions. TPR + TNR - 1 is 0.050, and the correction divides by that number.
+158 dev items (87 pass, 71 fail), every one a real agent decision. Intervals and error counts: [`paper/climb_table.md`](paper/climb_table.md). Target: both above 0.9.
 
-Measured on half the tickets and applied to the other half, over 2,000 random splits:
+## Data
 
-- the correction was undefined (TPR + TNR <= 1) in 33.5% of splits;
-- where it was defined, the corrected rate was off by a median of 19.3 points, against 4.7 points for the judge's raw pass rate, and was further from the truth than the raw rate in 92.8% of splits.
+| | Tickets | Labeled items | Pass | Fail | Use |
+|---|---|---|---|---|---|
+| train | 60 (v2) | 86 | 58 | 28 | few-shot examples only |
+| dev | 120 (v3) | 158 | 87 | 71 | refining the judge |
+| test | 120 (v3) | 158 | 96 | 62 | one run of the frozen judge |
 
-For a single 30-ticket run, I checked 95% intervals on 200 splits; the correction was defined on 128 of them. An interval that resamples tickets contained the true rate in 96% of those but had a median width of 100 points, which is the honest answer for this judge. judgy 0.1.0's interval, which resamples items and holds the run's pass rate fixed, contained the true rate in 44%.
-
-Two things follow. The 600 items are 66 distinct ticket/action pairs, so every split and every interval has to be by ticket. And this judge is far from the course's bar of TPR and TNR above 90% on dev, so the paper starts by trying to get it there.
-
-## Study design
-
-**Judge items.** Each v2 ticket is paired with each of the four actions (refund, reship, escalate, reply). An item is PASS when the action is the one the reference policy gives, FAIL otherwise. That gives 240 items, 60 PASS and 180 FAIL, without needing the agent to make mistakes. Built by `data/build.py`.
-
-**Labels.** The reference policy (`judge/policy.py`, copied unchanged from paper 2) is my reading of the support policy written as code. Before any number is treated as final, the tickets where the judge and the reference disagree get a hand audit, because two policy rules were already arguable in paper 2.
-
-**Why the test split is new tickets.** Every v2 ticket has already been seen, in paper 2 and in phase 0, including which ones the judge gets wrong. A variant tuned with that knowledge cannot be tested on the same tickets. So v2 is split by ticket into train (15%, few-shot examples) and dev (85%, iteration), stratified by difficulty tag, and the test split is a new set, v3, written and frozen before any judge sees it. v3 needs roughly 50 tickets so the test split has about 50 PASS items.
-
-**Freeze.** A variant is tuned on dev only, including the choice of threshold on Jev's raw `noul` score. `freeze.py` records the variant's fingerprint and threshold in `freeze.json`; `run_judge.py` refuses to run the test split for anything else.
-
-**Correction.** `judge/estimate.py` computes the corrected pass rate with an interval that resamples tickets on both the labeled side and the run being estimated, and reports how often the correction was undefined. Its point estimate matches judgy's (tested).
-
-Research questions and the paper plan are in [`paper/outline.md`](paper/outline.md).
+- **Tickets.** v2 is paper 2's 60 hand-written tickets. v3 is 240 tickets generated from the policy's dimensions (issue, status, days around the 14- and 30-day cutoffs, totals around $500, stock) and a customer framing (plain, demand, wrong claim, angry, indirect): `data/make_data_v3.py`.
+- **Agent outputs.** Paper 2's agent, imported unchanged at commit `12a0eef`, under four of its configs: clean, "keep the customer happy" instructions, stock removed, and the old policy without the $500 limit. v2 decisions come from paper 2's runs (`agent/harvest_paper2.py`); v3 decisions from this repo's runs (`agent/run_agent.py`, `agent` workflow).
+- **Labels.** One item per distinct (ticket, action) the agent produced; PASS when the action is the one the reference policy (`judge/policy.py`) gives. `data/build_labeled.py`.
+- **Splits** are by ticket. Test is not looked at until a judge is frozen; `run_judge.py` refuses the test split for any judge not recorded in `freeze.json`.
 
 ## What is here
 
 | Path | What it does |
 |---|---|
-| `judge/policy.py` | The support policy text and reference function, unchanged from paper 2 (checksum in `data/CHECKSUMS.json`) |
-| `judge/judges.py` | Judge variants. `p2` is paper 2's judge, verbatim. |
-| `judge/jev.py`, `judge/jev_stub.py` | Jev client that keeps the raw `noul` score; a local stand-in for tests |
+| `judge/judges.py` | Every judge version, one per climb step, each with a fingerprint |
+| `judge/jev.py`, `judge/claude.py` | Judge backends; the raw score or the reasoning is kept |
 | `judge/estimate.py` | TPR, TNR, corrected pass rate, ticket-level bootstrap |
-| `data/v2/` | Paper 2's tickets and orders, unchanged |
-| `data/build.py` | Builds `data/items_v2.jsonl` and the ticket-level split `data/splits/v2.json` |
-| `phase0/` | Paper 2's clean-run judge votes (`fetch_paper2.py`, pinned to a commit) and the phase 0 results |
-| `run_judge.py` | Runs one variant over one split; writes `runs/<id>/manifest.json` and `judgments.jsonl` |
-| `analysis/rates.py` | TPR and TNR for a run, with ticket-level intervals and a threshold sweep |
-| `freeze.py` | Freezes a variant and threshold before the test split |
-| `.github/workflows/` | `ci` (tests, phase 0 reproduces), `secrets` (gitleaks), `judge` (judge runs), `collect` (runs to the `data` branch) |
-
-## Setup
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install pre-commit -r requirements.lock
-pre-commit install
-```
-
-Put the Jev key in `.env` (gitignored) as `TYPESAFE_API_KEY=...`, and add it as a repository secret for the `judge` workflow.
+| `run_judge.py` | Runs one judge on one split; `judge` workflow runs it in CI and commits to the `data` branch |
+| `analysis/rates.py`, `analysis/errors.py` | TPR/TNR with intervals and a threshold sweep; errors grouped by the rule that decides them |
+| `analysis/climb.py` | Rebuilds the climb table from the runs listed in `paper/climb.json` |
+| `freeze.py` | Freezes a judge and threshold before the test split |
+| `phase0/`, `paper/preliminary.md` | Earlier results: paper 2's judge on its own runs, and on constructed wrong actions |
+| `.github/workflows/` | `ci`, `secrets`, `agent`, `judge`, `collect` |
 
 ## Running it
 
 ```bash
-# no key needed
-python -m pytest -q tests
-python analysis/phase0.py
-JEV_BACKEND=stub python run_judge.py --variant p2 --dataset v2 --split dev --run-id stub-dev
-python analysis/rates.py runs/stub-dev
+python3 -m venv .venv && source .venv/bin/activate
+pip install pre-commit -r requirements.lock && pre-commit install
+python -m pytest -q tests                      # no keys needed
 
-# real Jev; paper runs go through the `judge` workflow instead
-python run_judge.py --variant p2 --dataset v2 --split dev --run-id p2-dev-01
+# a judge step on dev, locally (keys in .env: TYPESAFE_API_KEY, ANTHROPIC_API_KEY)
+python run_judge.py --variant j2 --dataset labeled --split dev --run-id j2-dev
+python analysis/rates.py runs/j2-dev
+python analysis/errors.py runs/j2-dev
+
+# or through CI, which commits the run to the data branch
+gh workflow run judge.yml -f variant=j2 -f dataset=labeled -f split=dev -f backend=api
+git fetch origin data && python analysis/climb.py
 ```
 
-A p2 dev run is 204 items x 2 calls, about 410 calls and about a cent.
+A Jev step on dev costs about a cent; a Claude Haiku step well under a dollar.
 
 ## Sources
 
 - `judge/policy.py`, `data/v2/`: [eval-run-validity](https://github.com/bfalkowski/eval-run-validity) `main` at `12a0eef`
-- `phase0/paper2_clean_items.jsonl`: eval-run-validity `data` branch at `da1d6ae` (see `phase0/SOURCE.json`)
+- Paper 2 agent decisions and phase 0 items: eval-run-validity `data` branch at `da1d6ae`
 - Estimator cross-check: [judgy](https://pypi.org/project/judgy/) 0.1.0
 
-Not affiliated with TypeSafe or Parlance Labs.
+Not affiliated with TypeSafe, Anthropic or Parlance Labs.

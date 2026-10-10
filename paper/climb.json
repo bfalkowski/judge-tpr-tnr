@@ -1,0 +1,13 @@
+{
+ "dataset": "labeled",
+ "split": "dev",
+ "threshold": 0.5,
+ "steps": [
+  {"step": 0, "variant": "p2", "run": "gh38078843303-p2-labeled-dev",
+   "change": "Baseline: paper 2's judge, one sentence, no definitions or examples"},
+  {"step": 1, "variant": "j1", "run": "gh38078970979-j1-labeled-dev",
+   "change": "Precise Pass/Fail definitions from the errors of step 0"},
+  {"step": 2, "variant": "j2", "run": "gh38079133175-j2-labeled-dev",
+   "change": "Four train examples with critiques at the 14- and 30-day cutoffs"}
+ ]
+}
