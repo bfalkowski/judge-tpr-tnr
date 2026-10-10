@@ -40,18 +40,66 @@ How to decide:
 4. The $500 limit applies to refunds only: a refund of more than $500 must be an escalation instead. A reship is not affected by the limit."""
 
 
+# Step 2 (after error analysis of j1 on dev, gh38078970979): few-shot examples.
+# All 19 of j1's false passes were still day counting at the 14- and 30-day
+# cutoffs. Four train items, one each side of each cutoff, with a short
+# critique that shows the count. Train is v2 only, so no dev or test ticket
+# can appear here (checked in few_shot()).
+J2_EXAMPLES = [
+    ("v2:V001:refund", "PASS", "Delivered 2026-09-01, today is 2026-10-01: 30 days, inside the window. "
+                               "Damaged, $129, so refund."),
+    ("v2:V002:refund", "FAIL", "Delivered 2026-08-31, today is 2026-10-01: 31 days, outside the 30-day window. "
+                               "The policy requires escalate, not refund."),
+    ("v2:V005:reship", "FAIL", "Shipped 2026-09-17, today is 2026-10-01: 14 days, not delivered. 14 days or less "
+                               "is too early, so the only correct action is reply. The customer's 'two full weeks' "
+                               "does not change that."),
+    ("v2:V006:reship", "PASS", "Shipped 2026-09-16, today is 2026-10-01: 15 days, not delivered, in stock. "
+                               "More than 14 days, so reship."),
+]
+J2_INSTRUCTIONS = J1_INSTRUCTIONS + """
+Worked examples, with the reasoning a reviewer used, are in `examples`. Apply the same reasoning: count the days from the dates before deciding."""
+
+_items = None
+
+
+def few_shot(examples):
+    global _items
+    if _items is None:
+        from judge import data
+        _items = {it["item_id"]: it for it in data.load_items("labeled")}
+        split = data.load_split("labeled")
+        for item_id, _, _ in examples:
+            assert split[_items[item_id]["ticket_id"]] == "train", f"{item_id} is not a train item"
+    out = []
+    for item_id, verdict, critique in examples:
+        it = _items[item_id]
+        assert (verdict == "PASS") == bool(it["label"]), item_id
+        out.append({"ticket": it["ticket"], "order": it["order"], "stock": it["stock"],
+                    "agent_resolution": it["action"], "verdict": verdict, "reasoning": critique})
+    return out
+
+
+def j2_state(item):
+    return {**p2_state(item), "examples": few_shot(J2_EXAMPLES)}
+
+
 VARIANTS = {
     "p2": {"instructions": P2_INSTRUCTIONS, "state": p2_state, "question": "follows_policy",
            "notes": "paper 2 judge, verbatim"},
     "j1": {"instructions": J1_INSTRUCTIONS, "state": p2_state, "question": "follows_policy",
            "notes": "step 1: precise Pass/Fail definitions from error analysis of p2 on dev"},
+    "j2": {"instructions": J2_INSTRUCTIONS, "state": j2_state, "question": "follows_policy",
+           "notes": "step 2: j1 plus four train examples with critiques at the day cutoffs"},
 }
 
 
 def fingerprint(name):
     v = VARIANTS[name]
-    blob = json.dumps({"instructions": v["instructions"], "question": v["question"],
-                       "state": inspect.getsource(v["state"])}, sort_keys=True)
+    parts = {"instructions": v["instructions"], "question": v["question"],
+             "state": inspect.getsource(v["state"])}
+    if v["state"] is j2_state:  # few-shot examples are part of the judge
+        parts["examples"] = J2_EXAMPLES
+    blob = json.dumps(parts, sort_keys=True)
     return hashlib.sha256(blob.encode()).hexdigest()[:16]
 
 
