@@ -164,3 +164,25 @@ def test_api_backend_without_a_key_stops_before_writing(tmp_path):
                         "--run-id", "t3"], cwd=ROOT, env=env, capture_output=True, text=True)
     assert p.returncode != 0 and "TYPESAFE_API_KEY" in p.stderr
     assert not (tmp_path / "t3").exists()
+
+
+# ------------------------------------------------------------------ labeled set
+
+def test_labeled_items_are_real_decisions_labeled_by_the_policy():
+    items = data.load_items("labeled")
+    assert len({it["item_id"] for it in items}) == len(items)
+    for it in items:
+        assert it["label"] == int(it["action"] == it["expected"])
+        assert sum(it["sources"].values()) >= 1
+
+
+def test_labeled_split_is_by_ticket_and_train_is_v2_only():
+    s = data.load_split("labeled")
+    for it in data.load_items("labeled"):
+        assert (s[it["ticket_id"]] == "train") == (it["dataset"] == "v2")
+    counts = {sp: [0, 0] for sp in ("dev", "test")}
+    for it in data.load_items("labeled"):
+        if s[it["ticket_id"]] in counts:
+            counts[s[it["ticket_id"]]][it["label"]] += 1
+    for sp, (fail, ok) in counts.items():
+        assert fail >= 30 and ok >= 30, (sp, fail, ok)

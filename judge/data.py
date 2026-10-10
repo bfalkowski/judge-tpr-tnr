@@ -16,7 +16,7 @@ from judge.policy import ACTIONS, resolve
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 DATA = os.path.join(ROOT, "data")
-DATASETS = ["v2"]  # v3 (new, unseen tickets for the test split) is added here once built
+DATASETS = ["v2", "v3"]
 
 
 def load(version):
