@@ -1,0 +1,13 @@
+{
+ "run_id": "gh38078712356-agent-v3-prompt_edit",
+ "dataset": "v3",
+ "config": "prompt_edit",
+ "p2_commit": "12a0eef7c90b3b77b84953c81946398f2d1f84d7",
+ "model": "jev-latest",
+ "backend": "api",
+ "n_tickets": 240,
+ "started_at": "2026-10-10T19:10:15Z",
+ "finished_at": "2026-10-10T19:10:59Z",
+ "errored": 0,
+ "spend_usd": 0.006903
+}
