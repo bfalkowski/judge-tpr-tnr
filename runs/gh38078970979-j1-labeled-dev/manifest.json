@@ -1,0 +1,19 @@
+{
+ "run_id": "gh38078970979-j1-labeled-dev",
+ "variant": "j1",
+ "fingerprint": "57c3d6a4fd857961",
+ "model": "jev-latest",
+ "backend": "api",
+ "dataset": "labeled",
+ "split": "dev",
+ "repeats": 2,
+ "n_items": 158,
+ "items_sha256": "d2ae982dac5b091445bfbb04f0fbfbcac7519cd839d84e41b5a5aa2bbcfa5f0e",
+ "split_sha256": "8aaf94c4b59f019ddfdd3fba1d166b50771218437bb0e780bc1b25b885bc13d9",
+ "git_commit": "a8e36d8994b3d2ba3e204f39fd6ac75d0fe7d9e7",
+ "frozen": null,
+ "started_at": "2026-10-10T19:14:10Z",
+ "finished_at": "2026-10-10T19:15:01Z",
+ "errored_calls": 0,
+ "spend_usd": 0.011141
+}
