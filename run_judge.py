@@ -25,7 +25,7 @@ import subprocess
 import sys
 import time
 
-from judge import data, jev, judges
+from judge import claude, data, jev, judges
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -70,8 +70,9 @@ def main():
     ap.add_argument("--out", default=os.path.join(ROOT, "runs"))
     a = ap.parse_args()
 
-    if os.environ.get("JEV_BACKEND") != "stub" and not os.environ.get("TYPESAFE_API_KEY"):
-        sys.exit("TYPESAFE_API_KEY is not set: add it to .env, or as a repository secret for the "
+    need = "ANTHROPIC_API_KEY" if judges.backend(a.variant) == "claude" else "TYPESAFE_API_KEY"
+    if os.environ.get("JEV_BACKEND") != "stub" and not os.environ.get(need):
+        sys.exit(f"{need} is not set: add it to .env, or as a repository secret for the "
                  "judge workflow, or use JEV_BACKEND=stub")
     frozen = check_frozen(a.variant) if a.split == "test" else None
     if a.split == "all" and "test" in set(data.load_split(a.dataset).values()):
@@ -88,7 +89,7 @@ def main():
     os.makedirs(run_dir, exist_ok=True)
     manifest = {
         "run_id": a.run_id, "variant": a.variant, "fingerprint": judges.fingerprint(a.variant),
-        "model": jev.model(), "backend": os.environ.get("JEV_BACKEND") or "api",
+        "model": judges.model(a.variant), "backend": os.environ.get("JEV_BACKEND") or "api",
         "dataset": a.dataset, "split": a.split, "repeats": a.repeats, "n_items": len(items),
         "items_sha256": hashlib.sha256(open(data.items_path(a.dataset), "rb").read()).hexdigest(),
         "split_sha256": hashlib.sha256(open(data.split_path(a.dataset), "rb").read()).hexdigest(),
@@ -101,7 +102,7 @@ def main():
     errors = 0
     with open(os.path.join(run_dir, "judgments.jsonl"), "w") as out:
         for it in items:
-            if jev.SPENT_USD > max_spend:
+            if jev.SPENT_USD + claude.SPENT_USD > max_spend:
                 print(f"spend cap ${max_spend} reached; stopping")
                 break
             for call in range(1, a.repeats + 1):
@@ -110,16 +111,16 @@ def main():
                 try:
                     noul, meta = judges.ask(a.variant, it)
                     row.update(noul=noul, error=None, **meta)
-                except jev.JevCallError as e:
+                except (jev.JevCallError, claude.ClaudeCallError) as e:
                     errors += 1
                     row.update(noul=None, error=e.error_type)
                 out.write(json.dumps(row) + "\n")
                 out.flush()
     manifest.update(finished_at=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-                    errored_calls=errors, spend_usd=round(jev.SPENT_USD, 6))
+                    errored_calls=errors, spend_usd=round(jev.SPENT_USD + claude.SPENT_USD, 6))
     json.dump(manifest, open(os.path.join(run_dir, "manifest.json"), "w"), indent=1)
     print(f"{a.run_id}: {len(items)} items x {a.repeats} calls, {errors} errored, "
-          f"spend ${jev.SPENT_USD:.4f}")
+          f"spend ${jev.SPENT_USD + claude.SPENT_USD:.4f}")
     sys.exit(1 if errors else 0)
 
 

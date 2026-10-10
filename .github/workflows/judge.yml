@@ -38,6 +38,7 @@ jobs:
       - name: Run judge
         env:
           TYPESAFE_API_KEY: ${{ secrets.TYPESAFE_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           JEV_BACKEND: ${{ inputs.backend == 'stub' && 'stub' || '' }}
           MAX_SPEND_USD: ${{ inputs.max_spend_usd }}
         run: |
@@ -50,10 +51,13 @@ jobs:
         if: always()
         env:
           TYPESAFE_API_KEY: ${{ secrets.TYPESAFE_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          if [ -n "$TYPESAFE_API_KEY" ] && grep -rqF "$TYPESAFE_API_KEY" runs 2>/dev/null; then
-            echo "the API key appears in the run outputs; not uploading"; exit 1
-          fi
+          for k in "$TYPESAFE_API_KEY" "$ANTHROPIC_API_KEY"; do
+            if [ -n "$k" ] && grep -rqF "$k" runs 2>/dev/null; then
+              echo "an API key appears in the run outputs; not uploading"; exit 1
+            fi
+          done
           echo "SECRETS_OK=1" >> $GITHUB_ENV
       - uses: actions/upload-artifact@v4
         if: always()

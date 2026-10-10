@@ -83,6 +83,37 @@ def j2_state(item):
     return {**p2_state(item), "examples": few_shot(J2_EXAMPLES)}
 
 
+# Step 3 (after error analysis of j2 on dev, gh38079133175): a different, more
+# capable model. 9 of j2's 13 false passes were still the 14-day cutoff, even
+# with a worked example of it, and the agent is also Jev. Same definitions and
+# examples as j2, on Claude, with the structured output the method recommends
+# (a short reasoning, then Pass or Fail).
+CLAUDE_MODEL = "claude-haiku-4-5-20251001"
+C3_SYSTEM = """You are reviewing one resolution by a customer support agent.
+
+""" + J1_INSTRUCTIONS + """
+
+Return a JSON object with two keys:
+  "reasoning": one or two sentences that state the dates and the day count you used, and the action the policy requires.
+  "answer": "Pass" or "Fail"."""
+
+
+def claude_user(item, examples):
+    lines = ["SUPPORT POLICY:", p2_state(item)["policy"], "", "TODAY: " + TODAY, ""]
+    if examples:
+        lines.append("EXAMPLES (reviewed by a person):")
+        for e in few_shot(examples):
+            ex = {k: e[k] for k in ("ticket", "order", "stock", "agent_resolution")}
+            lines += [json.dumps(ex), json.dumps({"reasoning": e["reasoning"], "answer": e["verdict"].title()}), ""]
+    st = {k: v for k, v in p2_state(item).items() if k not in ("policy", "today")}
+    lines += ["Evaluate this item. ITEM:", json.dumps(st)]
+    return "\n".join(lines)
+
+
+def c3_state(item):
+    return {"system": C3_SYSTEM, "user": claude_user(item, J2_EXAMPLES)}
+
+
 VARIANTS = {
     "p2": {"instructions": P2_INSTRUCTIONS, "state": p2_state, "question": "follows_policy",
            "notes": "paper 2 judge, verbatim"},
@@ -90,6 +121,8 @@ VARIANTS = {
            "notes": "step 1: precise Pass/Fail definitions from error analysis of p2 on dev"},
     "j2": {"instructions": J2_INSTRUCTIONS, "state": j2_state, "question": "follows_policy",
            "notes": "step 2: j1 plus four train examples with critiques at the day cutoffs"},
+    "c3": {"instructions": C3_SYSTEM, "state": c3_state, "question": "claude", "backend": "claude",
+           "model": CLAUDE_MODEL, "notes": "step 3: j2's definitions and examples on Claude, reasoning then answer"},
 }
 
 
@@ -97,14 +130,30 @@ def fingerprint(name):
     v = VARIANTS[name]
     parts = {"instructions": v["instructions"], "question": v["question"],
              "state": inspect.getsource(v["state"])}
-    if v["state"] is j2_state:  # few-shot examples are part of the judge
+    if v["state"] in (j2_state, c3_state):  # few-shot examples are part of the judge
         parts["examples"] = J2_EXAMPLES
+    if v.get("backend") == "claude":
+        parts["model"] = v["model"]
+        parts["user_template"] = inspect.getsource(claude_user)
     blob = json.dumps(parts, sort_keys=True)
     return hashlib.sha256(blob.encode()).hexdigest()[:16]
 
 
-def ask(name, item):
-    """Returns (noul, meta) for one call. Raises jev.JevCallError."""
+def backend(name):
+    return VARIANTS[name].get("backend", "jev")
+
+
+def model(name):
     from judge import jev
+    return VARIANTS[name].get("model") or jev.model()
+
+
+def ask(name, item):
+    """Returns (noul, meta) for one call. Raises jev.JevCallError or claude.ClaudeCallError."""
     v = VARIANTS[name]
+    if backend(name) == "claude":
+        from judge import claude
+        st = v["state"](item)
+        return claude.ask(v["model"], st["system"], st["user"])
+    from judge import jev
     return jev.ask_noul(v["state"](item), v["question"], v["instructions"])
