@@ -1,4 +1,9 @@
-# Exact versions used for paper runs and CI.
+# Exact versions used for paper runs and CI. opentelemetry is needed by
+# paper 2's agent code (agent/run_agent.py); its versions match paper 2's lock.
 judgy==0.1.0
 numpy==2.2.6
 pytest==8.4.2
+opentelemetry-api==1.45.0
+opentelemetry-sdk==1.45.0
+opentelemetry-semantic-conventions==0.66b0
+typing_extensions==4.15.0

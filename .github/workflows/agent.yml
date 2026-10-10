@@ -1,0 +1,79 @@
+name: agent
+# Run paper 2's support agent (eval-run-validity, pinned commit) on a dataset
+# from this repo, one job per config. Decisions are committed to the `data`
+# branch under runs/<run_id>/.
+on:
+  workflow_dispatch:
+    inputs:
+      dataset:
+        default: v3
+      configs:
+        description: 'JSON list from: clean, template_edit, context_strip, prompt_edit'
+        default: '["clean", "template_edit", "context_strip", "prompt_edit"]'
+      backend:
+        type: choice
+        options: [stub, api]
+        default: stub
+      max_spend_usd:
+        default: "0.5"
+
+permissions:
+  contents: write
+
+jobs:
+  agent:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        config: ${{ fromJSON(inputs.configs) }}
+    env:
+      RUN_ID: gh${{ github.run_id }}-agent-${{ inputs.dataset }}-${{ matrix.config }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: bfalkowski/eval-run-validity
+          ref: 12a0eef7c90b3b77b84953c81946398f2d1f84d7
+          path: p2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.lock
+      - name: Run agent
+        env:
+          TYPESAFE_API_KEY: ${{ secrets.TYPESAFE_API_KEY }}
+          JEV_BACKEND: ${{ inputs.backend == 'stub' && 'stub' || '' }}
+          MAX_SPEND_USD: ${{ inputs.max_spend_usd }}
+          P2_DIR: p2
+        run: python agent/run_agent.py --dataset ${{ inputs.dataset }} --config ${{ matrix.config }} --run-id $RUN_ID
+      - name: No secrets in run outputs
+        if: always()
+        env:
+          TYPESAFE_API_KEY: ${{ secrets.TYPESAFE_API_KEY }}
+        run: |
+          if [ -n "$TYPESAFE_API_KEY" ] && grep -rqF "$TYPESAFE_API_KEY" runs 2>/dev/null; then
+            echo "the API key appears in the run outputs; not committing"; exit 1
+          fi
+          echo "SECRETS_OK=1" >> $GITHUB_ENV
+      - name: Commit to data branch
+        if: always() && env.SECRETS_OK == '1' && hashFiles(format('runs/{0}/decisions.jsonl', env.RUN_ID)) != ''
+        run: |
+          mv runs/$RUN_ID /tmp/$RUN_ID
+          rm -rf p2
+          git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
+          for attempt in 1 2 3 4 5; do
+            git fetch origin data || true
+            if git rev-parse --verify origin/data >/dev/null 2>&1; then
+              git checkout -f -B data origin/data
+            else
+              git checkout -f --orphan data; git rm -rf -q . ; git clean -fdq
+            fi
+            mkdir -p runs; rm -rf runs/$RUN_ID; cp -r /tmp/$RUN_ID runs/$RUN_ID
+            git add runs/$RUN_ID
+            git commit -q -m "agent run $RUN_ID" || { echo "nothing new"; exit 0; }
+            git push origin data && exit 0
+            sleep $((RANDOM % 10 + 3))
+          done
+          exit 1
