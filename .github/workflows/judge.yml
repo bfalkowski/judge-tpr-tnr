@@ -56,7 +56,8 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           for k in "$TYPESAFE_API_KEY" "$ANTHROPIC_API_KEY"; do
-            if [ -n "$k" ] && grep -rqF "$k" runs 2>/dev/null; then
+            k=$(printf '%s' "$k" | tr -d '[:space:]')  # a secret saved with a trailing newline
+            if [ -n "$k" ] && grep -rqF -- "$k" runs 2>/dev/null; then
               echo "an API key appears in the run outputs; not uploading"; exit 1
             fi
           done
