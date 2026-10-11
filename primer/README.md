@@ -10,6 +10,7 @@ Section anchors for links from other papers: `#question`, `#label`, `#tpr-tnr`, 
 `#range`, `#report`, `#models`, `#glossary`.
 
 The primer follows one invented example (is this customer service reply polite?) from labeling to reporting.
-`numbers.py` recomputes every number in it, including the Section 6 intervals.
+`numbers.py` recomputes every number in it, including the Section 6 intervals. `range.py` is the short
+version of the 95% range calculation shown in Appendix A.
 
 Status: draft, for Bryan's review and edit before it goes on bfalkowski.github.io.

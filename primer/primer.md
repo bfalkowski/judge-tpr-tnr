@@ -109,7 +109,7 @@ The interactive version of this page lets you move θ, TPR and TNR and watch the
 
 ## 6. The range, and how to tighten it
 
-The 74% is an estimate. TPR and TNR were measured on only 25 replies each, and the raw score came from one month of 400 replies. Recomputing the correction on many resamples of those counts (a bootstrap; Efron and Tibshirani 1993) gives a 95% range of **63% to 88%**. That is wide, and it is honest: the raw "71%" had the same uncertainty, just hidden.
+The 74% is an estimate. TPR and TNR were measured on only 25 replies each, and the raw score came from one month of 400 replies. Recomputing the correction on many resamples of those counts (a bootstrap; Efron and Tibshirani 1993) gives a 95% range of **63% to 88%** (Appendix A shows the calculation step by step). That is wide, and it is honest: the raw "71%" had the same uncertainty, just hidden.
 
 Three things narrow it. Each row below has the same 74% estimate:
 
@@ -161,6 +161,63 @@ The same applies whenever the replies change in other ways, such as new template
 | Correction | θ = (p_obs + TNR − 1) / (TPR + TNR − 1), clipped to [0, 1] |
 | Youden's J | TPR + TNR − 1. How much better than a coin flip the judge is |
 | Range | The middle 95% of the corrected estimate across many resamples |
+
+## Appendix A. How the 95% range is calculated
+
+The range comes from a bootstrap (Efron and Tibshirani 1993). The idea is to ask: if I had happened to label a different 25 polite replies, a different 25 rude ones, and judged a different month of 400 replies, how much would my 74% move?
+
+**Step 1. List what each number was counted from.** Every number in the correction is a count out of a limited sample:
+
+| Number | Counted from | Value |
+|---|---|---|
+| TPR | 25 polite test replies | 23 passed, 0.92 |
+| TNR | 25 rude test replies | 22 failed, 0.88 |
+| Raw score | 400 new replies | 284 passed, 0.71 |
+
+**Step 2. Redraw each count.** Pretend to label 25 polite replies again, where each one passes with chance 0.92, and count how many pass. You might get 23 again, or 21, or 25. Do the same for TNR (25 replies, chance 0.88) and for the raw score (400 replies, chance 0.71).
+
+**Step 3. Apply the correction to the redrawn numbers.** Three example redraws:
+
+| Draw | TPR | TNR | Raw score | Corrected |
+|---|---|---|---|---|
+| 1 | 22/25 = 0.88 | 22/25 = 0.88 | 277/400 = 0.693 | (0.693 + 0.88 − 1) / (0.88 + 0.88 − 1) = 0.753 |
+| 2 | 24/25 = 0.96 | 22/25 = 0.88 | 284/400 = 0.710 | (0.710 + 0.88 − 1) / (0.96 + 0.88 − 1) = 0.702 |
+| 3 | 24/25 = 0.96 | 20/25 = 0.80 | 296/400 = 0.740 | (0.740 + 0.80 − 1) / (0.96 + 0.80 − 1) = 0.711 |
+
+**Step 4. Repeat 10,000 times and keep the middle 95%.** Sort the 10,000 corrected estimates. The value 2.5% of the way up the list is the bottom of the range and the value 97.5% of the way up is the top. Here that gives about 63% to 88%. Because the draws are random, a rerun can differ by about a point.
+
+**Step 5. Skip draws with no answer.** If a draw happens to give TPR + TNR − 1 of 0 or less, the correction has no answer for it. With a strong judge this almost never happens. If it happens often, the judge is too weak to correct (Section 6).
+
+The whole calculation in Python (`primer/range.py`):
+
+```python
+import random
+
+def corrected(raw, tpr, tnr):
+    return min(1, max(0, (raw + tnr - 1) / (tpr + tnr - 1)))
+
+def redraw(n, rate):
+    # how many of n items would come out "yes" if the true rate were `rate`
+    return sum(random.random() < rate for _ in range(n)) / n
+
+estimates = []
+for _ in range(10000):
+    tpr = redraw(25, 23 / 25)     # 25 polite test replies, 23 passed
+    tnr = redraw(25, 22 / 25)     # 25 rude test replies, 22 failed
+    raw = redraw(400, 284 / 400)  # 400 new replies, 284 passed
+    if tpr + tnr - 1 > 0:
+        estimates.append(corrected(raw, tpr, tnr))
+
+estimates.sort()
+low = estimates[int(0.025 * len(estimates))]
+high = estimates[int(0.975 * len(estimates))]
+print(f"95% range: {low:.0%} to {high:.0%}")
+```
+
+Two notes:
+
+- **Redraw from what you actually counted.** If the same reply appears in your labeled set many times, count it once. Repeats make the range look narrower than it is.
+- **Some tools leave out the raw score's uncertainty.** The `judgy` library and the `validate-evaluator` skill redraw TPR and TNR but keep the raw score fixed. That gives a narrower range. Redrawing all three, as above, includes the fact that this month's 400 replies are also a sample.
 
 ## References
 
