@@ -143,7 +143,7 @@ For comparison, checking 100 random replies by hand would give about 74% ± 9 po
 
 **Changing the judge's model** changes TPR and TNR, because they describe that particular judge. A stronger model often raises both and narrows the range, but you have to measure it: run the new judge on dev, then once on fresh test labels. Call the judge with a dated model ID rather than an alias like "latest", so the provider cannot swap the model underneath you.
 
-**Changing the model that writes the replies** changes the real pass rate, which is what you want to measure. It can also change the judge's TPR and TNR, because the new model may be rude in ways the judge was never checked on. After a change like that, label about 50 new replies and check that the judge still lands near its old TPR and TNR before trusting the corrected numbers. The correction uses the TPR and TNR you measured; if the judge's real rates on new replies have drifted, the corrected number is off and nothing in the math tells you. The interactive version of this page lets you set the measured rates apart from the real ones and see how far the estimate moves.
+**Changing the model that writes the replies** changes the real pass rate, which is what you want to measure. It can also change the judge's TPR and TNR, because the new model may be rude in ways the judge was never checked on. After a change like that, label about 50 new replies and check that the judge still lands near its old TPR and TNR before trusting the corrected numbers. The correction uses the TPR and TNR you measured; if the judge's real rates on new replies have drifted, the corrected number is off and nothing in the math tells you. The interactive version of this page has a box for exactly this: the judge's real TNR has dropped from 0.88 to 0.80 since you measured it, you still correct with 0.88, and the estimate comes out 2.6 points high. Re-checking the judge brings it back.
 
 **Using the same model for both** is a risk of its own. A judge tends to miss the same mistakes its own model makes. Use a different, and preferably stronger, model for the judge.
 
@@ -188,31 +188,7 @@ The range comes from a bootstrap (Efron and Tibshirani 1993). The idea is to ask
 
 **Step 5. Skip draws with no answer.** If a draw happens to give TPR + TNR − 1 of 0 or less, the correction has no answer for it. With a strong judge this almost never happens. If it happens often, the judge is too weak to correct (Section 6).
 
-The whole calculation in Python (`primer/range.py`):
-
-```python
-import random
-
-def corrected(raw, tpr, tnr):
-    return min(1, max(0, (raw + tnr - 1) / (tpr + tnr - 1)))
-
-def redraw(n, rate):
-    # how many of n items would come out "yes" if the true rate were `rate`
-    return sum(random.random() < rate for _ in range(n)) / n
-
-estimates = []
-for _ in range(10000):
-    tpr = redraw(25, 23 / 25)     # 25 polite test replies, 23 passed
-    tnr = redraw(25, 22 / 25)     # 25 rude test replies, 22 failed
-    raw = redraw(400, 284 / 400)  # 400 new replies, 284 passed
-    if tpr + tnr - 1 > 0:
-        estimates.append(corrected(raw, tpr, tnr))
-
-estimates.sort()
-low = estimates[int(0.025 * len(estimates))]
-high = estimates[int(0.975 * len(estimates))]
-print(f"95% range: {low:.0%} to {high:.0%}")
-```
+The repo has a short script that does exactly this (`primer/range.py`).
 
 Two notes:
 

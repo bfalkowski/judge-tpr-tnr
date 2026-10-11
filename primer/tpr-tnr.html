@@ -101,6 +101,10 @@
   .check input { margin-top: 5px; accent-color: var(--accent); }
   .measured { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px 20px; margin-bottom: 4px; }
   .warn { color: var(--bad); font-weight: 600; }
+  .drift { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px 24px; }
+  .drift-col { display: grid; gap: 10px; align-content: start; min-width: 0; }
+  .drift-h { font-weight: 700; margin: 0; font-size: 15px; }
+  .drift-h span { display: block; font-weight: 400; color: var(--muted); font-size: 13.5px; }
   .btn { font: 600 14.5px var(--font-body); color: var(--accent); background: var(--bg); border: 1.5px solid var(--accent);
          border-radius: 6px; padding: 6px 12px; cursor: pointer; }
   .btn:hover { background: var(--alt-bg); }
@@ -110,7 +114,7 @@
     .topbar, article { padding-inline: 16px; }
     h1 { font-size: 28px; }
     .lab { padding: 14px; }
-    .lab-grid, .measured { grid-template-columns: minmax(0, 1fr); }
+    .lab-grid, .measured, .drift { grid-template-columns: minmax(0, 1fr); }
     .cell-head { flex-direction: column-reverse; align-items: flex-start; gap: 0; }
     table.cm td.rate { padding-left: 4px; font-size: 13px; }
     table.cm { border-spacing: 4px; }
@@ -190,7 +194,7 @@ Reply: {{REPLY}}</pre>
   <span class="eq">θ = (0.71 + 0.88 − 1) / (0.92 + 0.88 − 1) = 0.59 / 0.80 = 0.74</span>
   <p>The judge's number was a little low. Missing 8% of the polite replies pulled it down by about 6 points (0.08 × 0.74), and letting 12% of the rude replies through pushed it up by about 3 (0.12 × 0.26). Undoing both gives 74%.</p>
   <p>Notice that 74% is very different from the 50% in your labeled set. That is expected. You balanced the labeled set on purpose; real replies have their own mix. TPR and TNR do not depend on the mix, which is why they can be carried from the labeled set to new data. A different pass rate on new data is not a reason to change the judge. Reading the judge's verdicts on some new replies, and finding mistakes your labeled set did not cover, is.</p>
-  <p>Move θ, TPR and TNR below to watch the matrix and the raw score change. It starts at this example's numbers. A second box in Section 8 shows the correction.</p>
+  <p>Move θ, TPR and TNR below to watch the matrix and the raw score change. It starts at this example's numbers.</p>
   <section class="lab" aria-labelledby="lab-title">
     <p class="lab-title" id="lab-title">Try it</p>
     <p class="lab-note">100 replies sorted into the confusion matrix from Section 3. Blue dots are polite replies, orange are rude; filled dots are ones the judge passed. Green cells (✓) are where the judge agreed with you; red cells (✗) are its mistakes. Counts are rounded to whole replies; the formulas below use exact values.</p>
@@ -260,24 +264,33 @@ Reply: {{REPLY}}</pre>
   <h2 id="models"><span class="num">8.</span>When models change</h2>
   <p><strong>Changing the judge's model</strong> changes TPR and TNR, because they describe that particular judge. A stronger model often raises both and narrows the range, but you have to measure it: run the new judge on dev, then once on fresh test labels. Call the judge with a dated model ID rather than an alias like "latest", so the provider cannot swap the model underneath you.</p>
   <p><strong>Changing the model that writes the replies</strong> changes the real pass rate, which is what you want to measure. It can also change the judge's TPR and TNR, because the new model may be rude in ways the judge was never checked on. After a change like that, label about 50 new replies and check that the judge still lands near its old TPR and TNR before trusting the corrected numbers.</p>
-  <p>The box below shows why. The correction uses the TPR and TNR you measured on your test set. If the judge's real rates on new replies have drifted away from those, the correction is off, and nothing in the math tells you.</p>
+  <p>The box below shows why. The correction uses the TPR and TNR you measured on your test set. If the judge's real rates have drifted since then, the corrected number is off, and nothing in the math tells you.</p>
   <section class="lab" aria-labelledby="lab2-title">
-    <p class="lab-title" id="lab2-title">Try it: correct with the rates you measured</p>
-    <p class="lab-note">The judge's real behavior comes from the sliders in Section 5: <span id="real-summary"></span>. Set the TPR and TNR you measured on your test set. When they match the real ones, the correction lands on the truth. Move them apart to see how far it drifts.</p>
-    <div class="measured" id="measured">
-      <div class="ctl">
-        <label for="mtpr">Measured TPR <output id="mtpr-out" for="mtpr">0.92</output></label>
-        <input type="range" id="mtpr" min="0" max="100" step="1" value="92">
+    <p class="lab-title" id="lab2-title">Try it: when the judge drifts</p>
+    <p class="lab-note">Last month you measured the judge on your test set: TPR 0.92, TNR 0.88. Since then the model that writes the replies changed, and the judge now lets more rude replies through. Its real TNR today is 0.80, but you don't know that, so you still correct with 0.88.</p>
+    <div class="drift">
+      <div class="drift-col">
+        <p class="drift-h">What is really happening <span>(you can't see this in practice)</span></p>
+        <div class="ctl"><label for="rtheta">True pass rate θ <output id="rtheta-out" for="rtheta">74%</output></label>
+          <input type="range" id="rtheta" min="0" max="100" step="1" value="74"></div>
+        <div class="ctl"><label for="rtpr">Judge's real TPR <output id="rtpr-out" for="rtpr">0.92</output></label>
+          <input type="range" id="rtpr" min="0" max="100" step="1" value="92"></div>
+        <div class="ctl"><label for="rtnr">Judge's real TNR <output id="rtnr-out" for="rtnr">0.80</output></label>
+          <input type="range" id="rtnr" min="0" max="100" step="1" value="80"></div>
       </div>
-      <div class="ctl">
-        <label for="mtnr">Measured TNR <output id="mtnr-out" for="mtnr">0.88</output></label>
-        <input type="range" id="mtnr" min="0" max="100" step="1" value="88">
+      <div class="drift-col">
+        <p class="drift-h">What you measured last month <span>(what the correction uses)</span></p>
+        <div class="ctl"><label for="mtpr">Measured TPR <output id="mtpr-out" for="mtpr">0.92</output></label>
+          <input type="range" id="mtpr" min="0" max="100" step="1" value="92"></div>
+        <div class="ctl"><label for="mtnr">Measured TNR <output id="mtnr-out" for="mtnr">0.88</output></label>
+          <input type="range" id="mtnr" min="0" max="100" step="1" value="88"></div>
+        <p style="margin:6px 0 0"><button type="button" class="btn" id="match">Re-check the judge</button></p>
+        <p class="lab-note" style="margin:6px 0 0">Re-checking means labeling a fresh sample and measuring again, so your numbers catch up with the real ones.</p>
       </div>
     </div>
-    <p style="margin:8px 0 0"><button type="button" class="btn" id="match">Match the judge's real rates</button></p>
     <div class="readout" aria-live="polite">
+      <div class="big"><span>Judge reports <b id="d-raw"></b></span><span>You correct it to <b id="corr"></b></span><span>Truth <b id="truth2"></b></span><span>Off by <b id="corr-err"></b></span></div>
       <span class="eq" id="eq-corr"></span>
-      <div class="big"><span>Corrected estimate <b id="corr"></b></span><span>Truth <b id="truth2"></b></span><span>Off by <b id="corr-err"></b></span><span>Youden's J <b id="jval"></b></span></div>
     </div>
   </section>
   <p><strong>Using the same model for both</strong> is a risk of its own. A judge tends to miss the same mistakes its own model makes. Use a different, and preferably stronger, model for the judge.</p>
@@ -319,28 +332,7 @@ Reply: {{REPLY}}</pre>
   </table></div>
   <p><strong>Step 4. Repeat 10,000 times and keep the middle 95%.</strong> Sort the 10,000 corrected estimates. The value 2.5% of the way up the list is the bottom of the range and the value 97.5% of the way up is the top. Here that gives about 63% to 88%. Because the draws are random, a rerun can differ by about a point.</p>
   <p><strong>Step 5. Skip draws with no answer.</strong> If a draw happens to give TPR + TNR − 1 of 0 or less, the correction has no answer for it. With a strong judge this almost never happens. If it happens often, the judge is too weak to correct (Section 6).</p>
-  <p>The whole calculation in Python (<code>primer/range.py</code> in the repo):</p>
-  <pre class="prompt">import random
-
-def corrected(raw, tpr, tnr):
-    return min(1, max(0, (raw + tnr - 1) / (tpr + tnr - 1)))
-
-def redraw(n, rate):
-    # how many of n items would come out &quot;yes&quot; if the true rate were `rate`
-    return sum(random.random() &lt; rate for _ in range(n)) / n
-
-estimates = []
-for _ in range(10000):
-    tpr = redraw(25, 23 / 25)     # 25 polite test replies, 23 passed
-    tnr = redraw(25, 22 / 25)     # 25 rude test replies, 22 failed
-    raw = redraw(400, 284 / 400)  # 400 new replies, 284 passed
-    if tpr + tnr - 1 &gt; 0:
-        estimates.append(corrected(raw, tpr, tnr))
-
-estimates.sort()
-low = estimates[int(0.025 * len(estimates))]
-high = estimates[int(0.975 * len(estimates))]
-print(f&quot;95% range: {low:.0%} to {high:.0%}&quot;)</pre>
+  <p>The repo has a short script that does exactly this (<code>primer/range.py</code>).</p>
   <p>Two notes:</p>
   <ul>
     <li><strong>Redraw from what you actually counted.</strong> If the same reply appears in your labeled set many times, count it once. Repeats make the range look narrower than it is.</li>
@@ -385,10 +377,8 @@ print(f&quot;95% range: {low:.0%} to {high:.0%}&quot;)</pre>
 
   function update() {
     const theta = $("theta").value / 100, tpr = $("tpr").value / 100, tnr = $("tnr").value / 100;
-    const mtpr = $("mtpr").value / 100, mtnr = $("mtnr").value / 100;
     $("theta-out").textContent = Math.round(theta * 100) + "%";
     $("tpr-out").textContent = f2(tpr); $("tnr-out").textContent = f2(tnr);
-    $("mtpr-out").textContent = f2(mtpr); $("mtnr-out").textContent = f2(mtnr);
 
     const c = counts(theta, tpr, tnr);
     ["tp", "fn", "fp", "tn"].forEach(k => { $("c-" + k).textContent = c[k]; fill(k, c[k]); });
@@ -402,26 +392,36 @@ print(f&quot;95% range: {low:.0%} to {high:.0%}&quot;)</pre>
     const a = tpr * theta, b = (1 - tnr) * (1 - theta), p = a + b;
     $("eq-pobs").textContent =
       `p_obs = TPR × θ + (1 − TNR) × (1 − θ)\n      = ${f2(tpr)} × ${f2(theta)} + ${f2(1 - tnr)} × ${f2(1 - theta)}\n      = ${a.toFixed(3)} + ${b.toFixed(3)} = ${p.toFixed(3)}`;
-    $("pobs").textContent = pct(p); $("truth").textContent = pct(theta); $("truth2").textContent = pct(theta);
+    $("pobs").textContent = pct(p); $("truth").textContent = pct(theta);
     $("raw-err").textContent = pts(p - theta);
-    $("real-summary").textContent = `true pass rate ${Math.round(theta * 100)}%, real TPR ${f2(tpr)}, real TNR ${f2(tnr)}, so the judge reports ${pct(p)}`;
 
-    const j = mtpr + mtnr - 1;
-    $("jval").textContent = f2(j);
+  }
+  ["theta", "tpr", "tnr"].forEach(id => $(id).addEventListener("input", update));
+  update();
+
+  // Section 8: the judge drifts after you measured it.
+  function drift() {
+    const theta = $("rtheta").value / 100, tpr = $("rtpr").value / 100, tnr = $("rtnr").value / 100;
+    const mtpr = $("mtpr").value / 100, mtnr = $("mtnr").value / 100;
+    $("rtheta-out").textContent = Math.round(theta * 100) + "%";
+    $("rtpr-out").textContent = f2(tpr); $("rtnr-out").textContent = f2(tnr);
+    $("mtpr-out").textContent = f2(mtpr); $("mtnr-out").textContent = f2(mtnr);
+    const p = observed(theta, tpr, tnr), j = mtpr + mtnr - 1;
+    $("d-raw").textContent = pct(p); $("truth2").textContent = pct(theta);
     const est = corrected(p, mtpr, mtnr);
     if (est === null) {
-      $("eq-corr").innerHTML = `θ = (p_obs + TNR − 1) / (TPR + TNR − 1)\n  = ${(p + mtnr - 1).toFixed(3)} / ${j.toFixed(3)}\n<span class="warn">No answer: TPR + TNR − 1 is 0 or below, so the judge is no better than a coin flip.</span>`;
+      $("eq-corr").innerHTML = `θ = (p_obs + TNR − 1) / (TPR + TNR − 1)\n  = ${(p + mtnr - 1).toFixed(3)} / ${j.toFixed(3)}\n<span class="warn">No answer: measured TPR + TNR − 1 is 0 or below.</span>`;
       $("corr").textContent = "none"; $("corr-err").textContent = "n/a";
-    } else {
-      const raw = (p + mtnr - 1) / j;
-      const clip = raw < 0 || raw > 1 ? `  (clipped from ${raw.toFixed(3)})` : "";
-      $("eq-corr").textContent =
-        `θ = (p_obs + TNR − 1) / (TPR + TNR − 1)\n  = (${p.toFixed(3)} + ${f2(mtnr)} − 1) / (${f2(mtpr)} + ${f2(mtnr)} − 1)\n  = ${(p + mtnr - 1).toFixed(3)} / ${j.toFixed(3)} = ${est.toFixed(3)}${clip}`;
-      $("corr").textContent = pct(est); $("corr-err").textContent = pts(est - theta);
+      return;
     }
+    const raw = (p + mtnr - 1) / j;
+    const clip = raw < 0 || raw > 1 ? `  (clipped from ${raw.toFixed(3)})` : "";
+    $("eq-corr").textContent =
+      `θ = (p_obs + measured TNR − 1) / (measured TPR + measured TNR − 1)\n  = (${p.toFixed(3)} + ${f2(mtnr)} − 1) / (${f2(mtpr)} + ${f2(mtnr)} − 1)\n  = ${(p + mtnr - 1).toFixed(3)} / ${j.toFixed(3)} = ${est.toFixed(3)}${clip}`;
+    $("corr").textContent = pct(est); $("corr-err").textContent = pts(est - theta);
   }
-  ["theta", "tpr", "tnr", "mtpr", "mtnr"].forEach(id => $(id).addEventListener("input", update));
-  $("match").addEventListener("click", () => { $("mtpr").value = $("tpr").value; $("mtnr").value = $("tnr").value; update(); });
-  update();
+  ["rtheta", "rtpr", "rtnr", "mtpr", "mtnr"].forEach(id => $(id).addEventListener("input", drift));
+  $("match").addEventListener("click", () => { $("mtpr").value = $("rtpr").value; $("mtnr").value = $("rtnr").value; drift(); });
+  drift();
 })();
 </script>
