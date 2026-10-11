@@ -14,6 +14,8 @@ This primer works through one small example from start to finish: label some out
 
 - "Thanks for reaching out! I've reset your password." PASS
 - "Read the FAQ next time." FAIL
+- "So sorry your toaster set off the smoke alarm. A replacement is on the way." PASS
+- "We received your complaint and laughed." FAIL
 
 Anyone can answer this, which makes it a good first example. Real judge questions are usually fuzzier. That is the point of using a judge: if a simple rule could answer the question, you would write the rule instead.
 

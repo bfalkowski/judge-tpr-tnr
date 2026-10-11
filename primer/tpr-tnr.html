@@ -155,7 +155,7 @@
 <p>This primer works through one small example from start to finish: label some outputs, measure a judge, improve it, use it, and report the result with a range. The counts are invented for teaching; every calculation is checked by <code>primer/numbers.py</code>.</p></div>
   <h2 id="question"><span class="num">1.</span>The question</h2>
   <p><strong>Is this customer service reply polite?</strong></p>
-  <ul><li>"Thanks for reaching out! I've reset your password." PASS</li><li>"Read the FAQ next time." FAIL</li></ul>
+  <ul><li>"Thanks for reaching out! I've reset your password." PASS</li><li>"Read the FAQ next time." FAIL</li><li>"So sorry your toaster set off the smoke alarm. A replacement is on the way." PASS</li><li>"We received your complaint and laughed." FAIL</li></ul>
   <p>Anyone can answer this, which makes it a good first example. Real judge questions are usually fuzzier. That is the point of using a judge: if a simple rule could answer the question, you would write the rule instead.</p>
   <h2 id="label"><span class="num">2.</span>Label a set and split it</h2>
   <p>Pick 100 real replies and decide each one yourself: 50 you would call polite and 50 you would not. The 50/50 balance is deliberate, so that both kinds are well represented, even if real replies are mostly polite. Then split them:</p>
