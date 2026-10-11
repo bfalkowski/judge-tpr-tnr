@@ -105,6 +105,11 @@
   .drift-col { display: grid; gap: 10px; align-content: start; min-width: 0; }
   .drift-h { font-weight: 700; margin: 0; font-size: 15px; }
   .drift-h span { display: block; font-weight: 400; color: var(--muted); font-size: 13.5px; }
+  .hidden-side { border: 1.5px dashed var(--line); border-radius: 8px; padding: 12px; background: var(--alt-bg); }
+  .seen-side { border: 1.5px solid var(--line); border-radius: 8px; padding: 12px; }
+  .drift-out { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px 24px; margin: 14px 0 0; }
+  .drift-out .big { flex-direction: column; gap: 6px; }
+  .verdict { margin: 12px 0 0; font-size: 15px; }
   .btn { font: 600 14.5px var(--font-body); color: var(--accent); background: var(--bg); border: 1.5px solid var(--accent);
          border-radius: 6px; padding: 6px 12px; cursor: pointer; }
   .btn:hover { background: var(--alt-bg); }
@@ -114,7 +119,7 @@
     .topbar, article { padding-inline: 16px; }
     h1 { font-size: 28px; }
     .lab { padding: 14px; }
-    .lab-grid, .measured, .drift { grid-template-columns: minmax(0, 1fr); }
+    .lab-grid, .measured, .drift, .drift-out { grid-template-columns: minmax(0, 1fr); }
     .cell-head { flex-direction: column-reverse; align-items: flex-start; gap: 0; }
     table.cm td.rate { padding-left: 4px; font-size: 13px; }
     table.cm { border-spacing: 4px; }
@@ -201,7 +206,7 @@ Reply: {{REPLY}}</pre>
     <div class="lab-grid">
       <div class="controls">
         <div class="ctl">
-          <label for="theta">True pass rate θ <output id="theta-out" for="theta">74%</output></label>
+          <label for="theta">Really polite θ <output id="theta-out" for="theta">74%</output></label>
           <span class="hint">the share of replies that are actually polite</span>
           <input type="range" id="theta" min="0" max="100" step="1" value="74">
         </div>
@@ -267,31 +272,37 @@ Reply: {{REPLY}}</pre>
   <p>The box below shows why. The correction uses the TPR and TNR you measured on your test set. If the judge's real rates have drifted since then, the corrected number is off, and nothing in the math tells you.</p>
   <section class="lab" aria-labelledby="lab2-title">
     <p class="lab-title" id="lab2-title">Try it: when the judge drifts</p>
-    <p class="lab-note">Last month you measured the judge on your test set: TPR 0.92, TNR 0.88. Since then the model that writes the replies changed, and the judge now lets more rude replies through. Its real TNR today is 0.80, but you don't know that, so you still correct with 0.88.</p>
+    <p class="lab-note">Last month you measured the judge on your test set: TPR 0.92, TNR 0.88. Since then the model that writes the replies changed, and the judge now lets more rude replies through. Its real TNR today is 0.80. You don't know that, because the only way to find out is to label new replies by hand. So you still correct with 0.88.</p>
+    <p class="lab-note">The dashed box is hidden from you in real life. It is shown here only so you can see the error. Everything in the solid box is all you actually have.</p>
     <div class="drift">
-      <div class="drift-col">
-        <p class="drift-h">What is really happening <span>(you can't see this in practice)</span></p>
-        <div class="ctl"><label for="rtheta">True pass rate θ <output id="rtheta-out" for="rtheta">74%</output></label>
+      <div class="drift-col hidden-side">
+        <p class="drift-h">Hidden: what is really true <span>(only hand-labeling reveals this)</span></p>
+        <div class="ctl"><label for="rtheta">Really polite θ <output id="rtheta-out" for="rtheta">74%</output></label>
           <input type="range" id="rtheta" min="0" max="100" step="1" value="74"></div>
+        <p class="lab-note" style="margin:0">θ is set by the replies. The judge can't change it.</p>
         <div class="ctl"><label for="rtpr">Judge's real TPR <output id="rtpr-out" for="rtpr">0.92</output></label>
           <input type="range" id="rtpr" min="0" max="100" step="1" value="92"></div>
         <div class="ctl"><label for="rtnr">Judge's real TNR <output id="rtnr-out" for="rtnr">0.80</output></label>
           <input type="range" id="rtnr" min="0" max="100" step="1" value="80"></div>
       </div>
-      <div class="drift-col">
-        <p class="drift-h">What you measured last month <span>(what the correction uses)</span></p>
+      <div class="drift-col seen-side">
+        <p class="drift-h">What you have: last month's measurement <span>(what the correction uses)</span></p>
         <div class="ctl"><label for="mtpr">Measured TPR <output id="mtpr-out" for="mtpr">0.92</output></label>
           <input type="range" id="mtpr" min="0" max="100" step="1" value="92"></div>
         <div class="ctl"><label for="mtnr">Measured TNR <output id="mtnr-out" for="mtnr">0.88</output></label>
           <input type="range" id="mtnr" min="0" max="100" step="1" value="88"></div>
         <p style="margin:6px 0 0"><button type="button" class="btn" id="match">Re-check the judge</button></p>
-        <p class="lab-note" style="margin:6px 0 0">Re-checking means labeling a fresh sample and measuring again, so your numbers catch up with the real ones.</p>
+        <p class="lab-note" style="margin:6px 0 0">Re-checking means hand-labeling a fresh sample of today's replies and measuring the judge again, so your numbers catch up with the real ones.</p>
       </div>
     </div>
-    <div class="readout" aria-live="polite">
-      <div class="big"><span>Judge reports <b id="d-raw"></b></span><span>You correct it to <b id="corr"></b></span><span>Truth <b id="truth2"></b></span><span>Off by <b id="corr-err"></b></span></div>
-      <span class="eq" id="eq-corr"></span>
+    <div class="drift-out" aria-live="polite">
+      <div class="hidden-side"><p class="drift-h">Hidden from you</p>
+        <div class="big"><span>Really polite <b id="truth2"></b></span><span>Your estimate is off by <b id="corr-err"></b></span></div></div>
+      <div class="seen-side"><p class="drift-h">You see</p>
+        <div class="big"><span>Judge reports <b id="d-raw"></b></span><span>You correct it to <b id="corr"></b></span></div></div>
     </div>
+    <p class="verdict" id="verdict"></p>
+    <div class="readout"><span class="eq" id="eq-corr"></span></div>
   </section>
   <p><strong>Using the same model for both</strong> is a risk of its own. A judge tends to miss the same mistakes its own model makes. Use a different, and preferably stronger, model for the judge.</p>
   <p>The same applies whenever the replies change in other ways, such as new templates or new kinds of requests: re-check the judge on a fresh labeled sample. In practice that is the ongoing cost of using a judge.</p>
@@ -412,6 +423,7 @@ Reply: {{REPLY}}</pre>
     if (est === null) {
       $("eq-corr").innerHTML = `θ = (p_obs + TNR − 1) / (TPR + TNR − 1)\n  = ${(p + mtnr - 1).toFixed(3)} / ${j.toFixed(3)}\n<span class="warn">No answer: measured TPR + TNR − 1 is 0 or below.</span>`;
       $("corr").textContent = "none"; $("corr-err").textContent = "n/a";
+      $("verdict").textContent = "";
       return;
     }
     const raw = (p + mtnr - 1) / j;
@@ -419,6 +431,10 @@ Reply: {{REPLY}}</pre>
     $("eq-corr").textContent =
       `θ = (p_obs + measured TNR − 1) / (measured TPR + measured TNR − 1)\n  = (${p.toFixed(3)} + ${f2(mtnr)} − 1) / (${f2(mtpr)} + ${f2(mtnr)} − 1)\n  = ${(p + mtnr - 1).toFixed(3)} / ${j.toFixed(3)} = ${est.toFixed(3)}${clip}`;
     $("corr").textContent = pct(est); $("corr-err").textContent = pts(est - theta);
+    const stale = Math.abs(mtpr - tpr) > 0.005 || Math.abs(mtnr - tnr) > 0.005;
+    $("verdict").innerHTML = stale
+      ? `<strong>Your rates are out of date.</strong> Nothing in the solid box looks wrong, yet the corrected number is off by ${pts(est - theta)} (the raw score was off by ${pts(p - theta)}). The only way to catch this is to label new replies: press Re-check.`
+      : `<strong>Your rates match the judge.</strong> The correction undoes the judge's mistakes and lands on the truth.`;
   }
   ["rtheta", "rtpr", "rtnr", "mtpr", "mtnr"].forEach(id => $(id).addEventListener("input", drift));
   $("match").addEventListener("click", () => { $("mtpr").value = $("rtpr").value; $("mtnr").value = $("rtnr").value; drift(); });
