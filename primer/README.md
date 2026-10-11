@@ -7,7 +7,7 @@ A short explainer the calculation paper (`paper/draft.md`) links back to for def
   worked examples in the text (checked with node before publishing).
 
 Section anchors for links from other papers: `#question`, `#label`, `#tpr-tnr`, `#improve`, `#correction`,
-`#range`, `#report`, `#models`, `#together`, `#glossary`.
+`#range`, `#report`, `#models`, `#summary`, `#glossary`.
 
 The primer follows one invented example (is this customer service reply polite?) from labeling to reporting.
 `numbers.py` recomputes every number in it, including the Section 6 intervals. `range.py` is the short

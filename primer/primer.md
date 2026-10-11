@@ -158,9 +158,9 @@ For comparison, checking 100 random replies by hand would give about 74% ± 9 po
 
 The same applies whenever the replies change in other ways, such as new templates or new kinds of requests: re-check the judge on a fresh labeled sample. In practice that is the ongoing cost of using a judge.
 
-## 9. Putting it together
+## 9. Summary
 
-Go back to Section 5. The judge checked 400 new replies and said 284 were polite (71%). Suppose you hand-labeled all 400 and found 296 were really polite (74%). Everything in this primer comes down to three ideas that explain that gap.
+The judge said 284 of last month's 400 replies were polite (71%). If you had hand-labeled all 400, you would have found 296 (74%). Three ideas explain the gap.
 
 **1. The judge makes two kinds of mistakes.** It fails some polite replies: it passes 92% of them (TPR 0.92), so it fails 24 of the 296. And it passes some rude replies: it fails 88% of them (TNR 0.88), so about 12 of the 104 rude replies get through.
 
