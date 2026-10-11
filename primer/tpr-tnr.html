@@ -110,6 +110,19 @@
   .drift-out { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px 24px; margin: 14px 0 0; }
   .drift-out .big { flex-direction: column; gap: 6px; }
   .verdict { margin: 12px 0 0; font-size: 15px; }
+  .sbar { display: flex; height: 30px; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); margin: 6px 0 4px; }
+  .sbar span { display: block; height: 100%; transition: flex-basis .15s; min-width: 0; }
+  .seg-tp { background: var(--ok-line); }
+  .seg-fn { background: var(--no-bg); background-image: repeating-linear-gradient(45deg, var(--no-line) 0 2px, transparent 2px 7px); }
+  .seg-fp { background: var(--no-line); }
+  .seg-tn { background: var(--ok-bg); background-image: repeating-linear-gradient(45deg, var(--ok-line) 0 1px, transparent 1px 7px); }
+  .sbar-scale { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+  .sline { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 15px; margin: 0 0 10px; }
+  .chip { display: inline-flex; align-items: baseline; gap: 6px; border-radius: 6px; padding: 4px 9px; border: 1.5px solid var(--line); }
+  .chip b { font-family: var(--font-mono); font-weight: 500; font-size: 17px; }
+  .chip i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; font-style: normal; align-self: center; }
+  .chip.out { border-color: var(--accent); }
+  .op { font-family: var(--font-mono); font-size: 18px; color: var(--muted); }
   .btn { font: 600 14.5px var(--font-body); color: var(--accent); background: var(--bg); border: 1.5px solid var(--accent);
          border-radius: 6px; padding: 6px 12px; cursor: pointer; }
   .btn:hover { background: var(--alt-bg); }
@@ -138,6 +151,43 @@
 
   <div class="abstract"><p>An LLM judge reads an output and says PASS or FAIL. Teams use judges to answer questions like "what share of our replies are polite?" without reading every reply themselves. Before you trust the number a judge reports, you need to know how often it gets each kind of output right. That is what TPR and TNR measure.</p>
 <p>This primer works through one small example from start to finish: label some outputs, measure a judge, improve it, use it, and report the result with a range. The counts are invented for teaching; every calculation is checked by <code>primer/numbers.py</code>.</p></div>
+  <h2 id="short">The short version</h2>
+  <p>Your judge checks 400 customer service replies and says 284 are polite (71%). If you hand-labeled all 400, you would find 296 are really polite (74%). Three ideas explain the gap.</p>
+  <p><strong>1. The judge makes two kinds of mistakes.</strong> It fails some polite replies: it passes 92% of them (TPR 0.92), so it fails 24 of the 296. And it passes some rude replies: it fails 88% of them (TNR 0.88), so about 12 of the 104 rude replies get through.</p>
+  <p><strong>2. The mistakes push the score in opposite directions.</strong> The 24 polite replies it failed pull the score down. The 12 rude replies it passed push it up. They don't cancel, so the judge reports 284 instead of 296.</p>
+  <p><strong>3. If you know the two rates, you can undo the mistakes.</strong> You measure TPR and TNR once by hand-labeling a sample. The correction then works back from the judge's 71% to an estimate of 74%. That only holds while the judge behaves the way it did when you measured it. When the replies change (a new model, new templates), label a fresh sample and check the rates again.</p>
+  <section class="lab" aria-labelledby="lab0-title">
+    <p class="lab-title" id="lab0-title">Try it: the 400 replies in one line</p>
+    <p class="lab-note">74% of the replies are really polite. Move the judge's TPR and TNR and watch its two kinds of mistakes change the score it reports.</p>
+    <div class="controls">
+      <div class="ctl"><label for="stpr">TPR <output id="stpr-out" for="stpr">0.92</output></label>
+        <span class="hint">share of polite replies it passes</span>
+        <input type="range" id="stpr" min="50" max="100" step="1" value="92"></div>
+      <div class="ctl"><label for="stnr">TNR <output id="stnr-out" for="stnr">0.88</output></label>
+        <span class="hint">share of rude replies it fails</span>
+        <input type="range" id="stnr" min="50" max="100" step="1" value="88"></div>
+    </div>
+    <div class="sbar" role="img" id="sbar" aria-label="">
+      <span class="seg-tp" id="sb-tp"></span><span class="seg-fn" id="sb-fn"></span><span class="seg-fp" id="sb-fp"></span><span class="seg-tn" id="sb-tn"></span>
+    </div>
+    <div class="sbar-scale"><span>← 296 really polite</span><span>104 really rude →</span></div>
+    <div class="sline" style="font-size:13.5px;color:var(--muted);gap:4px 14px">
+      <span class="chip" style="border:none;padding:0"><i class="seg-tp"></i>polite, passed</span>
+      <span class="chip" style="border:none;padding:0"><i class="seg-fn"></i>polite, failed by mistake</span>
+      <span class="chip" style="border:none;padding:0"><i class="seg-fp"></i>rude, passed by mistake</span>
+      <span class="chip" style="border:none;padding:0"><i class="seg-tn"></i>rude, failed</span>
+    </div>
+    <div class="sline" aria-live="polite">
+      <span class="chip"><b>296</b> really polite</span>
+      <span class="op">−</span>
+      <span class="chip"><i class="seg-fn"></i><b id="s-fn">24</b> polite it failed</span>
+      <span class="op">+</span>
+      <span class="chip"><i class="seg-fp"></i><b id="s-fp">12</b> rude it passed</span>
+      <span class="op">=</span>
+      <span class="chip out"><b id="s-judge">284</b> <span>judge says polite (<span id="s-jpct">71%</span>)</span></span>
+    </div>
+    <p class="lab-note" id="s-corr" style="margin:0"></p>
+  </section>
   <h2 id="question"><span class="num">1.</span>The question</h2>
   <p><strong>Is this customer service reply polite?</strong></p>
   <ul><li>"Thanks for reaching out! I've reset your password." PASS</li><li>"Read the FAQ next time." FAIL</li></ul>
@@ -376,6 +426,26 @@ Reply: {{REPLY}}</pre>
     return { tp, fn: good - tp, fp, tn: bad - fp };
   }
   window.primerMath = { observed, corrected, counts };
+
+  // Short version: 400 replies, 296 polite, in one line.
+  function shortLine() {
+    const N = 400, POL = 296, RUDE = N - POL, theta = POL / N;
+    const tpr = $("stpr").value / 100, tnr = $("stnr").value / 100;
+    $("stpr-out").textContent = f2(tpr); $("stnr-out").textContent = f2(tnr);
+    const fn = Math.round(POL * (1 - tpr)), fp = Math.round(RUDE * (1 - tnr));
+    const tp = POL - fn, tn = RUDE - fp, judge = tp + fp;
+    [["tp", tp], ["fn", fn], ["fp", fp], ["tn", tn]].forEach(([k, n]) => { $("sb-" + k).style.flex = `0 0 ${100 * n / N}%`; });
+    $("sbar").setAttribute("aria-label", `${tp} polite passed, ${fn} polite failed, ${fp} rude passed, ${tn} rude failed`);
+    $("s-fn").textContent = fn; $("s-fp").textContent = fp; $("s-judge").textContent = judge;
+    $("s-jpct").textContent = Math.round(100 * judge / N) + "%";
+    const est = corrected(observed(theta, tpr, tnr), tpr, tnr);
+    const dir = judge < POL ? "too low" : judge > POL ? "too high" : "right, by luck";
+    $("s-corr").innerHTML = est === null
+      ? `This judge is no better than a coin flip (TPR + TNR ≤ 1), so its score can't be corrected.`
+      : `The judge's ${Math.round(100 * judge / N)}% is ${dir}. Knowing TPR ${f2(tpr)} and TNR ${f2(tnr)}, the correction takes it back to <strong>${Math.round(100 * est)}%</strong>.`;
+  }
+  ["stpr", "stnr"].forEach(id => $(id).addEventListener("input", shortLine));
+  shortLine();
 
   const names = { tp: "Polite, judge passed (true positive)", fn: "Polite, judge failed (false fail)",
                   fp: "Rude, judge passed (false pass)", tn: "Rude, judge failed (true negative)" };

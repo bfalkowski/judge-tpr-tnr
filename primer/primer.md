@@ -8,6 +8,18 @@ An LLM judge reads an output and says PASS or FAIL. Teams use judges to answer q
 
 This primer works through one small example from start to finish: label some outputs, measure a judge, improve it, use it, and report the result with a range. The counts are invented for teaching; every calculation is checked by `primer/numbers.py`.
 
+## The short version
+
+Your judge checks 400 customer service replies and says 284 are polite (71%). If you hand-labeled all 400, you would find 296 are really polite (74%). Three ideas explain the gap.
+
+**1. The judge makes two kinds of mistakes.** It fails some polite replies: it passes 92% of them (TPR 0.92), so it fails 24 of the 296. And it passes some rude replies: it fails 88% of them (TNR 0.88), so about 12 of the 104 rude replies get through.
+
+**2. The mistakes push the score in opposite directions.** The 24 polite replies it failed pull the score down. The 12 rude replies it passed push it up. They don't cancel, so the judge reports 284 instead of 296.
+
+**3. If you know the two rates, you can undo the mistakes.** You measure TPR and TNR once by hand-labeling a sample. The correction then works back from the judge's 71% to an estimate of 74%. That only holds while the judge behaves the way it did when you measured it. When the replies change (a new model, new templates), label a fresh sample and check the rates again.
+
+The interactive version of this page shows the 400 replies as one bar, with sliders for TPR and TNR.
+
 ## 1. The question
 
 **Is this customer service reply polite?**
