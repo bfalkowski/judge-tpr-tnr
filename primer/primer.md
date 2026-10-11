@@ -95,7 +95,7 @@ If the judge had stayed poor after a few rounds, the usual next steps are a stro
 
 ## 5. Use it on new replies
 
-Last month's 400 support replies go through the judge. Nobody labels these. It passes 284, so the judge says **71%** are polite.
+We are happy with our judge, so we release it to production. Last month it scored 400 support replies that nobody labeled. It passed 284, so the judge says **71%** are polite.
 
 That raw number still contains the judge's mistakes. Here is how they mix in. If the true share of polite replies is θ (theta), the judge passes:
 

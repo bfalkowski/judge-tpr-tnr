@@ -207,7 +207,7 @@ Reply: {{REPLY}}</pre>
   <p>Now run it <strong>once</strong> on the test set: it passes 23 of 25 polite replies and fails 22 of 25 rude ones, so <strong>TPR 0.92, TNR 0.88.</strong> Slightly lower than dev is normal, since you tuned on dev. These are the numbers you report. Do not change the judge because of what test shows; if test is bad, go back to dev and use fresh test labels afterwards.</p>
   <p>If the judge had stayed poor after a few rounds, the usual next steps are a stronger model for the judge, or splitting the question into smaller ones.</p>
   <h2 id="correction"><span class="num">5.</span>Use it on new replies</h2>
-  <p>Last month's 400 support replies go through the judge. Nobody labels these. It passes 284, so the judge says <strong>71%</strong> are polite.</p>
+  <p>We are happy with our judge, so we release it to production. Last month it scored 400 support replies that nobody labeled. It passed 284, so the judge says <strong>71%</strong> are polite.</p>
   <p>That raw number still contains the judge's mistakes. Here is how they mix in. If the true share of polite replies is θ (theta), the judge passes:</p>
   <ul><li>the polite replies it recognizes: TPR × θ</li><li>the rude replies it lets through: (1 − TNR) × (1 − θ)</li></ul>
   <p>So its raw score is:</p>
