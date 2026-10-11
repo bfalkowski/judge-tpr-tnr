@@ -22,3 +22,41 @@ TPR and TNR from the test run. Each v4 agent run has 200 decisions; the judge sc
 | template_edit | 146 of 200 | 73.0% | 76.7% | 74.0% | [68.6%, 85.4%] | yes | [72.1%, 82.3%] | yes |
 | context_strip | 146 of 200 | 73.0% | 76.7% | 74.5% | [68.6%, 85.4%] | yes | [72.1%, 82.3%] | yes |
 | prompt_edit | 137 of 200 | 68.5% | 71.4% | 69.0% | [63.0%, 80.2%] | yes | [66.8%, 76.7%] | yes |
+
+## Do the judge's error rates carry over? Test rates against the actual rates on each v4 run
+
+The actual rates use the answer key, which a real deployment would not have.
+
+| Judge | Test TPR | Test TNR | Agent config | Actual TPR on run | Actual TNR on run |
+|---|---|---|---|---|---|
+| p2 | 0.792 | 0.532 | clean | 0.812 | 0.217 |
+| p2 | 0.792 | 0.532 | template_edit | 0.831 | 0.192 |
+| p2 | 0.792 | 0.532 | context_strip | 0.792 | 0.667 |
+| p2 | 0.792 | 0.532 | prompt_edit | 0.775 | 0.419 |
+| j2 | 0.906 | 0.774 | clean | 0.857 | 0.739 |
+| j2 | 0.906 | 0.774 | template_edit | 0.858 | 0.769 |
+| j2 | 0.906 | 0.774 | context_strip | 0.852 | 0.784 |
+| j2 | 0.906 | 0.774 | prompt_edit | 0.877 | 0.790 |
+| c3 (frozen) | 0.927 | 0.919 | clean | 0.968 | 0.935 |
+| c3 (frozen) | 0.927 | 0.919 | template_edit | 0.959 | 0.923 |
+| c3 (frozen) | 0.927 | 0.919 | context_strip | 0.966 | 0.961 |
+| c3 (frozen) | 0.927 | 0.919 | prompt_edit | 0.964 | 0.935 |
+
+## Secondary analysis after the freeze: the same correction with earlier judges
+
+Each judge's TPR and TNR measured on the same test split, then applied to the same four v4 runs. Error is distance from the true pass rate, in points.
+
+| Judge | Test TPR | Test TNR | TPR + TNR - 1 | Agent config | p_obs | Corrected | True | Raw error | Corrected error | Ticket-level 95% CI | Contains true |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| p2 | 0.792 | 0.532 | 0.324 | clean | 80.5% | 100.0% | 77.0% | 3.5 | 23.0 | [77.8%, 100.0%] | no |
+| p2 | 0.792 | 0.532 | 0.324 | template_edit | 82.5% | 100.0% | 74.0% | 8.5 | 26.0 | [84.2%, 100.0%] | no |
+| p2 | 0.792 | 0.532 | 0.324 | context_strip | 67.5% | 64.0% | 74.5% | 7.0 | 10.5 | [32.1%, 95.4%] | yes |
+| p2 | 0.792 | 0.532 | 0.324 | prompt_edit | 71.5% | 76.3% | 69.0% | 2.5 | 7.3 | [47.5%, 100.0%] | yes |
+| j2 | 0.906 | 0.774 | 0.680 | clean | 72.0% | 72.6% | 77.0% | 5.0 | 4.4 | [59.9%, 84.7%] | yes |
+| j2 | 0.906 | 0.774 | 0.680 | template_edit | 69.5% | 69.0% | 74.0% | 4.5 | 5.0 | [56.0%, 80.9%] | yes |
+| j2 | 0.906 | 0.774 | 0.680 | context_strip | 69.0% | 68.2% | 74.5% | 5.5 | 6.3 | [55.2%, 80.4%] | yes |
+| j2 | 0.906 | 0.774 | 0.680 | prompt_edit | 67.0% | 65.3% | 69.0% | 2.0 | 3.7 | [52.1%, 77.3%] | yes |
+| c3 (frozen) | 0.927 | 0.919 | 0.846 | clean | 76.0% | 80.3% | 77.0% | 1.0 | 3.3 | [72.4%, 88.8%] | yes |
+| c3 (frozen) | 0.927 | 0.919 | 0.846 | template_edit | 73.0% | 76.7% | 74.0% | 1.0 | 2.7 | [68.6%, 85.4%] | yes |
+| c3 (frozen) | 0.927 | 0.919 | 0.846 | context_strip | 73.0% | 76.7% | 74.5% | 1.5 | 2.2 | [68.6%, 85.4%] | yes |
+| c3 (frozen) | 0.927 | 0.919 | 0.846 | prompt_edit | 68.5% | 71.4% | 69.0% | 0.5 | 2.4 | [63.0%, 80.2%] | yes |

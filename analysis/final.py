@@ -37,6 +37,10 @@ V4_RUN = "gh38116159452-c3-v4-prod"
 V4_DECISIONS = "data/correction/gh38116062449_v4.jsonl"
 DEV_RUN = "gh38104945965-c3-labeled-dev"
 CONFIGS = ["clean", "template_edit", "context_strip", "prompt_edit"]
+# Secondary analysis after the freeze (run with --post-hoc; see paper/decisions.md):
+# earlier judges from the climb, measured on test and applied to v4 the same way.
+POST_HOC = {"p2": ("gh38116579165-p2-labeled-test-posthoc", "gh38116597788-p2-v4-prod-posthoc"),
+            "j2": ("gh38116620845-j2-labeled-test-posthoc", "gh38116646374-j2-v4-prod-posthoc")}
 ITERATIONS = 10000
 
 
@@ -64,7 +68,29 @@ def item_level_ci(labels, preds, p_obs, iterations=ITERATIONS, seed=0):
         else:
             boot.append(est)
     boot.sort()
+    if not boot:
+        return None, dropped / iterations
     return [boot[int(0.025 * (len(boot) - 1))], boot[int(0.975 * (len(boot) - 1))]], dropped / iterations
+
+
+def correct_runs(test, v4_v, decisions, t):
+    test_labels, test_preds = [x["label"] for x in test], [x["pred"] for x in test]
+    out = []
+    for cfg in CONFIGS:
+        ds = [d for d in decisions if d["config"] == cfg]
+        run = [{"ticket_id": d["ticket_id"], "label": d["label"],
+                "pred": int(v4_v[f"v4:{d['ticket_id']}:{d['action']}"]["noul"] >= t)} for d in ds]
+        e = estimate(test, run, iterations=ITERATIONS, seed=1)
+        ci_item, dropped = item_level_ci(test_labels, test_preds, e["p_obs"])
+        cov = lambda ci: ci is not None and ci[0] <= e["true_rate"] <= ci[1]
+        actual = rates([x["label"] for x in run], [x["pred"] for x in run])  # known only because of the answer key
+        out.append({"config": cfg, "m": len(run), "k": sum(x["pred"] for x in run), "p_obs": e["p_obs"],
+                    "actual_tpr": actual["tpr"], "actual_tnr": actual["tnr"], "fails_in_run": actual["fp"] + actual["tn"],
+                    "true": e["true_rate"], "corrected": e["corrected"],
+                    "ci_ticket": e["ci"], "ci_ticket_undefined": e["undefined_share"],
+                    "ci_item": ci_item, "ci_item_dropped": dropped,
+                    "covered_ticket": cov(e["ci"]), "covered_item": cov(ci_item)})
+    return out
 
 
 def ambiguous(it):
@@ -96,27 +122,25 @@ def main():
     v4_v, v4_m = verdicts(V4_RUN, t)
     assert v4_m["fingerprint"] == freeze["fingerprint"] and v4_m["dataset"] == "v4"
     decisions = [json.loads(l) for l in open(os.path.join(ROOT, V4_DECISIONS))]
-    test_labels, test_preds = [x["label"] for x in test], [x["pred"] for x in test]
-    runs = []
-    for cfg in CONFIGS:
-        ds = [d for d in decisions if d["config"] == cfg]
-        run = [{"ticket_id": d["ticket_id"], "label": d["label"],
-                "pred": int(v4_v[f"v4:{d['ticket_id']}:{d['action']}"]["noul"] >= t)} for d in ds]
-        e = estimate(test, run, iterations=ITERATIONS, seed=1)
-        ci_item, dropped = item_level_ci(test_labels, test_preds, e["p_obs"])
-        runs.append({"config": cfg, "m": len(run), "k": sum(x["pred"] for x in run), "p_obs": e["p_obs"],
-                     "true": e["true_rate"], "corrected": e["corrected"],
-                     "ci_ticket": e["ci"], "ci_ticket_undefined": e["undefined_share"],
-                     "ci_item": ci_item, "ci_item_dropped": dropped,
-                     "covered_ticket": e["ci"][0] <= e["true_rate"] <= e["ci"][1],
-                     "covered_item": ci_item[0] <= e["true_rate"] <= ci_item[1]})
+    runs = correct_runs(test, v4_v, decisions, t)
+
+    post_hoc = {}
+    for name, (test_run, v4_run) in POST_HOC.items():
+        tv, tm = verdicts(test_run, t)
+        vv, vm = verdicts(v4_run, t)
+        assert tm["post_hoc"] and vm["post_hoc"] and tm["variant"] == vm["variant"] == name
+        assert len(tv) == len(test) and len(vv) == len(v4_v)
+        ptest = [{"ticket_id": labeled[i]["ticket_id"], "label": labeled[i]["label"], "pred": int(v["noul"] >= t)}
+                 for i, v in sorted(tv.items())]
+        post_hoc[name] = {"test": rates([x["label"] for x in ptest], [x["pred"] for x in ptest]),
+                          "runs": correct_runs(ptest, vv, decisions, t), "test_run": test_run, "v4_run": v4_run}
 
     res = {"freeze": freeze, "runs_used": {"dev": DEV_RUN, "test": TEST_RUN, "v4": V4_RUN,
                                            "v4_decisions": V4_DECISIONS},
            "dev": r_dev, "test": r_all, "test_repeat_disagree": repeat_disagree, "test_items": len(by_item),
            "test_without_ambiguous": {**r_clear, "set_aside": len(test) - len(clear)},
            "v4_items": len(v4_v), "v4_spend_usd": v4_m.get("spend_usd"), "test_spend_usd": test_m.get("spend_usd"),
-           "correction": runs}
+           "correction": runs, "post_hoc": post_hoc}
     json.dump(res, open(os.path.join(ROOT, "paper", "results.json"), "w"), indent=1)
     open(os.path.join(ROOT, "paper", "results.md"), "w").write(report(res))
     print(report(res))
@@ -148,6 +172,29 @@ def report(r):
         L.append(f"| {x['config']} | {x['k']} of {x['m']} | {pct(x['p_obs'])} | {pct(x['corrected'])} | {pct(x['true'])} | "
                  f"[{pct(x['ci_ticket'][0])}, {pct(x['ci_ticket'][1])}] | {'yes' if x['covered_ticket'] else 'no'} | "
                  f"[{pct(x['ci_item'][0])}, {pct(x['ci_item'][1])}] | {'yes' if x['covered_item'] else 'no'} |")
+    L += ["", "## Do the judge's error rates carry over? Test rates against the actual rates on each v4 run", "",
+          "The actual rates use the answer key, which a real deployment would not have.", "",
+          "| Judge | Test TPR | Test TNR | Agent config | Actual TPR on run | Actual TNR on run |", "|---|---|---|---|---|---|"]
+    judges0 = [(n, r["post_hoc"][n]["test"], r["post_hoc"][n]["runs"]) for n in r["post_hoc"]]
+    judges0.append((r["freeze"]["variant"] + " (frozen)", r["test"], r["correction"]))
+    for name, tr, runs in judges0:
+        for x in runs:
+            L.append(f"| {name} | {tr['tpr']:.3f} | {tr['tnr']:.3f} | {x['config']} | {x['actual_tpr']:.3f} | {x['actual_tnr']:.3f} |")
+    L += ["", "## Secondary analysis after the freeze: the same correction with earlier judges", "",
+          "Each judge's TPR and TNR measured on the same test split, then applied to the same four v4 runs. "
+          "Error is distance from the true pass rate, in points.", "",
+          "| Judge | Test TPR | Test TNR | TPR + TNR - 1 | Agent config | p_obs | Corrected | True | Raw error | "
+          "Corrected error | Ticket-level 95% CI | Contains true |", "|---|---|---|---|---|---|---|---|---|---|---|---|"]
+    judges = [(n, r["post_hoc"][n]["test"], r["post_hoc"][n]["runs"]) for n in r["post_hoc"]]
+    judges.append((r["freeze"]["variant"] + " (frozen)", r["test"], r["correction"]))
+    fp = lambda v: "n/a" if v is None else pct(v)
+    for name, tr, runs in judges:
+        for x in runs:
+            ci = "none" if not x["ci_ticket"] else f"[{pct(x['ci_ticket'][0])}, {pct(x['ci_ticket'][1])}]"
+            ce = "n/a" if x["corrected"] is None else f"{100 * abs(x['corrected'] - x['true']):.1f}"
+            L.append(f"| {name} | {tr['tpr']:.3f} | {tr['tnr']:.3f} | {tr['youden']:.3f} | {x['config']} | {pct(x['p_obs'])} | "
+                     f"{fp(x['corrected'])} | {pct(x['true'])} | {100 * abs(x['p_obs'] - x['true']):.1f} | {ce} | {ci} | "
+                     f"{'yes' if x['covered_ticket'] else 'no'} |")
     L.append("")
     return "\n".join(L)
 

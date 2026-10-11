@@ -55,6 +55,9 @@
    "m": 200,
    "k": 152,
    "p_obs": 0.76,
+   "actual_tpr": 0.9675324675324676,
+   "actual_tnr": 0.9347826086956522,
+   "fails_in_run": 46,
    "true": 0.77,
    "corrected": 0.802604208019055,
    "ci_ticket": [
@@ -75,6 +78,9 @@
    "m": 200,
    "k": 146,
    "p_obs": 0.73,
+   "actual_tpr": 0.9594594594594594,
+   "actual_tnr": 0.9230769230769231,
+   "fails_in_run": 52,
    "true": 0.74,
    "corrected": 0.7671615720524018,
    "ci_ticket": [
@@ -95,6 +101,9 @@
    "m": 200,
    "k": 146,
    "p_obs": 0.73,
+   "actual_tpr": 0.9664429530201343,
+   "actual_tnr": 0.9607843137254902,
+   "fails_in_run": 51,
    "true": 0.745,
    "corrected": 0.7671615720524018,
    "ci_ticket": [
@@ -115,6 +124,9 @@
    "m": 200,
    "k": 137,
    "p_obs": 0.685,
+   "actual_tpr": 0.9637681159420289,
+   "actual_tnr": 0.9354838709677419,
+   "fails_in_run": 62,
    "true": 0.69,
    "corrected": 0.7139976181024218,
    "ci_ticket": [
@@ -130,5 +142,223 @@
    "covered_ticket": true,
    "covered_item": true
   }
- ]
+ ],
+ "post_hoc": {
+  "p2": {
+   "test": {
+    "tp": 76,
+    "fn": 20,
+    "fp": 29,
+    "tn": 33,
+    "n": 158,
+    "tpr": 0.7916666666666666,
+    "tnr": 0.532258064516129,
+    "youden": 0.3239247311827955
+   },
+   "runs": [
+    {
+     "config": "clean",
+     "m": 200,
+     "k": 161,
+     "p_obs": 0.805,
+     "actual_tpr": 0.8116883116883117,
+     "actual_tnr": 0.21739130434782608,
+     "fails_in_run": 46,
+     "true": 0.77,
+     "corrected": 1.0,
+     "ci_ticket": [
+      0.7781035272560699,
+      1.0
+     ],
+     "ci_ticket_undefined": 0.0,
+     "ci_item": [
+      0.8306149732620319,
+      1.0
+     ],
+     "ci_item_dropped": 0.0002,
+     "covered_ticket": false,
+     "covered_item": false
+    },
+    {
+     "config": "template_edit",
+     "m": 200,
+     "k": 165,
+     "p_obs": 0.825,
+     "actual_tpr": 0.831081081081081,
+     "actual_tnr": 0.19230769230769232,
+     "fails_in_run": 52,
+     "true": 0.74,
+     "corrected": 1.0,
+     "ci_ticket": [
+      0.8416075650118207,
+      1.0
+     ],
+     "ci_ticket_undefined": 0.0,
+     "ci_item": [
+      0.8851637554585146,
+      1.0
+     ],
+     "ci_item_dropped": 0.0002,
+     "covered_ticket": false,
+     "covered_item": false
+    },
+    {
+     "config": "context_strip",
+     "m": 200,
+     "k": 135,
+     "p_obs": 0.675,
+     "actual_tpr": 0.7919463087248322,
+     "actual_tnr": 0.6666666666666666,
+     "fails_in_run": 51,
+     "true": 0.745,
+     "corrected": 0.639834024896266,
+     "ci_ticket": [
+      0.32138888888888917,
+      0.954390243902438
+     ],
+     "ci_ticket_undefined": 0.0,
+     "ci_item": [
+      0.38281250000000067,
+      0.8775111884634507
+     ],
+     "ci_item_dropped": 0.0002,
+     "covered_ticket": true,
+     "covered_item": true
+    },
+    {
+     "config": "prompt_edit",
+     "m": 200,
+     "k": 143,
+     "p_obs": 0.715,
+     "actual_tpr": 0.7753623188405797,
+     "actual_tnr": 0.41935483870967744,
+     "fails_in_run": 62,
+     "true": 0.69,
+     "corrected": 0.7633195020746887,
+     "ci_ticket": [
+      0.4750000000000007,
+      1.0
+     ],
+     "ci_ticket_undefined": 0.0,
+     "ci_item": [
+      0.5380267214799589,
+      1.0
+     ],
+     "ci_item_dropped": 0.0002,
+     "covered_ticket": true,
+     "covered_item": true
+    }
+   ],
+   "test_run": "gh38116579165-p2-labeled-test-posthoc",
+   "v4_run": "gh38116597788-p2-v4-prod-posthoc"
+  },
+  "j2": {
+   "test": {
+    "tp": 87,
+    "fn": 9,
+    "fp": 14,
+    "tn": 48,
+    "n": 158,
+    "tpr": 0.90625,
+    "tnr": 0.7741935483870968,
+    "youden": 0.6804435483870968
+   },
+   "runs": [
+    {
+     "config": "clean",
+     "m": 200,
+     "k": 144,
+     "p_obs": 0.72,
+     "actual_tpr": 0.8571428571428571,
+     "actual_tnr": 0.7391304347826086,
+     "fails_in_run": 46,
+     "true": 0.77,
+     "corrected": 0.7262814814814814,
+     "ci_ticket": [
+      0.5986467236467233,
+      0.8468476357267951
+     ],
+     "ci_ticket_undefined": 0.0,
+     "ci_item": [
+      0.6490241718889882,
+      0.8062650602409638
+     ],
+     "ci_item_dropped": 0.0,
+     "covered_ticket": true,
+     "covered_item": true
+    },
+    {
+     "config": "template_edit",
+     "m": 200,
+     "k": 139,
+     "p_obs": 0.695,
+     "actual_tpr": 0.8581081081081081,
+     "actual_tnr": 0.7692307692307693,
+     "fails_in_run": 52,
+     "true": 0.74,
+     "corrected": 0.6895407407407408,
+     "ci_ticket": [
+      0.5598501872659178,
+      0.8094944512946977
+     ],
+     "ci_ticket_undefined": 0.0,
+     "ci_item": [
+      0.6099538698103538,
+      0.7683062560620755
+     ],
+     "ci_item_dropped": 0.0,
+     "covered_ticket": true,
+     "covered_item": true
+    },
+    {
+     "config": "context_strip",
+     "m": 200,
+     "k": 138,
+     "p_obs": 0.69,
+     "actual_tpr": 0.8523489932885906,
+     "actual_tnr": 0.7843137254901961,
+     "fails_in_run": 51,
+     "true": 0.745,
+     "corrected": 0.6821925925925925,
+     "ci_ticket": [
+      0.552176100628931,
+      0.8041937389249851
+     ],
+     "ci_ticket_undefined": 0.0,
+     "ci_item": [
+      0.601479289940828,
+      0.7613362178671416
+     ],
+     "ci_item_dropped": 0.0,
+     "covered_ticket": true,
+     "covered_item": true
+    },
+    {
+     "config": "prompt_edit",
+     "m": 200,
+     "k": 134,
+     "p_obs": 0.67,
+     "actual_tpr": 0.8768115942028986,
+     "actual_tnr": 0.7903225806451613,
+     "fails_in_run": 62,
+     "true": 0.69,
+     "corrected": 0.6528000000000002,
+     "ci_ticket": [
+      0.520677966101695,
+      0.7728279883381924
+     ],
+     "ci_ticket_undefined": 0.0,
+     "ci_item": [
+      0.569994568169473,
+      0.7310721745184497
+     ],
+     "ci_item_dropped": 0.0,
+     "covered_ticket": true,
+     "covered_item": true
+    }
+   ],
+   "test_run": "gh38116620845-j2-labeled-test-posthoc",
+   "v4_run": "gh38116646374-j2-v4-prod-posthoc"
+  }
+ }
 }
