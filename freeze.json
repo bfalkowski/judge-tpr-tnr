@@ -1,0 +1,8 @@
+{
+ "variant": "c3",
+ "fingerprint": "1b1bebcddff9f66c",
+ "threshold": 0.5,
+ "dev_run": "gh38104945965-c3-labeled-dev",
+ "git_commit": "70592d932633eae85d15149857546c9d6785a752",
+ "frozen_at": "2026-10-11T05:41:19Z"
+}
