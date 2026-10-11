@@ -60,7 +60,6 @@
   .abstract { margin: 0 0 16px; background: var(--alt-bg); border-left: 3px solid var(--accent); padding: 14px 18px;
               border-radius: 0 6px 6px 0; margin-bottom: 8px; }
   .abstract p:last-child { margin-bottom: 0; }
-  .draft { color: var(--muted); font-style: italic; }
   footer { text-align: center; color: var(--muted); font-size: 14px; padding: 32px 16px; border-top: 1px solid var(--line); }
 
   /* The lab */
@@ -142,10 +141,10 @@
 <main class="container"><article>
   <h1>Can You Trust Your Judge's Score?</h1>
   <p class="subtitle">A Primer on TPR and TNR for LLM Judges</p>
-  <p class="byline">Bryan Falkowski · October 2026 · <span class="draft">Draft</span></p>
+  <p class="byline">Bryan Falkowski · October 2026</p>
 
   <div class="abstract"><p>An LLM judge reads an output and says PASS or FAIL. Teams use judges to answer questions like "what share of our replies are polite?" without reading every reply themselves. Before you trust the number a judge reports, you need to know how often it gets each kind of output right. That is what TPR and TNR measure.</p>
-<p>This primer works through one small example from start to finish: label some outputs, measure a judge, improve it, use it, and report the result with a range. The counts are invented for teaching; every calculation is checked by <code>primer/numbers.py</code>.</p></div>
+<p>This primer works through one small example from start to finish: label some outputs, measure a judge, improve it, use it, and report the result with a range. The counts are invented for teaching; every calculation is checked by <a href="https://github.com/bfalkowski/judge-tpr-tnr/blob/main/primer/numbers.py"><code>primer/numbers.py</code></a>.</p></div>
   <h2 id="question"><span class="num">1.</span>The question</h2>
   <p><strong>Is this customer service reply polite?</strong></p>
   <ul><li>"Thanks for reaching out! I've reset your password." PASS</li><li>"Read the FAQ next time." FAIL</li><li>"So sorry your toaster set off the smoke alarm. A replacement is on the way." PASS</li><li>"We received your complaint and laughed." FAIL</li></ul>
@@ -357,7 +356,7 @@ Reply: {{REPLY}}</pre>
   </table></div>
   <p><strong>Step 4. Repeat 10,000 times and keep the middle 95%.</strong> Sort the 10,000 corrected estimates. The value 2.5% of the way up the list is the bottom of the range and the value 97.5% of the way up is the top. Here that gives about 63% to 88%. Because the draws are random, a rerun can differ by about a point.</p>
   <p><strong>Step 5. Skip draws with no answer.</strong> If a draw happens to give TPR + TNR − 1 of 0 or less, the correction has no answer for it. With a strong judge this almost never happens. If it happens often, the judge is too weak to correct (Section 6).</p>
-  <p>The repo has a short script that does exactly this (<code>primer/range.py</code>).</p>
+  <p>The repo has a short script that does exactly this (<a href="https://github.com/bfalkowski/judge-tpr-tnr/blob/main/primer/range.py"><code>primer/range.py</code></a>).</p>
   <p>Two notes:</p>
   <ul>
     <li><strong>Redraw from what you actually counted.</strong> If the same reply appears in your labeled set many times, count it once. Repeats make the range look narrower than it is.</li>
@@ -368,7 +367,7 @@ Reply: {{REPLY}}</pre>
   <ul><li>Altman and Bland. <a href="https://www.bmj.com/content/308/6943/1552">Diagnostic tests 1: sensitivity and specificity</a>. BMJ, 1994.</li><li>Efron and Tibshirani. An Introduction to the Bootstrap. Chapman and Hall, 1993.</li><li>Husain. <a href="https://hamel.dev/blog/posts/llm-judge/">Using LLM-as-a-Judge For Evaluation: A Complete Guide</a>. 2024.</li><li>Husain and Shankar. <a href="https://github.com/ai-evals-course/evals-skills">evals-skills</a>, <code>validate-evaluator</code>.</li><li>Rogan and Gladen. Estimating prevalence from the results of a screening test. American Journal of Epidemiology, 1978.</li><li>Youden. Index for rating diagnostic tests. Cancer, 1950.</li></ul>
 </article></main>
 
-<footer>© 2026 Bryan Falkowski</footer>
+<footer>© 2026 Bryan Falkowski · <a href="https://bfalkowski.github.io/">Home</a> · <a href="https://github.com/bfalkowski/judge-tpr-tnr">Code</a></footer>
 
 <script>
 (function () {
@@ -377,7 +376,7 @@ Reply: {{REPLY}}</pre>
   const f2 = x => x.toFixed(2);
   const pts = x => Math.abs(100 * x) < 0.05 ? "0.0 pts" : (x > 0 ? "+" : "−") + Math.abs(100 * x).toFixed(1) + " pts";
 
-  // Exact formulas (also used by the checks in primer/check_widget.js).
+  // Exact formulas.
   function observed(theta, tpr, tnr) { return tpr * theta + (1 - tnr) * (1 - theta); }
   function corrected(pobs, tpr, tnr) {
     const j = tpr + tnr - 1;

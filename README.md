@@ -6,7 +6,7 @@ The judge decides whether a support agent's resolution follows a support policy.
 
 The method follows the judge-validation loop taught in AI Evaluation for Engineers and PMs (Husain and Shankar), as published in Hamel Husain's [LLM-as-a-judge guide](https://hamel.dev/blog/posts/llm-judge/) and the [`validate-evaluator`](https://github.com/ai-evals-course/evals-skills) skill. Paper plan and sources: [`paper/outline.md`](paper/outline.md).
 
-New to TPR and TNR? Start with the primer, [Can You Trust Your Judge's Score?](primer/primer.md).
+New to TPR and TNR? Start with the primer, [Can You Trust Your Judge's Score?](https://bfalkowski.github.io/writing/judge-score.html) ([source](primer/primer.md)).
 
 ## The climb so far (dev)
 
