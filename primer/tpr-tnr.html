@@ -97,11 +97,14 @@
   .readout .eq { margin: 0; white-space: pre; }
   .big { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 15px; }
   .big b { font-family: var(--font-mono); font-weight: 500; font-size: 18px; }
-  .part2 { border-top: 1px solid var(--line); margin-top: 16px; padding-top: 14px; }
   .check { display: flex; gap: 8px; align-items: flex-start; font-size: 15px; margin: 0 0 12px; }
   .check input { margin-top: 5px; accent-color: var(--accent); }
   .measured { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px 20px; margin-bottom: 4px; }
   .warn { color: var(--bad); font-weight: 600; }
+  .btn { font: 600 14.5px var(--font-body); color: var(--accent); background: var(--bg); border: 1.5px solid var(--accent);
+         border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+  .btn:hover { background: var(--alt-bg); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   @media (max-width: 720px) {
     .topbar, article { padding-inline: 16px; }
@@ -187,7 +190,7 @@ Reply: {{REPLY}}</pre>
   <span class="eq">θ = (0.71 + 0.88 − 1) / (0.92 + 0.88 − 1) = 0.59 / 0.80 = 0.74</span>
   <p>The judge's number was a little low. Missing 8% of the polite replies pulled it down by about 6 points (0.08 × 0.74), and letting 12% of the rude replies through pushed it up by about 3 (0.12 × 0.26). Undoing both gives 74%.</p>
   <p>Notice that 74% is very different from the 50% in your labeled set. That is expected. You balanced the labeled set on purpose; real replies have their own mix. TPR and TNR do not depend on the mix, which is why they can be carried from the labeled set to new data. A different pass rate on new data is not a reason to change the judge. Reading the judge's verdicts on some new replies, and finding mistakes your labeled set did not cover, is.</p>
-  <p>Move θ, TPR and TNR below to watch the raw score and the correction change. It starts at this example's numbers.</p>
+  <p>Move θ, TPR and TNR below to watch the matrix and the raw score change. It starts at this example's numbers. A second box in Section 8 shows the correction.</p>
   <section class="lab" aria-labelledby="lab-title">
     <p class="lab-title" id="lab-title">Try it</p>
     <p class="lab-note">100 replies sorted into the confusion matrix from Section 3. Blue dots are polite replies, orange are rude; filled dots are ones the judge passed. Green cells (✓) are where the judge agreed with you; red cells (✗) are its mistakes. Counts are rounded to whole replies; the formulas below use exact values.</p>
@@ -232,24 +235,6 @@ Reply: {{REPLY}}</pre>
       <span class="eq" id="eq-pobs"></span>
       <div class="big"><span>Judge reports <b id="pobs"></b></span><span>Truth <b id="truth"></b></span><span>Off by <b id="raw-err"></b></span></div>
     </div>
-    <div class="part2">
-      <p class="lab-title">Correct it</p>
-      <label class="check"><input type="checkbox" id="linked" checked><span>The TPR and TNR I measured on my labeled set match the judge's real ones. Untick to see what happens when your measurement is off (Sections 6 and 8).</span></label>
-      <div class="measured" id="measured" hidden>
-        <div class="ctl">
-          <label for="mtpr">Measured TPR <output id="mtpr-out" for="mtpr">0.92</output></label>
-          <input type="range" id="mtpr" min="0" max="100" step="1" value="92">
-        </div>
-        <div class="ctl">
-          <label for="mtnr">Measured TNR <output id="mtnr-out" for="mtnr">0.88</output></label>
-          <input type="range" id="mtnr" min="0" max="100" step="1" value="88">
-        </div>
-      </div>
-      <div class="readout" aria-live="polite">
-        <span class="eq" id="eq-corr"></span>
-        <div class="big"><span>Corrected estimate <b id="corr"></b></span><span>Truth <b id="truth2"></b></span><span>Off by <b id="corr-err"></b></span><span>Youden's J <b id="jval"></b></span></div>
-      </div>
-    </div>
   </section>
   <h2 id="range"><span class="num">6.</span>The range, and how to tighten it</h2>
   <p>The 74% is an estimate. TPR and TNR were measured on only 25 replies each, and the raw score came from one month of 400 replies. Recomputing the correction on many resamples of those counts (a bootstrap; Efron and Tibshirani 1993) gives a 95% range of <strong>63% to 88%</strong>. That is wide, and it is honest: the raw "71%" had the same uncertainty, just hidden.</p>
@@ -275,6 +260,26 @@ Reply: {{REPLY}}</pre>
   <h2 id="models"><span class="num">8.</span>When models change</h2>
   <p><strong>Changing the judge's model</strong> changes TPR and TNR, because they describe that particular judge. A stronger model often raises both and narrows the range, but you have to measure it: run the new judge on dev, then once on fresh test labels. Call the judge with a dated model ID rather than an alias like "latest", so the provider cannot swap the model underneath you.</p>
   <p><strong>Changing the model that writes the replies</strong> changes the real pass rate, which is what you want to measure. It can also change the judge's TPR and TNR, because the new model may be rude in ways the judge was never checked on. After a change like that, label about 50 new replies and check that the judge still lands near its old TPR and TNR before trusting the corrected numbers.</p>
+  <p>The box below shows why. The correction uses the TPR and TNR you measured on your test set. If the judge's real rates on new replies have drifted away from those, the correction is off, and nothing in the math tells you.</p>
+  <section class="lab" aria-labelledby="lab2-title">
+    <p class="lab-title" id="lab2-title">Try it: correct with the rates you measured</p>
+    <p class="lab-note">The judge's real behavior comes from the sliders in Section 5: <span id="real-summary"></span>. Set the TPR and TNR you measured on your test set. When they match the real ones, the correction lands on the truth. Move them apart to see how far it drifts.</p>
+    <div class="measured" id="measured">
+      <div class="ctl">
+        <label for="mtpr">Measured TPR <output id="mtpr-out" for="mtpr">0.92</output></label>
+        <input type="range" id="mtpr" min="0" max="100" step="1" value="92">
+      </div>
+      <div class="ctl">
+        <label for="mtnr">Measured TNR <output id="mtnr-out" for="mtnr">0.88</output></label>
+        <input type="range" id="mtnr" min="0" max="100" step="1" value="88">
+      </div>
+    </div>
+    <p style="margin:8px 0 0"><button type="button" class="btn" id="match">Match the judge's real rates</button></p>
+    <div class="readout" aria-live="polite">
+      <span class="eq" id="eq-corr"></span>
+      <div class="big"><span>Corrected estimate <b id="corr"></b></span><span>Truth <b id="truth2"></b></span><span>Off by <b id="corr-err"></b></span><span>Youden's J <b id="jval"></b></span></div>
+    </div>
+  </section>
   <p><strong>Using the same model for both</strong> is a risk of its own. A judge tends to miss the same mistakes its own model makes. Use a different, and preferably stronger, model for the judge.</p>
   <p>The same applies whenever the replies change in other ways, such as new templates or new kinds of requests: re-check the judge on a fresh labeled sample. In practice that is the ongoing cost of using a judge.</p>
   <h2 id="glossary"><span class="num">9.</span>Glossary</h2>
@@ -329,9 +334,6 @@ Reply: {{REPLY}}</pre>
 
   function update() {
     const theta = $("theta").value / 100, tpr = $("tpr").value / 100, tnr = $("tnr").value / 100;
-    const linked = $("linked").checked;
-    if (linked) { $("mtpr").value = $("tpr").value; $("mtnr").value = $("tnr").value; }
-    $("measured").hidden = linked;
     const mtpr = $("mtpr").value / 100, mtnr = $("mtnr").value / 100;
     $("theta-out").textContent = Math.round(theta * 100) + "%";
     $("tpr-out").textContent = f2(tpr); $("tnr-out").textContent = f2(tnr);
@@ -351,6 +353,7 @@ Reply: {{REPLY}}</pre>
       `p_obs = TPR × θ + (1 − TNR) × (1 − θ)\n      = ${f2(tpr)} × ${f2(theta)} + ${f2(1 - tnr)} × ${f2(1 - theta)}\n      = ${a.toFixed(3)} + ${b.toFixed(3)} = ${p.toFixed(3)}`;
     $("pobs").textContent = pct(p); $("truth").textContent = pct(theta); $("truth2").textContent = pct(theta);
     $("raw-err").textContent = pts(p - theta);
+    $("real-summary").textContent = `true pass rate ${Math.round(theta * 100)}%, real TPR ${f2(tpr)}, real TNR ${f2(tnr)}, so the judge reports ${pct(p)}`;
 
     const j = mtpr + mtnr - 1;
     $("jval").textContent = f2(j);
@@ -366,8 +369,8 @@ Reply: {{REPLY}}</pre>
       $("corr").textContent = pct(est); $("corr-err").textContent = pts(est - theta);
     }
   }
-  ["theta", "tpr", "tnr", "mtpr", "mtnr", "linked"].forEach(id => $(id).addEventListener("input", update));
-  $("linked").addEventListener("change", update);
+  ["theta", "tpr", "tnr", "mtpr", "mtnr"].forEach(id => $(id).addEventListener("input", update));
+  $("match").addEventListener("click", () => { $("mtpr").value = $("tpr").value; $("mtnr").value = $("tnr").value; update(); });
   update();
 })();
 </script>

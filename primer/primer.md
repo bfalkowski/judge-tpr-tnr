@@ -105,7 +105,7 @@ The judge's number was a little low. Missing 8% of the polite replies pulled it 
 
 Notice that 74% is very different from the 50% in your labeled set. That is expected. You balanced the labeled set on purpose; real replies have their own mix. TPR and TNR do not depend on the mix, which is why they can be carried from the labeled set to new data. A different pass rate on new data is not a reason to change the judge. Reading the judge's verdicts on some new replies, and finding mistakes your labeled set did not cover, is.
 
-The interactive version of this page lets you move θ, TPR and TNR and watch the raw score and the correction change.
+The interactive version of this page lets you move θ, TPR and TNR and watch the matrix and the raw score change.
 
 ## 6. The range, and how to tighten it
 
@@ -143,7 +143,7 @@ For comparison, checking 100 random replies by hand would give about 74% ± 9 po
 
 **Changing the judge's model** changes TPR and TNR, because they describe that particular judge. A stronger model often raises both and narrows the range, but you have to measure it: run the new judge on dev, then once on fresh test labels. Call the judge with a dated model ID rather than an alias like "latest", so the provider cannot swap the model underneath you.
 
-**Changing the model that writes the replies** changes the real pass rate, which is what you want to measure. It can also change the judge's TPR and TNR, because the new model may be rude in ways the judge was never checked on. After a change like that, label about 50 new replies and check that the judge still lands near its old TPR and TNR before trusting the corrected numbers.
+**Changing the model that writes the replies** changes the real pass rate, which is what you want to measure. It can also change the judge's TPR and TNR, because the new model may be rude in ways the judge was never checked on. After a change like that, label about 50 new replies and check that the judge still lands near its old TPR and TNR before trusting the corrected numbers. The correction uses the TPR and TNR you measured; if the judge's real rates on new replies have drifted, the corrected number is off and nothing in the math tells you. The interactive version of this page lets you set the measured rates apart from the real ones and see how far the estimate moves.
 
 **Using the same model for both** is a risk of its own. A judge tends to miss the same mistakes its own model makes. Use a different, and preferably stronger, model for the judge.
 
