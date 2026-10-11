@@ -67,6 +67,9 @@ def main():
     ap.add_argument("--repeats", type=int, default=2, help="calls per item (paper 2 used 2)")
     ap.add_argument("--run-id", default=time.strftime("run-%Y%m%d-%H%M%S"))
     ap.add_argument("--limit", type=int, default=None, help="first N items only (smoke tests)")
+    ap.add_argument("--post-hoc", action="store_true",
+                    help="after a judge is frozen, run an earlier, non-frozen judge on test or prod for a "
+                         "secondary analysis; recorded in the manifest. Nothing it produces can change the frozen judge")
     ap.add_argument("--out", default=os.path.join(ROOT, "runs"))
     a = ap.parse_args()
 
@@ -74,7 +77,15 @@ def main():
     if os.environ.get("JEV_BACKEND") != "stub" and not os.environ.get(need):
         sys.exit(f"{need} is not set: add it to .env, or as a repository secret for the "
                  "judge workflow, or use JEV_BACKEND=stub")
-    frozen = check_frozen(a.variant) if a.split in ("test", "prod") else None
+    if a.post_hoc:
+        path = os.path.join(ROOT, "freeze.json")
+        if not os.path.exists(path):
+            sys.exit("--post-hoc is only allowed once a judge is frozen")
+        frozen = json.load(open(path))
+        if frozen["variant"] == a.variant:
+            sys.exit("--post-hoc is for judges other than the frozen one")
+    else:
+        frozen = check_frozen(a.variant) if a.split in ("test", "prod") else None
     if a.split == "all" and "test" in set(data.load_split(a.dataset).values()):
         sys.exit("--split all would include test tickets; run the splits separately")
     items = data.load_items(a.dataset) if a.split == "all" else data.items_for(a.dataset, a.split)
@@ -93,7 +104,7 @@ def main():
         "dataset": a.dataset, "split": a.split, "repeats": a.repeats, "n_items": len(items),
         "items_sha256": hashlib.sha256(open(data.items_path(a.dataset), "rb").read()).hexdigest(),
         "split_sha256": hashlib.sha256(open(data.split_path(a.dataset), "rb").read()).hexdigest(),
-        "git_commit": git_commit(), "frozen": frozen,
+        "git_commit": git_commit(), "frozen": frozen, "post_hoc": a.post_hoc,
         "started_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     }
     json.dump(manifest, open(os.path.join(run_dir, "manifest.json"), "w"), indent=1)
