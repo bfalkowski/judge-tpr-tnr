@@ -1,0 +1,377 @@
+<title>TPR and TNR for LLM Judges</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* Layout: the site's single 760px reading column; one interactive lab block in Section 4. */
+  :root {
+    --text: #2c2c2c; --muted: #5f6470; --line: #e0e2e6; --alt-bg: #f7f8fa; --bg: #ffffff;
+    --accent: #1d3f72; --on-accent: #ffffff;
+    --good: #2a5aa8; --bad: #c0562b; --dot-ring: #ffffff;
+    --font-body: "Source Sans 3", "Source Sans Pro", "Segoe UI", Helvetica, Arial, sans-serif;
+    --font-mono: "Roboto Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --text: #e4e6ea; --muted: #a0a6b2; --line: #2e333c; --alt-bg: #1c2027; --bg: #15181d;
+      --accent: #8fb0e3; --on-accent: #10141a;
+      --good: #6a95d8; --bad: #d6764a; --dot-ring: #15181d; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --text: #e4e6ea; --muted: #a0a6b2; --line: #2e333c; --alt-bg: #1c2027; --bg: #15181d;
+    --accent: #8fb0e3; --on-accent: #10141a;
+    --good: #6a95d8; --bad: #d6764a; --dot-ring: #15181d; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 17px/1.6 var(--font-body); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  a:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .topbar { border-bottom: 1px solid var(--line); padding-block: 14px; padding-inline: 32px; }
+  .topbar .container { display: flex; justify-content: space-between; gap: 16px; font-size: 15px; }
+  .topbar a.home { color: var(--text); font-weight: 600; }
+  .container { max-width: 760px; margin: 0 auto; }
+  article { padding-block: 48px 64px; padding-inline: 32px; }
+  h1 { font-size: 34px; font-weight: 600; line-height: 1.2; margin: 0 0 10px; text-wrap: balance; }
+  .byline { color: var(--muted); font-size: 15px; margin: 0 0 32px; }
+  h2 { font-size: 24px; font-weight: 700; margin: 44px 0 14px; text-wrap: balance; scroll-margin-top: 16px; }
+  h2 .num { color: var(--muted); font-weight: 600; margin-right: 6px; }
+  p { margin: 0 0 14px; }
+  ul, ol { margin: 0 0 16px; padding-left: 24px; }
+  li { margin-bottom: 6px; }
+  .table-wrap { overflow-x: auto; margin: 0 0 18px; }
+  table { border-collapse: collapse; width: 100%; font-size: 15px; font-variant-numeric: tabular-nums; }
+  th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--alt-bg); font-weight: 600; }
+  thead th { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+  td.n, th.n { text-align: right; }
+  code, .eq { font-family: var(--font-mono); }
+  code { font-size: 0.88em; }
+  .eq { display: block; background: var(--alt-bg); border: 1px solid var(--line); border-radius: 6px;
+        padding: 10px 14px; margin: 4px 0 16px; font-size: 14.5px; overflow-x: auto; white-space: pre; }
+  .abstract { background: var(--alt-bg); border-left: 3px solid var(--accent); padding: 14px 18px;
+              border-radius: 0 6px 6px 0; margin-bottom: 8px; }
+  .abstract p:last-child { margin-bottom: 0; }
+  .draft { color: var(--muted); font-style: italic; }
+  footer { text-align: center; color: var(--muted); font-size: 14px; padding: 32px 16px; border-top: 1px solid var(--line); }
+
+  /* The lab */
+  .lab { border: 1px solid var(--accent); border-radius: 8px; padding: 16px 18px 18px; margin: 8px 0 24px; }
+  .lab-title { font-weight: 700; color: var(--accent); margin: 0 0 4px; }
+  .lab-note { color: var(--muted); font-size: 14.5px; margin: 0 0 14px; }
+  .lab-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  .controls { display: grid; gap: 12px; min-width: 0; }
+  .ctl label { display: flex; justify-content: space-between; gap: 8px; font-size: 15px; font-weight: 600; }
+  .ctl output { font-family: var(--font-mono); font-weight: 500; font-variant-numeric: tabular-nums; }
+  .ctl .hint { display: block; color: var(--muted); font-size: 13.5px; font-weight: 400; }
+  input[type=range] { width: 100%; accent-color: var(--accent); margin: 4px 0 0; }
+  .dots { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; max-width: 280px; width: 100%; }
+  .dot { aspect-ratio: 1; border-radius: 50%; border: 2.5px solid var(--good); background: transparent; }
+  .dot.bad { border-color: var(--bad); }
+  .dot.passed { background: var(--good); box-shadow: 0 0 0 1px var(--dot-ring) inset; }
+  .dot.bad.passed { background: var(--bad); }
+  .legend { display: grid; grid-template-columns: auto 1fr auto; gap: 4px 8px; align-items: center;
+            font-size: 14px; margin: 12px 0 0; max-width: 300px; font-variant-numeric: tabular-nums; }
+  .legend .sw { width: 13px; height: 13px; border-radius: 50%; border: 2.5px solid var(--good); }
+  .legend .sw.bad { border-color: var(--bad); }
+  .legend .sw.passed { background: var(--good); }
+  .legend .sw.bad.passed { background: var(--bad); }
+  .legend .ct { font-family: var(--font-mono); text-align: right; }
+  .readout { margin: 14px 0 0; display: grid; gap: 8px; }
+  .readout .eq { margin: 0; white-space: pre; }
+  .big { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 15px; }
+  .big b { font-family: var(--font-mono); font-weight: 500; font-size: 18px; }
+  .part2 { border-top: 1px solid var(--line); margin-top: 16px; padding-top: 14px; }
+  .check { display: flex; gap: 8px; align-items: flex-start; font-size: 15px; margin: 0 0 12px; }
+  .check input { margin-top: 5px; accent-color: var(--accent); }
+  .measured { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px 20px; margin-bottom: 4px; }
+  .warn { color: var(--bad); font-weight: 600; }
+
+  @media (max-width: 720px) {
+    .topbar, article { padding-inline: 16px; }
+    h1 { font-size: 28px; }
+    .lab { padding: 14px; }
+    .lab-grid, .measured { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (prefers-reduced-motion: no-preference) { .dot { transition: background-color .15s, border-color .15s; } }
+</style>
+
+<div class="topbar"><div class="container">
+  <a class="home" href="https://bfalkowski.github.io/">Bryan Falkowski</a>
+  <a href="https://bfalkowski.github.io/#writing">All writing</a>
+</div></div>
+
+<main class="container"><article>
+  <h1>TPR and TNR for LLM Judges</h1>
+  <p class="byline">Bryan Falkowski · October 2026 · <span class="draft">Draft</span></p>
+
+  <div class="abstract">
+    <p>An LLM judge reads an output and says PASS or FAIL. Before you trust the pass rate it reports, you need to know two things about it: how often it passes things that should pass, and how often it fails things that should fail. Those are its true positive rate (TPR) and true negative rate (TNR). This primer explains both, shows how they bend the pass rate a judge reports, and shows how to undo that. Each section has a worked example you can check by hand. My other papers link back to the sections here.</p>
+  </div>
+
+  <h2 id="accuracy"><span class="num">1.</span>Why accuracy is not enough</h2>
+  <p>Say 95 of 100 outputs are good and 5 are bad. A judge that says PASS to everything is right 95 times, so its accuracy is 95%. It also catches none of the 5 bad outputs. If the point of the judge is to find failures, it is useless, and accuracy hides that completely.</p>
+  <p>Accuracy mixes two different questions into one number:</p>
+  <ul>
+    <li>When an output is good, does the judge pass it?</li>
+    <li>When an output is bad, does the judge fail it?</li>
+  </ul>
+  <p>TPR answers the first question and TNR the second. Kept separate, they show what accuracy hides: the always-PASS judge has TPR 1.0 and TNR 0.0.</p>
+
+  <h2 id="matrix"><span class="num">2.</span>The confusion matrix</h2>
+  <p>Start with labeled items: outputs where you already know the right answer, because a person (or, in my case, code) labeled them. Run the judge on them. Every item lands in one of four cells.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th></th><th>Judge says PASS</th><th>Judge says FAIL</th></tr></thead>
+    <tbody>
+      <tr><th>Should PASS</th><td>true positive (TP)</td><td>false negative (FN)</td></tr>
+      <tr><th>Should FAIL</th><td>false positive (FP)</td><td>true negative (TN)</td></tr>
+    </tbody>
+  </table></div>
+  <p>PASS is the "positive" class here, so a false positive is a false pass: the judge passed something that should fail. A false negative is a false fail.</p>
+  <p><strong>Example.</strong> 20 labeled items. 14 should pass and 6 should fail.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th></th><th class="n">Judge says PASS</th><th class="n">Judge says FAIL</th><th class="n">Total</th></tr></thead>
+    <tbody>
+      <tr><th>Should PASS</th><td class="n">13</td><td class="n">1</td><td class="n">14</td></tr>
+      <tr><th>Should FAIL</th><td class="n">4</td><td class="n">2</td><td class="n">6</td></tr>
+      <tr><th>Total</th><td class="n">17</td><td class="n">3</td><td class="n">20</td></tr>
+    </tbody>
+  </table></div>
+  <p>The judge passed 17 of the 20. It was right on 13 + 2 = 15, so its accuracy is 75%.</p>
+
+  <h2 id="tpr-tnr"><span class="num">3.</span>TPR and TNR</h2>
+  <span class="eq">TPR = TP / (TP + FN)    of the items that should pass, the share the judge passed
+TNR = TN / (TN + FP)    of the items that should fail, the share the judge failed</span>
+  <p>In the example, TPR = 13 / 14 = 0.93 and TNR = 2 / 6 = 0.33. The judge is good at recognizing good outputs and bad at catching bad ones: it passed 4 of the 6 failures.</p>
+  <p>Each rate is computed only within its own row. TPR uses only the items that should pass, and TNR only the items that should fail. So neither depends on how many good or bad items happen to be in the set, and everything below relies on that.</p>
+  <p><strong>Other names.</strong> In medical testing these are sensitivity (TPR) and specificity (TNR) (Altman and Bland 1994). In machine learning, TPR is the recall of the PASS class and TNR is the recall of the FAIL class. They are the same numbers.</p>
+  <p><strong>Why not precision?</strong> Precision asks a different question: of the items the judge passed, how many should have passed? It depends on how common good outputs are. Take a judge with TPR 0.9 and TNR 0.8. If 70% of outputs are good, its precision for PASS is 0.91. If only 30% are good, the same judge's precision is 0.66. The judge did not change; the mix did. TPR and TNR stay put when the mix changes, so they describe the judge itself.</p>
+
+  <h2 id="mix"><span class="num">4.</span>How the judge's errors bend the pass rate</h2>
+  <p>What you usually want from a judge is a pass rate: what share of your system's outputs are good. Call the true pass rate θ (theta). The judge does not report θ. It reports the share of outputs it passed, p<sub>obs</sub>, and that share is built from two parts:</p>
+  <ul>
+    <li>the good outputs it correctly passes: TPR × θ</li>
+    <li>the bad outputs it wrongly passes: (1 − TNR) × (1 − θ)</li>
+  </ul>
+  <span class="eq">p_obs = TPR × θ + (1 − TNR) × (1 − θ)</span>
+  <p><strong>Example.</strong> True pass rate θ = 0.70. The judge has TPR 0.9 and TNR 0.8. Good outputs it passes: 0.9 × 0.70 = 0.63. Bad outputs it passes: 0.2 × 0.30 = 0.06. Reported pass rate: 0.63 + 0.06 = 0.69. The judge reports 69% when the truth is 70%.</p>
+  <p>The two kinds of error push in opposite directions. Missing good outputs (TPR below 1) pulls the reported rate down. Passing bad outputs (TNR below 1) pushes it up. Here they nearly cancel. They will not always: with the same TPR but TNR 0.5, the judge would report 0.63 + 0.15 = 78%.</p>
+
+  <section class="lab" aria-labelledby="lab-title">
+    <p class="lab-title" id="lab-title">Try it</p>
+    <p class="lab-note">100 outputs. Blue should pass, orange should fail. A filled dot is one the judge passed; a hollow dot is one it failed. Dot counts are rounded to whole outputs; the formulas use exact values.</p>
+    <div class="lab-grid">
+      <div class="controls">
+        <div class="ctl">
+          <label for="theta">True pass rate θ <output id="theta-out" for="theta">70%</output></label>
+          <span class="hint">the share of outputs that are actually good</span>
+          <input type="range" id="theta" min="0" max="100" step="1" value="70">
+        </div>
+        <div class="ctl">
+          <label for="tpr">Judge TPR <output id="tpr-out" for="tpr">0.90</output></label>
+          <span class="hint">share of good outputs it passes</span>
+          <input type="range" id="tpr" min="0" max="100" step="1" value="90">
+        </div>
+        <div class="ctl">
+          <label for="tnr">Judge TNR <output id="tnr-out" for="tnr">0.80</output></label>
+          <span class="hint">share of bad outputs it fails</span>
+          <input type="range" id="tnr" min="0" max="100" step="1" value="80">
+        </div>
+      </div>
+      <div style="min-width:0">
+        <div class="dots" id="dots" role="img" aria-label="Grid of 100 outputs"></div>
+        <div class="legend" aria-live="polite">
+          <span class="sw passed"></span><span>Good, passed (TP)</span><span class="ct" id="c-tp"></span>
+          <span class="sw"></span><span>Good, failed (FN)</span><span class="ct" id="c-fn"></span>
+          <span class="sw bad passed"></span><span>Bad, passed (FP)</span><span class="ct" id="c-fp"></span>
+          <span class="sw bad"></span><span>Bad, failed (TN)</span><span class="ct" id="c-tn"></span>
+        </div>
+      </div>
+    </div>
+    <div class="readout" aria-live="polite">
+      <span class="eq" id="eq-pobs"></span>
+      <div class="big"><span>Judge reports <b id="pobs"></b></span><span>Truth <b id="truth"></b></span><span>Off by <b id="raw-err"></b></span></div>
+    </div>
+    <div class="part2">
+      <p class="lab-title">Correct it (Section 5)</p>
+      <label class="check"><input type="checkbox" id="linked" checked><span>The TPR and TNR I measured on my labeled set match the judge's real ones. Untick to see what happens when your measurement is off (Sections 6 and 8).</span></label>
+      <div class="measured" id="measured" hidden>
+        <div class="ctl">
+          <label for="mtpr">Measured TPR <output id="mtpr-out" for="mtpr">0.90</output></label>
+          <input type="range" id="mtpr" min="0" max="100" step="1" value="90">
+        </div>
+        <div class="ctl">
+          <label for="mtnr">Measured TNR <output id="mtnr-out" for="mtnr">0.80</output></label>
+          <input type="range" id="mtnr" min="0" max="100" step="1" value="80">
+        </div>
+      </div>
+      <div class="readout" aria-live="polite">
+        <span class="eq" id="eq-corr"></span>
+        <div class="big"><span>Corrected estimate <b id="corr"></b></span><span>Truth <b id="truth2"></b></span><span>Off by <b id="corr-err"></b></span><span>Youden's J <b id="jval"></b></span></div>
+      </div>
+    </div>
+  </section>
+
+  <h2 id="correction"><span class="num">5.</span>Undoing the mix</h2>
+  <p>If you know TPR and TNR, you can solve the formula in Section 4 for θ:</p>
+  <span class="eq">p_obs = TPR × θ + (1 − TNR) − (1 − TNR) × θ
+p_obs − (1 − TNR) = (TPR + TNR − 1) × θ
+
+θ = (p_obs + TNR − 1) / (TPR + TNR − 1)</span>
+  <p>This is the Rogan-Gladen estimator, from epidemiology, where it corrects disease rates measured with an imperfect test (Rogan and Gladen 1978). If the result falls below 0 or above 1, it is clipped to that range.</p>
+  <p><strong>Example.</strong> From Section 4: p<sub>obs</sub> = 0.69, TPR = 0.9, TNR = 0.8. Then θ = (0.69 + 0.8 − 1) / (0.9 + 0.8 − 1) = 0.49 / 0.70 = 0.70. The correction recovers the true 70%.</p>
+  <p>In practice the steps are:</p>
+  <ol>
+    <li>Label a set of items and measure the judge's TPR and TNR on them.</li>
+    <li>Run the judge on new, unlabeled outputs and count the share it passes, p<sub>obs</sub>.</li>
+    <li>Plug both into the formula.</li>
+  </ol>
+  <p>The labeled set and the new outputs must be different items. On the labeled set itself the formula gives back the exact true rate every time. For the 20 items in Section 2, p<sub>obs</sub> = 17/20 = 0.85, and (0.85 + 0.333 − 1) / (0.929 + 0.333 − 1) = 0.70, exactly the true 14/20. That is algebra, not evidence that the judge works.</p>
+
+  <h2 id="youden"><span class="num">6.</span>Why a weak judge breaks the correction</h2>
+  <p>The bottom of the formula, TPR + TNR − 1, is called Youden's J (Youden 1950). It measures how much better than a coin flip the judge is. It is 1 for a perfect judge and 0 for a judge that ignores the output. A judge that passes everything has TPR 1 and TNR 0, so J = 0.</p>
+  <p>Every error in the inputs gets divided by J. If p<sub>obs</sub> is off by 1 point:</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Judge</th><th class="n">J</th><th class="n">Corrected estimate is off by</th></tr></thead>
+    <tbody>
+      <tr><td>TPR 0.95, TNR 0.95</td><td class="n">0.90</td><td class="n">about 1.1 points</td></tr>
+      <tr><td>TPR 0.9, TNR 0.8</td><td class="n">0.70</td><td class="n">about 1.4 points</td></tr>
+      <tr><td>TPR 0.6, TNR 0.5</td><td class="n">0.10</td><td class="n">about 10 points</td></tr>
+    </tbody>
+  </table></div>
+  <p>The same holds for errors in TPR and TNR themselves, which are only estimates. With a weak judge, a 2-point wobble in p<sub>obs</sub> can move the corrected estimate by 20 points. When J is 0 or below, the formula has no answer at all.</p>
+  <p>So the correction is not a way to rescue a bad judge. You improve the judge first, until TPR and TNR are both high (a common target is above 0.9), and then correct. My worked example of that improvement loop is in the companion paper.</p>
+
+  <h2 id="labels"><span class="num">7.</span>How many labels you need</h2>
+  <p>TPR and TNR are measured on a sample, so each has an uncertainty. A rough 95% range for a rate measured on n items is ±1.96 × √(rate × (1 − rate) / n). For a rate near 0.9:</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th class="n">Items in that row</th><th class="n">Rough 95% range</th></tr></thead>
+    <tbody>
+      <tr><td class="n">30</td><td class="n">±0.11</td></tr>
+      <tr><td class="n">50</td><td class="n">±0.08</td></tr>
+      <tr><td class="n">100</td><td class="n">±0.06</td></tr>
+      <tr><td class="n">200</td><td class="n">±0.04</td></tr>
+    </tbody>
+  </table></div>
+  <p>What matters is the count in each row: TNR is measured only on items that should fail. If failures are rare, a random sample will have very few of them and TNR will be poorly measured. That is why the usual advice is to collect enough of both, 30 to 50 of each, even if that over-represents failures. Because each rate stays within its own row, over-representing failures does not bias them.</p>
+  <ul>
+    <li><strong>Count distinct cases.</strong> If the same input appears many times, those repeats are not independent evidence. Ten copies of one hard case count closer to one.</li>
+    <li><strong>Report an interval, not just a number.</strong> Recompute the corrected estimate on many resamples of your data (a bootstrap; Efron and Tibshirani 1993) and report the range that holds the middle 95%. A corrected 80% that could be anywhere from 72% to 89% should be reported that way.</li>
+  </ul>
+
+  <h2 id="assumption"><span class="num">8.</span>The assumption underneath</h2>
+  <p>The correction assumes the judge makes mistakes on the new outputs at the same rates it made them on the labeled set. That is the price of using two numbers to describe a judge.</p>
+  <p>It can fail. If a judge is good at catching some kinds of failure and bad at others, its TNR on a new batch depends on which kinds of failure that batch contains. In my companion paper, one judge measured TNR 0.53 on its labeled set. On four new batches its actual TNR was 0.19, 0.22, 0.42 and 0.67, depending on what kinds of mistakes the system made in each batch, and the corrected estimates were badly wrong. A strong judge's rates held steady across the same batches.</p>
+  <ul>
+    <li>Build the labeled set from failures your system actually produces, not from wrong answers you made up. Made-up wrong answers tend to be easier to catch.</li>
+    <li>Re-measure TPR and TNR on fresh labels when the system or its inputs change.</li>
+    <li>Prefer a strong judge. Its errors are fewer, so there is less for the assumption to get wrong.</li>
+  </ul>
+
+  <h2 id="glossary"><span class="num">9.</span>Glossary</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Term</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td>Labeled item</td><td>An output whose correct verdict is known in advance</td></tr>
+      <tr><td>True positive (TP)</td><td>Should pass; judge passed it</td></tr>
+      <tr><td>False negative (FN)</td><td>Should pass; judge failed it (a false fail)</td></tr>
+      <tr><td>False positive (FP)</td><td>Should fail; judge passed it (a false pass)</td></tr>
+      <tr><td>True negative (TN)</td><td>Should fail; judge failed it</td></tr>
+      <tr><td>TPR</td><td>TP / (TP + FN). Sensitivity. Recall of PASS</td></tr>
+      <tr><td>TNR</td><td>TN / (TN + FP). Specificity. Recall of FAIL</td></tr>
+      <tr><td>Accuracy</td><td>(TP + TN) / all items. Hides which kind of error the judge makes</td></tr>
+      <tr><td>Precision (PASS)</td><td>TP / (TP + FP). Changes with the share of good outputs, so it is not a property of the judge alone</td></tr>
+      <tr><td>θ (theta)</td><td>The true pass rate of a set of outputs</td></tr>
+      <tr><td>p<sub>obs</sub></td><td>The share of outputs the judge passed</td></tr>
+      <tr><td>Youden's J</td><td>TPR + TNR − 1. How much better than a coin flip the judge is</td></tr>
+      <tr><td>Rogan-Gladen correction</td><td>θ = (p<sub>obs</sub> + TNR − 1) / (TPR + TNR − 1), clipped to [0, 1]</td></tr>
+      <tr><td>Bootstrap interval</td><td>The range of an estimate across many resamples of the data</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="references">References</h2>
+  <ul>
+    <li>Altman and Bland. <a href="https://www.bmj.com/content/308/6943/1552">Diagnostic tests 1: sensitivity and specificity</a>. BMJ, 1994.</li>
+    <li>Efron and Tibshirani. An Introduction to the Bootstrap. Chapman and Hall, 1993.</li>
+    <li>Husain. <a href="https://hamel.dev/blog/posts/llm-judge/">Using LLM-as-a-Judge For Evaluation: A Complete Guide</a>. 2024.</li>
+    <li>Husain and Shankar. <a href="https://github.com/ai-evals-course/evals-skills">evals-skills</a>, <code>validate-evaluator</code>.</li>
+    <li>Rogan and Gladen. Estimating prevalence from the results of a screening test. American Journal of Epidemiology, 1978.</li>
+    <li>Youden. Index for rating diagnostic tests. Cancer, 1950.</li>
+  </ul>
+</article></main>
+
+<footer>© 2026 Bryan Falkowski</footer>
+
+<script>
+(function () {
+  const $ = id => document.getElementById(id);
+  const pct = x => (100 * x).toFixed(1) + "%";
+  const f2 = x => x.toFixed(2);
+  const pts = x => Math.abs(100 * x) < 0.05 ? "0.0 pts" : (x > 0 ? "+" : "−") + Math.abs(100 * x).toFixed(1) + " pts";
+
+  // Exact formulas (also used by the checks in primer/check_widget.js).
+  function observed(theta, tpr, tnr) { return tpr * theta + (1 - tnr) * (1 - theta); }
+  function corrected(pobs, tpr, tnr) {
+    const j = tpr + tnr - 1;
+    if (j <= 0) return null;
+    return Math.min(1, Math.max(0, (pobs + tnr - 1) / j));
+  }
+  function counts(theta, tpr, tnr) {
+    const good = Math.round(theta * 100), bad = 100 - good;
+    const tp = Math.round(tpr * good), fp = Math.round((1 - tnr) * bad);
+    return { tp, fn: good - tp, fp, tn: bad - fp };
+  }
+  window.primerMath = { observed, corrected, counts };
+
+  const dots = $("dots");
+  for (let i = 0; i < 100; i++) { const d = document.createElement("span"); d.className = "dot"; dots.appendChild(d); }
+  const names = { tp: "Should pass, judge passed (true positive)", fn: "Should pass, judge failed (false negative)",
+                  fp: "Should fail, judge passed (false positive)", tn: "Should fail, judge failed (true negative)" };
+
+  function update() {
+    const theta = $("theta").value / 100, tpr = $("tpr").value / 100, tnr = $("tnr").value / 100;
+    const linked = $("linked").checked;
+    if (linked) { $("mtpr").value = $("tpr").value; $("mtnr").value = $("tnr").value; }
+    $("measured").hidden = linked;
+    const mtpr = $("mtpr").value / 100, mtnr = $("mtnr").value / 100;
+    $("theta-out").textContent = Math.round(theta * 100) + "%";
+    $("tpr-out").textContent = f2(tpr); $("tnr-out").textContent = f2(tnr);
+    $("mtpr-out").textContent = f2(mtpr); $("mtnr-out").textContent = f2(mtnr);
+
+    const c = counts(theta, tpr, tnr);
+    const order = [].concat(Array(c.tp).fill("tp"), Array(c.fn).fill("fn"), Array(c.fp).fill("fp"), Array(c.tn).fill("tn"));
+    [...dots.children].forEach((d, i) => {
+      const k = order[i];
+      d.className = "dot" + (k === "fp" || k === "tn" ? " bad" : "") + (k === "tp" || k === "fp" ? " passed" : "");
+      d.title = names[k];
+    });
+    dots.setAttribute("aria-label", `100 outputs: ${c.tp} true positives, ${c.fn} false negatives, ${c.fp} false positives, ${c.tn} true negatives`);
+    ["tp", "fn", "fp", "tn"].forEach(k => $("c-" + k).textContent = c[k]);
+
+    const a = tpr * theta, b = (1 - tnr) * (1 - theta), p = a + b;
+    $("eq-pobs").textContent =
+      `p_obs = TPR × θ + (1 − TNR) × (1 − θ)\n      = ${f2(tpr)} × ${f2(theta)} + ${f2(1 - tnr)} × ${f2(1 - theta)}\n      = ${a.toFixed(3)} + ${b.toFixed(3)} = ${p.toFixed(3)}`;
+    $("pobs").textContent = pct(p); $("truth").textContent = pct(theta); $("truth2").textContent = pct(theta);
+    $("raw-err").textContent = pts(p - theta);
+
+    const j = mtpr + mtnr - 1;
+    $("jval").textContent = f2(j);
+    const est = corrected(p, mtpr, mtnr);
+    if (est === null) {
+      $("eq-corr").innerHTML = `θ = (p_obs + TNR − 1) / (TPR + TNR − 1)\n  = ${(p + mtnr - 1).toFixed(3)} / ${j.toFixed(3)}\n<span class="warn">No answer: TPR + TNR − 1 is 0 or below, so the judge is no better than a coin flip.</span>`;
+      $("corr").textContent = "none"; $("corr-err").textContent = "n/a";
+    } else {
+      const raw = (p + mtnr - 1) / j;
+      const clip = raw < 0 || raw > 1 ? `  (clipped from ${raw.toFixed(3)})` : "";
+      $("eq-corr").textContent =
+        `θ = (p_obs + TNR − 1) / (TPR + TNR − 1)\n  = (${p.toFixed(3)} + ${f2(mtnr)} − 1) / (${f2(mtpr)} + ${f2(mtnr)} − 1)\n  = ${(p + mtnr - 1).toFixed(3)} / ${j.toFixed(3)} = ${est.toFixed(3)}${clip}`;
+      $("corr").textContent = pct(est); $("corr-err").textContent = pts(est - theta);
+    }
+  }
+  ["theta", "tpr", "tnr", "mtpr", "mtnr", "linked"].forEach(id => $(id).addEventListener("input", update));
+  $("linked").addEventListener("change", update);
+  update();
+})();
+</script>
