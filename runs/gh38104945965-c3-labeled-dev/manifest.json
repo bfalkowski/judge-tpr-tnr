@@ -1,0 +1,19 @@
+{
+ "run_id": "gh38104945965-c3-labeled-dev",
+ "variant": "c3",
+ "fingerprint": "1b1bebcddff9f66c",
+ "model": "claude-haiku-4-5-20251001",
+ "backend": "api",
+ "dataset": "labeled",
+ "split": "dev",
+ "repeats": 2,
+ "n_items": 158,
+ "items_sha256": "d2ae982dac5b091445bfbb04f0fbfbcac7519cd839d84e41b5a5aa2bbcfa5f0e",
+ "split_sha256": "8aaf94c4b59f019ddfdd3fba1d166b50771218437bb0e780bc1b25b885bc13d9",
+ "git_commit": "6678524d1718aa140236402b160b334432254b6e",
+ "frozen": null,
+ "started_at": "2026-10-11T02:22:47Z",
+ "finished_at": "2026-10-11T02:29:45Z",
+ "errored_calls": 0,
+ "spend_usd": 0.57499
+}
