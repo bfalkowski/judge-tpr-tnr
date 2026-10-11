@@ -153,43 +153,6 @@
 
   <div class="abstract"><p>An LLM judge reads an output and says PASS or FAIL. Teams use judges to answer questions like "what share of our replies are polite?" without reading every reply themselves. Before you trust the number a judge reports, you need to know how often it gets each kind of output right. That is what TPR and TNR measure.</p>
 <p>This primer works through one small example from start to finish: label some outputs, measure a judge, improve it, use it, and report the result with a range. The counts are invented for teaching; every calculation is checked by <code>primer/numbers.py</code>.</p></div>
-  <h2 id="short">The short version</h2>
-  <p>Your judge checks 400 customer service replies and says 284 are polite (71%). If you hand-labeled all 400, you would find 296 are really polite (74%). Three ideas explain the gap.</p>
-  <p><strong>1. The judge makes two kinds of mistakes.</strong> It fails some polite replies: it passes 92% of them (TPR 0.92), so it fails 24 of the 296. And it passes some rude replies: it fails 88% of them (TNR 0.88), so about 12 of the 104 rude replies get through.</p>
-  <p><strong>2. The mistakes push the score in opposite directions.</strong> The 24 polite replies it failed pull the score down. The 12 rude replies it passed push it up. They don't cancel, so the judge reports 284 instead of 296.</p>
-  <p><strong>3. If you know the two rates, you can undo the mistakes.</strong> You measure TPR and TNR once by hand-labeling a sample. The correction then works back from the judge's 71% to an estimate of 74%. That only holds while the judge behaves the way it did when you measured it. When the replies change (a new model, new templates), label a fresh sample and check the rates again.</p>
-  <section class="lab" aria-labelledby="lab0-title">
-    <p class="lab-title" id="lab0-title">Try it: the 400 replies in one line</p>
-    <p class="lab-note">74% of the replies are really polite. Move the judge's TPR and TNR and watch its two kinds of mistakes change the score it reports.</p>
-    <div class="controls">
-      <div class="ctl"><label for="stpr">TPR <output id="stpr-out" for="stpr">0.92</output></label>
-        <span class="hint">share of polite replies it passes</span>
-        <input type="range" id="stpr" min="50" max="100" step="1" value="92"></div>
-      <div class="ctl"><label for="stnr">TNR <output id="stnr-out" for="stnr">0.88</output></label>
-        <span class="hint">share of rude replies it fails</span>
-        <input type="range" id="stnr" min="50" max="100" step="1" value="88"></div>
-    </div>
-    <div class="sbar" role="img" id="sbar" aria-label="">
-      <span class="seg-tp" id="sb-tp"></span><span class="seg-fn" id="sb-fn"></span><span class="seg-fp" id="sb-fp"></span><span class="seg-tn" id="sb-tn"></span>
-    </div>
-    <div class="sbar-scale"><span>← 296 really polite</span><span>104 really rude →</span></div>
-    <div class="sline" style="font-size:13.5px;color:var(--muted);gap:4px 14px">
-      <span class="chip" style="border:none;padding:0"><i class="seg-tp"></i>polite, passed</span>
-      <span class="chip" style="border:none;padding:0"><i class="seg-fn"></i>polite, failed by mistake</span>
-      <span class="chip" style="border:none;padding:0"><i class="seg-fp"></i>rude, passed by mistake</span>
-      <span class="chip" style="border:none;padding:0"><i class="seg-tn"></i>rude, failed</span>
-    </div>
-    <div class="sline" aria-live="polite">
-      <span class="chip"><b>296</b> really polite</span>
-      <span class="op">−</span>
-      <span class="chip"><i class="seg-fn"></i><b id="s-fn">24</b> polite it failed</span>
-      <span class="op">+</span>
-      <span class="chip"><i class="seg-fp"></i><b id="s-fp">12</b> rude it passed</span>
-      <span class="op">=</span>
-      <span class="chip out"><b id="s-judge">284</b> <span>judge says polite (<span id="s-jpct">71%</span>)</span></span>
-    </div>
-    <p class="lab-note" id="s-corr" style="margin:0"></p>
-  </section>
   <h2 id="question"><span class="num">1.</span>The question</h2>
   <p><strong>Is this customer service reply polite?</strong></p>
   <ul><li>"Thanks for reaching out! I've reset your password." PASS</li><li>"Read the FAQ next time." FAIL</li></ul>
@@ -358,7 +321,44 @@ Reply: {{REPLY}}</pre>
   </section>
   <p><strong>Using the same model for both</strong> is a risk of its own. A judge tends to miss the same mistakes its own model makes. Use a different, and preferably stronger, model for the judge.</p>
   <p>The same applies whenever the replies change in other ways, such as new templates or new kinds of requests: re-check the judge on a fresh labeled sample. In practice that is the ongoing cost of using a judge.</p>
-  <h2 id="glossary"><span class="num">9.</span>Glossary</h2>
+  <h2 id="together"><span class="num">9.</span>Putting it together</h2>
+  <p>Go back to Section 5. The judge checked 400 new replies and said 284 were polite (71%). Suppose you hand-labeled all 400 and found 296 were really polite (74%). Everything in this primer comes down to three ideas that explain that gap.</p>
+  <p><strong>1. The judge makes two kinds of mistakes.</strong> It fails some polite replies: it passes 92% of them (TPR 0.92), so it fails 24 of the 296. And it passes some rude replies: it fails 88% of them (TNR 0.88), so about 12 of the 104 rude replies get through.</p>
+  <p><strong>2. The mistakes push the score in opposite directions.</strong> The 24 polite replies it failed pull the score down. The 12 rude replies it passed push it up. They don't cancel, so the judge reports 284 instead of 296.</p>
+  <p><strong>3. If you know the two rates, you can undo the mistakes.</strong> You measure TPR and TNR once by hand-labeling a sample. The correction then works back from the judge's 71% to an estimate of 74%. That only holds while the judge behaves the way it did when you measured it. When the replies change (a new model, new templates), label a fresh sample and check the rates again.</p>
+  <section class="lab" aria-labelledby="lab0-title">
+    <p class="lab-title" id="lab0-title">Try it: the 400 replies in one line</p>
+    <p class="lab-note">74% of the replies are really polite. Move the judge's TPR and TNR and watch its two kinds of mistakes change the score it reports.</p>
+    <div class="controls">
+      <div class="ctl"><label for="stpr">TPR <output id="stpr-out" for="stpr">0.92</output></label>
+        <span class="hint">share of polite replies it passes</span>
+        <input type="range" id="stpr" min="50" max="100" step="1" value="92"></div>
+      <div class="ctl"><label for="stnr">TNR <output id="stnr-out" for="stnr">0.88</output></label>
+        <span class="hint">share of rude replies it fails</span>
+        <input type="range" id="stnr" min="50" max="100" step="1" value="88"></div>
+    </div>
+    <div class="sbar" role="img" id="sbar" aria-label="">
+      <span class="seg-tp" id="sb-tp"></span><span class="seg-fn" id="sb-fn"></span><span class="seg-fp" id="sb-fp"></span><span class="seg-tn" id="sb-tn"></span>
+    </div>
+    <div class="sbar-scale"><span>← 296 really polite</span><span>104 really rude →</span></div>
+    <div class="sline" style="font-size:13.5px;color:var(--muted);gap:4px 14px">
+      <span class="chip" style="border:none;padding:0"><i class="seg-tp"></i>polite, passed</span>
+      <span class="chip" style="border:none;padding:0"><i class="seg-fn"></i>polite, failed by mistake</span>
+      <span class="chip" style="border:none;padding:0"><i class="seg-fp"></i>rude, passed by mistake</span>
+      <span class="chip" style="border:none;padding:0"><i class="seg-tn"></i>rude, failed</span>
+    </div>
+    <div class="sline" aria-live="polite">
+      <span class="chip"><b>296</b> really polite</span>
+      <span class="op">−</span>
+      <span class="chip"><i class="seg-fn"></i><b id="s-fn">24</b> polite it failed</span>
+      <span class="op">+</span>
+      <span class="chip"><i class="seg-fp"></i><b id="s-fp">12</b> rude it passed</span>
+      <span class="op">=</span>
+      <span class="chip out"><b id="s-judge">284</b> <span>judge says polite (<span id="s-jpct">71%</span>)</span></span>
+    </div>
+    <p class="lab-note" id="s-corr" style="margin:0"></p>
+  </section>
+  <h2 id="glossary"><span class="num">10.</span>Glossary</h2>
   <div class="table-wrap"><table>
     <thead><tr><th>Term</th><th>Meaning</th></tr></thead>
     <tbody>
