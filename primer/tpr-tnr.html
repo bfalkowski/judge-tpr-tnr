@@ -51,7 +51,9 @@
   code { font-size: 0.88em; }
   .eq { display: block; background: var(--alt-bg); border: 1px solid var(--line); border-radius: 6px;
         padding: 10px 14px; margin: 4px 0 16px; font-size: 14.5px; overflow-x: auto; white-space: pre; }
-  .abstract { background: var(--alt-bg); border-left: 3px solid var(--accent); padding: 14px 18px;
+  pre.prompt { background: var(--alt-bg); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; margin: 4px 0 16px;
+               font: 13.5px/1.55 var(--font-mono); overflow-x: auto; white-space: pre; }
+  .abstract { margin: 0 0 16px; background: var(--alt-bg); border-left: 3px solid var(--accent); padding: 14px 18px;
               border-radius: 0 6px 6px 0; margin-bottom: 8px; }
   .abstract p:last-child { margin-bottom: 0; }
   .draft { color: var(--muted); font-style: italic; }
@@ -107,99 +109,98 @@
   <h1>TPR and TNR for LLM Judges</h1>
   <p class="byline">Bryan Falkowski · October 2026 · <span class="draft">Draft</span></p>
 
-  <div class="abstract">
-    <p>An LLM judge reads an output and says PASS or FAIL. Before you trust the pass rate it reports, you need to know two things about it: how often it passes things that should pass, and how often it fails things that should fail. Those are its true positive rate (TPR) and true negative rate (TNR). This primer explains both, shows how they bend the pass rate a judge reports, and shows how to undo that. Each section has a worked example you can check by hand. My other papers link back to the sections here.</p>
-  </div>
-
-  <h2 id="accuracy"><span class="num">1.</span>Why accuracy is not enough</h2>
-  <p>Say 95 of 100 outputs are good and 5 are bad. A judge that says PASS to everything is right 95 times, so its accuracy is 95%. It also catches none of the 5 bad outputs. If the point of the judge is to find failures, it is useless, and accuracy hides that completely.</p>
-  <p>Accuracy mixes two different questions into one number:</p>
-  <ul>
-    <li>When an output is good, does the judge pass it?</li>
-    <li>When an output is bad, does the judge fail it?</li>
-  </ul>
-  <p>TPR answers the first question and TNR the second. Kept separate, they show what accuracy hides: the always-PASS judge has TPR 1.0 and TNR 0.0.</p>
-
-  <h2 id="matrix"><span class="num">2.</span>The confusion matrix</h2>
-  <p>Start with labeled items: outputs where you already know the right answer, because a person (or, in my case, code) labeled them. Run the judge on them. Every item lands in one of four cells.</p>
+  <div class="abstract"><p>An LLM judge reads an output and says PASS or FAIL. Teams use judges to answer questions like "what share of our replies are polite?" without reading every reply themselves. Before you trust the number a judge reports, you need to know how often it gets each kind of output right. That is what TPR and TNR measure.</p>
+<p>This primer works through one small example from start to finish: label some outputs, measure a judge, improve it, use it, and report the result with a range. The counts are invented for teaching; every calculation is checked by <code>primer/numbers.py</code>.</p></div>
+  <h2 id="question"><span class="num">1.</span>The question</h2>
+  <p><strong>Is this customer service reply polite?</strong></p>
+  <ul><li>"Thanks for reaching out! I've reset your password." PASS</li><li>"Read the FAQ next time." FAIL</li></ul>
+  <p>Anyone can answer this, which makes it a good first example. Real judge questions are usually fuzzier. That is the point of using a judge: if a simple rule could answer the question, you would write the rule instead.</p>
+  <h2 id="label"><span class="num">2.</span>Label a set and split it</h2>
+  <p>Pick 100 real replies and decide each one yourself: 50 you would call polite and 50 you would not. The 50/50 balance is deliberate, so that both kinds are well represented, even if real replies are mostly polite. Then split them:</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Set</th><th>Replies</th><th>Used for</th></tr></thead>
+    <tbody>
+      <tr><td>Train</td><td>10 (5 polite, 5 rude)</td><td>Examples to put in the judge's prompt</td></tr>
+      <tr><td>Dev</td><td>40 (20 polite, 20 rude)</td><td>Measuring the judge while you improve it</td></tr>
+      <tr><td>Test</td><td>50 (25 polite, 25 rude)</td><td>One final measurement at the end</td></tr>
+    </tbody>
+  </table></div>
+  <p>Keep the three sets separate. A reply used as an example in the prompt must never be used to measure the judge.</p>
+  <h2 id="tpr-tnr"><span class="num">3.</span>Measure the judge</h2>
+  <p>The first version of the judge:</p>
+  <pre class="prompt">Is this customer service reply polite? Answer Pass or Fail.
+Reply: {{REPLY}}</pre>
+  <p>Run it on the 40 dev replies and sort the results into four cells:</p>
   <div class="table-wrap"><table>
     <thead><tr><th></th><th>Judge says PASS</th><th>Judge says FAIL</th></tr></thead>
     <tbody>
-      <tr><th>Should PASS</th><td>true positive (TP)</td><td>false negative (FN)</td></tr>
-      <tr><th>Should FAIL</th><td>false positive (FP)</td><td>true negative (TN)</td></tr>
+      <tr><th><strong>You said polite (20)</strong></th><td class="n">19</td><td class="n">1</td></tr>
+      <tr><th><strong>You said rude (20)</strong></th><td class="n">8</td><td class="n">12</td></tr>
     </tbody>
   </table></div>
-  <p>PASS is the "positive" class here, so a false positive is a false pass: the judge passed something that should fail. A false negative is a false fail.</p>
-  <p><strong>Example.</strong> 20 labeled items. 14 should pass and 6 should fail.</p>
-  <div class="table-wrap"><table>
-    <thead><tr><th></th><th class="n">Judge says PASS</th><th class="n">Judge says FAIL</th><th class="n">Total</th></tr></thead>
-    <tbody>
-      <tr><th>Should PASS</th><td class="n">13</td><td class="n">1</td><td class="n">14</td></tr>
-      <tr><th>Should FAIL</th><td class="n">4</td><td class="n">2</td><td class="n">6</td></tr>
-      <tr><th>Total</th><td class="n">17</td><td class="n">3</td><td class="n">20</td></tr>
-    </tbody>
-  </table></div>
-  <p>The judge passed 17 of the 20. It was right on 13 + 2 = 15, so its accuracy is 75%.</p>
+  <p>Two numbers come out of this table, one per row:</p>
+  <ul><li><strong>TPR (true positive rate)</strong> = polite replies it passed / all polite replies = 19 / 20 = <strong>0.95</strong></li><li><strong>TNR (true negative rate)</strong> = rude replies it failed / all rude replies = 12 / 20 = <strong>0.60</strong></li></ul>
+  <p>TPR says how well the judge recognizes good outputs. TNR says how well it catches bad ones. This judge is good at the first and poor at the second: it let 8 of 20 rude replies through.</p>
+  <p>Why two numbers and not one? This judge's accuracy is (19 + 12) / 40 = 78%, which sounds acceptable and hides the problem. Keeping the rows separate shows exactly which kind of mistake the judge makes. Each rate also only looks at its own row, so it does not change when the mix of polite and rude replies changes. That matters in Section 5.</p>
+  <p>In other fields TPR and TNR are called sensitivity and specificity (Altman and Bland 1994).</p>
+  <h2 id="improve"><span class="num">4.</span>Improve the judge</h2>
+  <p>TNR is far below the usual target of 0.9, so you stop and read the 8 rude replies it passed. They have something in common: rudeness dressed in polite words.</p>
+  <ul><li>"Thanks for your patience. As stated twice already, the FAQ covers this."</li><li>"Great, another password reset. Done."</li></ul>
+  <p>So the second version says what PASS and FAIL mean and shows one example of each, taken from the train set:</p>
+  <pre class="prompt">Is this customer service reply polite? Answer Pass or Fail.
 
-  <h2 id="tpr-tnr"><span class="num">3.</span>TPR and TNR</h2>
-  <span class="eq">TPR = TP / (TP + FN)    of the items that should pass, the share the judge passed
-TNR = TN / (TN + FP)    of the items that should fail, the share the judge failed</span>
-  <p>In the example, TPR = 13 / 14 = 0.93 and TNR = 2 / 6 = 0.33. The judge is good at recognizing good outputs and bad at catching bad ones: it passed 4 of the 6 failures.</p>
-  <p>Each rate is computed only within its own row. TPR uses only the items that should pass, and TNR only the items that should fail. So neither depends on how many good or bad items happen to be in the set, and everything below relies on that.</p>
-  <p><strong>Other names.</strong> In medical testing these are sensitivity (TPR) and specificity (TNR) (Altman and Bland 1994). In machine learning, TPR is the recall of the PASS class and TNR is the recall of the FAIL class. They are the same numbers.</p>
-  <p><strong>Why not precision?</strong> Precision asks a different question: of the items the judge passed, how many should have passed? The answer depends on how many good and bad items are in the batch, not only on the judge. Here is the same judge, with TPR 0.9 and TNR 0.8, on two batches of 100 outputs:</p>
-  <div class="table-wrap"><table>
-    <thead><tr><th></th><th class="n">Batch A</th><th class="n">Batch B</th></tr></thead>
-    <tbody>
-      <tr><td>Good outputs / bad outputs</td><td class="n">70 / 30</td><td class="n">30 / 70</td></tr>
-      <tr><td>Good outputs it passes (90% of good)</td><td class="n">63</td><td class="n">27</td></tr>
-      <tr><td>Bad outputs it passes (20% of bad)</td><td class="n">6</td><td class="n">14</td></tr>
-      <tr><td>Total it passes</td><td class="n">69</td><td class="n">41</td></tr>
-      <tr><th>Precision: good among those it passed</th><td class="n">63 / 69 = 0.91</td><td class="n">27 / 41 = 0.66</td></tr>
-      <tr><th>TPR</th><td class="n">63 / 70 = 0.9</td><td class="n">27 / 30 = 0.9</td></tr>
-      <tr><th>TNR</th><td class="n">24 / 30 = 0.8</td><td class="n">56 / 70 = 0.8</td></tr>
-    </tbody>
-  </table></div>
-  <p>The judge treated every output the same way, but its precision fell from 0.91 to 0.66. Batch B has more bad outputs, so the same 20% slip rate on bad outputs produces more false passes, and they make up a bigger share of what it passed. TPR looks only at the good outputs and TNR only at the bad ones, so neither moves. That is why they are used to describe a judge: you measure them on one labeled set and carry them to new batches whose mix you do not know. Precision describes the judge on one particular batch. To see it in the widget below, set TPR to 0.90 and TNR to 0.80 and move the true pass rate from 70% to 30%.</p>
+FAIL if the reply blames the customer, is sarcastic, or brushes them off,
+even if it uses words like "thanks" or "please".
+PASS if it is courteous and addresses the request, even if it is short.
 
-  <h2 id="mix"><span class="num">4.</span>How the judge's errors bend the pass rate</h2>
-  <p>What you usually want from a judge is a pass rate: what share of your system's outputs are good. Call the true pass rate θ (theta). The judge does not report θ. It reports the share of outputs it passed, p<sub>obs</sub>, and that share is built from two parts:</p>
-  <ul>
-    <li>the good outputs it correctly passes: TPR × θ</li>
-    <li>the bad outputs it wrongly passes: (1 − TNR) × (1 − θ)</li>
-  </ul>
+Example: "Great, another password reset. Done."  -&gt; Fail (sarcastic)
+Example: "Done! Your password has been reset."   -&gt; Pass (short but courteous)
+
+Reply: {{REPLY}}</pre>
+  <p>On dev again it passes 19 of 20 polite replies and fails 18 of 20 rude ones: <strong>TPR 0.95, TNR 0.90.</strong> Both are at target, so you stop.</p>
+  <p>Now run it <strong>once</strong> on the test set: it passes 23 of 25 polite replies and fails 22 of 25 rude ones, so <strong>TPR 0.92, TNR 0.88.</strong> Slightly lower than dev is normal, since you tuned on dev. These are the numbers you report. Do not change the judge because of what test shows; if test is bad, go back to dev and use fresh test labels afterwards.</p>
+  <p>If the judge had stayed poor after a few rounds, the usual next steps are a stronger model for the judge, or splitting the question into smaller ones.</p>
+  <h2 id="correction"><span class="num">5.</span>Use it on new replies</h2>
+  <p>Last month's 400 support replies go through the judge. Nobody labels these. It passes 284, so the judge says <strong>71%</strong> are polite.</p>
+  <p>That raw number still contains the judge's mistakes. Here is how they mix in. If the true share of polite replies is θ (theta), the judge passes:</p>
+  <ul><li>the polite replies it recognizes: TPR × θ</li><li>the rude replies it lets through: (1 − TNR) × (1 − θ)</li></ul>
+  <p>So its raw score is:</p>
   <span class="eq">p_obs = TPR × θ + (1 − TNR) × (1 − θ)</span>
-  <p><strong>Example.</strong> True pass rate θ = 0.70. The judge has TPR 0.9 and TNR 0.8. Good outputs it passes: 0.9 × 0.70 = 0.63. Bad outputs it passes: 0.2 × 0.30 = 0.06. Reported pass rate: 0.63 + 0.06 = 0.69. The judge reports 69% when the truth is 70%.</p>
-  <p>The two kinds of error push in opposite directions. Missing good outputs (TPR below 1) pulls the reported rate down. Passing bad outputs (TNR below 1) pushes it up. Here they nearly cancel. They will not always: with the same TPR but TNR 0.5, the judge would report 0.63 + 0.15 = 78%.</p>
-
+  <p>Solving that for θ gives the correction (Rogan and Gladen 1978):</p>
+  <span class="eq">θ = (p_obs + TNR − 1) / (TPR + TNR − 1)</span>
+  <p>With the test numbers:</p>
+  <span class="eq">θ = (0.71 + 0.88 − 1) / (0.92 + 0.88 − 1) = 0.59 / 0.80 = 0.74</span>
+  <p>The judge's number was a little low. Missing 8% of the polite replies pulled it down by about 6 points (0.08 × 0.74), and letting 12% of the rude replies through pushed it up by about 3 (0.12 × 0.26). Undoing both gives 74%.</p>
+  <p>Notice that 74% is very different from the 50% in your labeled set. That is expected. You balanced the labeled set on purpose; real replies have their own mix. TPR and TNR do not depend on the mix, which is why they can be carried from the labeled set to new data. A different pass rate on new data is not a reason to change the judge. Reading the judge's verdicts on some new replies, and finding mistakes your labeled set did not cover, is.</p>
+  <p>Move θ, TPR and TNR below to watch the raw score and the correction change. It starts at this example's numbers.</p>
   <section class="lab" aria-labelledby="lab-title">
     <p class="lab-title" id="lab-title">Try it</p>
-    <p class="lab-note">100 outputs. Blue should pass, orange should fail. A filled dot is one the judge passed; a hollow dot is one it failed. Dot counts are rounded to whole outputs; the formulas use exact values.</p>
+    <p class="lab-note">100 replies. Blue are polite (should pass), orange are rude (should fail). A filled dot is one the judge passed; a hollow dot is one it failed. Dot counts are rounded to whole outputs; the formulas use exact values.</p>
     <div class="lab-grid">
       <div class="controls">
         <div class="ctl">
-          <label for="theta">True pass rate θ <output id="theta-out" for="theta">70%</output></label>
-          <span class="hint">the share of outputs that are actually good</span>
-          <input type="range" id="theta" min="0" max="100" step="1" value="70">
+          <label for="theta">True pass rate θ <output id="theta-out" for="theta">74%</output></label>
+          <span class="hint">the share of replies that are actually polite</span>
+          <input type="range" id="theta" min="0" max="100" step="1" value="74">
         </div>
         <div class="ctl">
-          <label for="tpr">Judge TPR <output id="tpr-out" for="tpr">0.90</output></label>
-          <span class="hint">share of good outputs it passes</span>
-          <input type="range" id="tpr" min="0" max="100" step="1" value="90">
+          <label for="tpr">Judge TPR <output id="tpr-out" for="tpr">0.92</output></label>
+          <span class="hint">share of polite replies it passes</span>
+          <input type="range" id="tpr" min="0" max="100" step="1" value="92">
         </div>
         <div class="ctl">
-          <label for="tnr">Judge TNR <output id="tnr-out" for="tnr">0.80</output></label>
-          <span class="hint">share of bad outputs it fails</span>
-          <input type="range" id="tnr" min="0" max="100" step="1" value="80">
+          <label for="tnr">Judge TNR <output id="tnr-out" for="tnr">0.88</output></label>
+          <span class="hint">share of rude replies it fails</span>
+          <input type="range" id="tnr" min="0" max="100" step="1" value="88">
         </div>
       </div>
       <div style="min-width:0">
         <div class="dots" id="dots" role="img" aria-label="Grid of 100 outputs"></div>
         <div class="legend" aria-live="polite">
-          <span class="sw passed"></span><span>Good, passed (TP)</span><span class="ct" id="c-tp"></span>
-          <span class="sw"></span><span>Good, failed (FN)</span><span class="ct" id="c-fn"></span>
-          <span class="sw bad passed"></span><span>Bad, passed (FP)</span><span class="ct" id="c-fp"></span>
-          <span class="sw bad"></span><span>Bad, failed (TN)</span><span class="ct" id="c-tn"></span>
+          <span class="sw passed"></span><span>Polite, passed (TP)</span><span class="ct" id="c-tp"></span>
+          <span class="sw"></span><span>Polite, failed (FN)</span><span class="ct" id="c-fn"></span>
+          <span class="sw bad passed"></span><span>Rude, passed (FP)</span><span class="ct" id="c-fp"></span>
+          <span class="sw bad"></span><span>Rude, failed (TN)</span><span class="ct" id="c-tn"></span>
         </div>
       </div>
     </div>
@@ -208,16 +209,16 @@ TNR = TN / (TN + FP)    of the items that should fail, the share the judge faile
       <div class="big"><span>Judge reports <b id="pobs"></b></span><span>Truth <b id="truth"></b></span><span>Off by <b id="raw-err"></b></span></div>
     </div>
     <div class="part2">
-      <p class="lab-title">Correct it (Section 5)</p>
-      <label class="check"><input type="checkbox" id="linked" checked><span>The TPR and TNR I measured on my labeled set match the judge's real ones. Untick to see what happens when your measurement is off (Sections 6 and 9).</span></label>
+      <p class="lab-title">Correct it</p>
+      <label class="check"><input type="checkbox" id="linked" checked><span>The TPR and TNR I measured on my labeled set match the judge's real ones. Untick to see what happens when your measurement is off (Sections 6 and 8).</span></label>
       <div class="measured" id="measured" hidden>
         <div class="ctl">
-          <label for="mtpr">Measured TPR <output id="mtpr-out" for="mtpr">0.90</output></label>
-          <input type="range" id="mtpr" min="0" max="100" step="1" value="90">
+          <label for="mtpr">Measured TPR <output id="mtpr-out" for="mtpr">0.92</output></label>
+          <input type="range" id="mtpr" min="0" max="100" step="1" value="92">
         </div>
         <div class="ctl">
-          <label for="mtnr">Measured TNR <output id="mtnr-out" for="mtnr">0.80</output></label>
-          <input type="range" id="mtnr" min="0" max="100" step="1" value="80">
+          <label for="mtnr">Measured TNR <output id="mtnr-out" for="mtnr">0.88</output></label>
+          <input type="range" id="mtnr" min="0" max="100" step="1" value="88">
         </div>
       </div>
       <div class="readout" aria-live="polite">
@@ -226,119 +227,48 @@ TNR = TN / (TN + FP)    of the items that should fail, the share the judge faile
       </div>
     </div>
   </section>
-
-  <h2 id="correction"><span class="num">5.</span>Undoing the mix</h2>
-  <p>If you know TPR and TNR, you can solve the formula in Section 4 for θ:</p>
-  <span class="eq">p_obs = TPR × θ + (1 − TNR) − (1 − TNR) × θ
-p_obs − (1 − TNR) = (TPR + TNR − 1) × θ
-
-θ = (p_obs + TNR − 1) / (TPR + TNR − 1)</span>
-  <p>This is the Rogan-Gladen estimator, from epidemiology, where it corrects disease rates measured with an imperfect test (Rogan and Gladen 1978). If the result falls below 0 or above 1, it is clipped to that range.</p>
-  <p><strong>Example.</strong> From Section 4: p<sub>obs</sub> = 0.69, TPR = 0.9, TNR = 0.8. Then θ = (0.69 + 0.8 − 1) / (0.9 + 0.8 − 1) = 0.49 / 0.70 = 0.70. The correction recovers the true 70%.</p>
-  <p>In practice the steps are:</p>
-  <ol>
-    <li>Label a set of items and measure the judge's TPR and TNR on them.</li>
-    <li>Run the judge on new, unlabeled outputs and count the share it passes, p<sub>obs</sub>.</li>
-    <li>Plug both into the formula.</li>
-  </ol>
-  <p>The labeled set and the new outputs must be different items. On the labeled set itself the formula gives back the exact true rate every time. For the 20 items in Section 2, p<sub>obs</sub> = 17/20 = 0.85, and (0.85 + 0.333 − 1) / (0.929 + 0.333 − 1) = 0.70, exactly the true 14/20. That is algebra, not evidence that the judge works.</p>
-
-  <h2 id="youden"><span class="num">6.</span>Why a weak judge breaks the correction</h2>
-  <p>The bottom of the formula, TPR + TNR − 1, is called Youden's J (Youden 1950). It measures how much better than a coin flip the judge is. It is 1 for a perfect judge and 0 for a judge that ignores the output. A judge that passes everything has TPR 1 and TNR 0, so J = 0.</p>
-  <p>Every error in the inputs gets divided by J. If p<sub>obs</sub> is off by 1 point:</p>
+  <h2 id="range"><span class="num">6.</span>The range, and how to tighten it</h2>
+  <p>The 74% is an estimate. TPR and TNR were measured on only 25 replies each, and the raw score came from one month of 400 replies. Recomputing the correction on many resamples of those counts (a bootstrap; Efron and Tibshirani 1993) gives a 95% range of <strong>63% to 88%</strong>. That is wide, and it is honest: the raw "71%" had the same uncertainty, just hidden.</p>
+  <p>Three things narrow it. Each row below has the same 74% estimate:</p>
   <div class="table-wrap"><table>
-    <thead><tr><th>Judge</th><th class="n">J</th><th class="n">Corrected estimate is off by</th></tr></thead>
+    <thead><tr><th>Test labels (polite / rude)</th><th>Replies judged</th><th>Judge TPR / TNR</th><th>95% range</th><th>Width</th></tr></thead>
     <tbody>
-      <tr><td>TPR 0.95, TNR 0.95</td><td class="n">0.90</td><td class="n">about 1.1 points</td></tr>
-      <tr><td>TPR 0.9, TNR 0.8</td><td class="n">0.70</td><td class="n">about 1.4 points</td></tr>
-      <tr><td>TPR 0.6, TNR 0.5</td><td class="n">0.10</td><td class="n">about 10 points</td></tr>
+      <tr><td class="n">25 / 25</td><td class="n">400</td><td class="n">0.92 / 0.88</td><td class="n">63% to 88%</td><td class="n">25 points</td></tr>
+      <tr><td class="n">100 / 100</td><td class="n">400</td><td class="n">0.92 / 0.88</td><td class="n">66% to 82%</td><td class="n">16</td></tr>
+      <tr><td class="n">25 / 25</td><td class="n">2,000</td><td class="n">0.92 / 0.88</td><td class="n">64% to 87%</td><td class="n">23</td></tr>
+      <tr><td class="n">25 / 25</td><td class="n">400</td><td class="n">0.97 / 0.97</td><td class="n">67% to 82%</td><td class="n">15</td></tr>
+      <tr><td class="n">100 / 100</td><td class="n">2,000</td><td class="n">0.92 / 0.88</td><td class="n">68% to 80%</td><td class="n">12</td></tr>
+      <tr><td class="n">100 / 100</td><td class="n">2,000</td><td class="n">0.97 / 0.97</td><td class="n">70% to 78%</td><td class="n">7</td></tr>
     </tbody>
   </table></div>
-  <p>The same holds for errors in TPR and TNR themselves, which are only estimates. With a weak judge, a 2-point wobble in p<sub>obs</sub> can move the corrected estimate by 20 points. When J is 0 or below, the formula has no answer at all.</p>
-  <p>So the correction is not a way to rescue a bad judge. You improve the judge first, until TPR and TNR are both high (a common target is above 0.9), and then correct. My worked example of that improvement loop is in the companion paper.</p>
-
-  <h2 id="labels"><span class="num">7.</span>How many labels you need</h2>
-  <p>TPR and TNR are measured on a sample, so each has an uncertainty. A rough 95% range for a rate measured on n items is ±1.96 × √(rate × (1 − rate) / n). For a rate near 0.9:</p>
-  <div class="table-wrap"><table>
-    <thead><tr><th class="n">Items in that row</th><th class="n">Rough 95% range</th></tr></thead>
-    <tbody>
-      <tr><td class="n">30</td><td class="n">±0.11</td></tr>
-      <tr><td class="n">50</td><td class="n">±0.08</td></tr>
-      <tr><td class="n">100</td><td class="n">±0.06</td></tr>
-      <tr><td class="n">200</td><td class="n">±0.04</td></tr>
-    </tbody>
-  </table></div>
-  <p>What matters is the count in each row: TNR is measured only on items that should fail. If failures are rare, a random sample will have very few of them and TNR will be poorly measured. That is why the usual advice is to collect enough of both, 30 to 50 of each, even if that over-represents failures. Because each rate stays within its own row, over-representing failures does not bias them.</p>
-  <ul>
-    <li><strong>Count distinct cases.</strong> If the same input appears many times, those repeats are not independent evidence. Ten copies of one hard case count closer to one.</li>
-    <li><strong>Report an interval, not just a number.</strong> Recompute the corrected estimate on many resamples of your data (a bootstrap; Efron and Tibshirani 1993) and report the range that holds the middle 95%. A corrected 80% that could be anywhere from 72% to 89% should be reported that way.</li>
-  </ul>
-
-  <h2 id="using"><span class="num">8.</span>Using the numbers</h2>
-  <p>Here is the whole procedure on one run, the way you would report it to someone who only wants to know how good the outputs are.</p>
-  <p><strong>Step 1: measure the judge once, on labeled items.</strong> Say you labeled 100 good and 100 bad outputs. The judge passed 88 of the good ones and failed 91 of the bad ones, so TPR = 0.88 and TNR = 0.91.</p>
-  <p><strong>Step 2: run the judge on new outputs.</strong> A new run has 200 outputs. The judge passes 122 of them, so its raw score is p<sub>obs</sub> = 122 / 200 = 61%. This is not the run's real pass rate. It still contains the judge's mistakes: the good outputs it missed and the bad ones it let through.</p>
-  <p><strong>Step 3: correct the raw score.</strong></p>
-  <span class="eq">θ = (0.61 + 0.91 − 1) / (0.88 + 0.91 − 1) = 0.52 / 0.79 = 0.66</span>
-  <p>The best estimate of the run's real pass rate is 66%. Here the correction moved the number up, because this judge's bigger problem is missing good outputs (12% of them) rather than passing bad ones (9%). For a judge whose bigger problem is passing bad outputs, the correction moves the number down.</p>
-  <p><strong>Step 4: put a range on it.</strong> Resample the labeled items and the run many times, recompute the corrected estimate each time, and keep the middle 95%. For these counts the range is about 56% to 76%.</p>
-  <p><strong>Step 5: report the result with what it rests on.</strong></p>
-  <div class="abstract"><p><strong>Pass rate: 66% (95% range 56% to 76%).</strong> The judge passed 61% of the 200 outputs in this run; that was corrected for its measured error rates. It passes 88% of good outputs and fails 91% of bad ones, measured on 200 labeled examples (100 good, 100 bad), last checked on [date].</p></div>
-  <p>The person reading this gets the number they care about, how sure it is, and why it can be trusted.</p>
-  <p><strong>Making the range narrower.</strong> The range comes from three sources of uncertainty: the judge's raw score on the run, its TPR, and its TNR. For the same judge (TPR 0.88, TNR 0.91, raw score 61%):</p>
-  <div class="table-wrap"><table>
-    <thead><tr><th class="n">Labeled items (good / bad)</th><th class="n">Outputs in the run</th><th class="n">95% range</th><th class="n">Width</th></tr></thead>
-    <tbody>
-      <tr><td class="n">100 / 100</td><td class="n">200</td><td class="n">56% to 76%</td><td class="n">21 points</td></tr>
-      <tr><td class="n">300 / 300</td><td class="n">200</td><td class="n">57% to 75%</td><td class="n">18 points</td></tr>
-      <tr><td class="n">100 / 100</td><td class="n">1,000</td><td class="n">59% to 73%</td><td class="n">14 points</td></tr>
-      <tr><td class="n">300 / 300</td><td class="n">1,000</td><td class="n">61% to 71%</td><td class="n">10 points</td></tr>
-      <tr><td class="n">1,000 / 1,000</td><td class="n">5,000</td><td class="n">63% to 68%</td><td class="n">5 points</td></tr>
-    </tbody>
-  </table></div>
-  <p>With only 200 outputs, more labels barely help; the run itself is the main source of uncertainty. A better judge also narrows the range, because the correction divides everything by TPR + TNR − 1 (Section 6). With TPR and TNR both 0.97 and the first row's counts, the range is 15 points wide instead of 21.</p>
-  <p><strong>Keeping the numbers current.</strong> TPR and TNR describe the judge on the kinds of outputs it was checked on. Re-check them on a fresh labeled sample when the system changes, its inputs change, or the judge's model or prompt changes. Section 9 explains why.</p>
-  <p><strong>When the correction barely moves the number.</strong> If the judge is strong and its two kinds of mistakes are about equal, the raw score and the corrected estimate will be close. In my companion paper the raw score was within 1.5 points of the truth for a strong judge. The correction is still worth running, because it is what gives you the range.</p>
-
-  <h2 id="assumption"><span class="num">9.</span>The assumption underneath</h2>
-  <p>The correction assumes the judge makes mistakes on the new outputs at the same rates it made them on the labeled set. That is the price of using two numbers to describe a judge.</p>
-  <p>It can fail. If a judge is good at catching some kinds of failure and bad at others, its TNR on a new batch depends on which kinds of failure that batch contains. In my companion paper, one judge measured TNR 0.53 on its labeled set. On four new batches its actual TNR was 0.19, 0.22, 0.42 and 0.67, depending on what kinds of mistakes the system made in each batch, and the corrected estimates were badly wrong. A strong judge's rates held steady across the same batches.</p>
-  <ul>
-    <li>Build the labeled set from failures your system actually produces, not from wrong answers you made up. Made-up wrong answers tend to be easier to catch.</li>
-    <li>Re-measure TPR and TNR on fresh labels when the system or its inputs change.</li>
-    <li>Prefer a strong judge. Its errors are fewer, so there is less for the assumption to get wrong.</li>
-  </ul>
-
-  <h2 id="glossary"><span class="num">10.</span>Glossary</h2>
+  <ul><li><strong>Fix the biggest source of uncertainty first.</strong> Here it is the 25 test labels per row. Judging more replies barely helps until there are more labels. You can add test labels after the judge is frozen, as long as you do not change the judge because of them.</li><li><strong>A better judge helps a lot.</strong> The correction divides everything by TPR + TNR − 1 (Youden's J; Youden 1950). At 0.80, a 1-point error becomes about 1.2 points. For a weak judge with TPR 0.6 and TNR 0.5, J is 0.10 and a 1-point error becomes 10 points. The correction cannot rescue a weak judge; improve the judge first.</li></ul>
+  <h2 id="report"><span class="num">7.</span>Report it</h2>
+  <div class="abstract"><p><strong>About 74% of last month's replies were polite (95% range 63% to 88%).</strong> Scored by an LLM judge that agrees with a human reviewer on 92% of polite replies and 88% of rude ones, measured on 50 hand-labeled replies on Oct 11.</p></div>
+  <p>This gives the reader the number they care about, how sure it is, and why it can be trusted.</p>
+  <p>How much weight to give it depends on the use:</p>
+  <ul><li><strong>Big changes</strong> show up clearly. A drop from 74% to 50% after a template change is larger than the whole range.</li><li><strong>Comparing two versions</strong> scored by the same judge on the same kind of data is more reliable than either number alone, because the judge's errors largely affect both the same way.</li><li><strong>Small changes in the absolute level</strong>, like 74% to 72%, sit inside the range and should not be read as real.</li></ul>
+  <p>For comparison, checking 100 random replies by hand would give about 74% ± 9 points. The uncertainty comes from how much checked evidence sits under the number, whether a person or a judge does the scoring.</p>
+  <h2 id="models"><span class="num">8.</span>When models change</h2>
+  <p><strong>Changing the judge's model</strong> changes TPR and TNR, because they describe that particular judge. A stronger model often raises both and narrows the range, but you have to measure it: run the new judge on dev, then once on fresh test labels. Call the judge with a dated model ID rather than an alias like "latest", so the provider cannot swap the model underneath you.</p>
+  <p><strong>Changing the model that writes the replies</strong> changes the real pass rate, which is what you want to measure. It can also change the judge's TPR and TNR, because the new model may be rude in ways the judge was never checked on. After a change like that, label about 50 new replies and check that the judge still lands near its old TPR and TNR before trusting the corrected numbers.</p>
+  <p><strong>Using the same model for both</strong> is a risk of its own. A judge tends to miss the same mistakes its own model makes. Use a different, and preferably stronger, model for the judge.</p>
+  <p>The same applies whenever the replies change in other ways, such as new templates or new kinds of requests: re-check the judge on a fresh labeled sample. In practice that is the ongoing cost of using a judge.</p>
+  <h2 id="glossary"><span class="num">9.</span>Glossary</h2>
   <div class="table-wrap"><table>
     <thead><tr><th>Term</th><th>Meaning</th></tr></thead>
     <tbody>
-      <tr><td>Labeled item</td><td>An output whose correct verdict is known in advance</td></tr>
-      <tr><td>True positive (TP)</td><td>Should pass; judge passed it</td></tr>
-      <tr><td>False negative (FN)</td><td>Should pass; judge failed it (a false fail)</td></tr>
-      <tr><td>False positive (FP)</td><td>Should fail; judge passed it (a false pass)</td></tr>
-      <tr><td>True negative (TN)</td><td>Should fail; judge failed it</td></tr>
-      <tr><td>TPR</td><td>TP / (TP + FN). Sensitivity. Recall of PASS</td></tr>
-      <tr><td>TNR</td><td>TN / (TN + FP). Specificity. Recall of FAIL</td></tr>
-      <tr><td>Accuracy</td><td>(TP + TN) / all items. Hides which kind of error the judge makes</td></tr>
-      <tr><td>Precision (PASS)</td><td>TP / (TP + FP). Changes with the share of good outputs, so it is not a property of the judge alone</td></tr>
-      <tr><td>θ (theta)</td><td>The true pass rate of a set of outputs</td></tr>
-      <tr><td>p<sub>obs</sub></td><td>The share of outputs the judge passed</td></tr>
+      <tr><td>TPR</td><td>Of the outputs that should pass, the share the judge passes. Sensitivity</td></tr>
+      <tr><td>TNR</td><td>Of the outputs that should fail, the share the judge fails. Specificity</td></tr>
+      <tr><td>Train / dev / test</td><td>Labeled sets for prompt examples, for improving the judge, and for the one final measurement</td></tr>
+      <tr><td>p<sub>obs</sub></td><td>The share of new outputs the judge passes (its raw score)</td></tr>
+      <tr><td>θ (theta)</td><td>The true share of outputs that should pass</td></tr>
+      <tr><td>Correction</td><td>θ = (p<sub>obs</sub> + TNR − 1) / (TPR + TNR − 1), clipped to [0, 1]</td></tr>
       <tr><td>Youden's J</td><td>TPR + TNR − 1. How much better than a coin flip the judge is</td></tr>
-      <tr><td>Rogan-Gladen correction</td><td>θ = (p<sub>obs</sub> + TNR − 1) / (TPR + TNR − 1), clipped to [0, 1]</td></tr>
-      <tr><td>Bootstrap interval</td><td>The range of an estimate across many resamples of the data</td></tr>
+      <tr><td>Range</td><td>The middle 95% of the corrected estimate across many resamples</td></tr>
     </tbody>
   </table></div>
-
   <h2 id="references">References</h2>
-  <ul>
-    <li>Altman and Bland. <a href="https://www.bmj.com/content/308/6943/1552">Diagnostic tests 1: sensitivity and specificity</a>. BMJ, 1994.</li>
-    <li>Efron and Tibshirani. An Introduction to the Bootstrap. Chapman and Hall, 1993.</li>
-    <li>Husain. <a href="https://hamel.dev/blog/posts/llm-judge/">Using LLM-as-a-Judge For Evaluation: A Complete Guide</a>. 2024.</li>
-    <li>Husain and Shankar. <a href="https://github.com/ai-evals-course/evals-skills">evals-skills</a>, <code>validate-evaluator</code>.</li>
-    <li>Rogan and Gladen. Estimating prevalence from the results of a screening test. American Journal of Epidemiology, 1978.</li>
-    <li>Youden. Index for rating diagnostic tests. Cancer, 1950.</li>
-  </ul>
+  <ul><li>Altman and Bland. <a href="https://www.bmj.com/content/308/6943/1552">Diagnostic tests 1: sensitivity and specificity</a>. BMJ, 1994.</li><li>Efron and Tibshirani. An Introduction to the Bootstrap. Chapman and Hall, 1993.</li><li>Husain. <a href="https://hamel.dev/blog/posts/llm-judge/">Using LLM-as-a-Judge For Evaluation: A Complete Guide</a>. 2024.</li><li>Husain and Shankar. <a href="https://github.com/ai-evals-course/evals-skills">evals-skills</a>, <code>validate-evaluator</code>.</li><li>Rogan and Gladen. Estimating prevalence from the results of a screening test. American Journal of Epidemiology, 1978.</li><li>Youden. Index for rating diagnostic tests. Cancer, 1950.</li></ul>
 </article></main>
 
 <footer>© 2026 Bryan Falkowski</footer>

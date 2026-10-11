@@ -6,9 +6,10 @@ A short explainer the calculation paper (`paper/draft.md`) links back to for def
 - `tpr-tnr.html`: the page for the site, with the interactive widget in Section 4. The widget's formulas match the
   worked examples in the text (checked with node before publishing).
 
-Section anchors for links from other papers: `#accuracy`, `#matrix`, `#tpr-tnr`, `#mix`, `#correction`,
-`#youden`, `#labels`, `#using`, `#assumption`, `#glossary`.
+Section anchors for links from other papers: `#question`, `#label`, `#tpr-tnr`, `#improve`, `#correction`,
+`#range`, `#report`, `#models`, `#glossary`.
 
-`numbers.py` recomputes every number in the worked examples, including the Section 8 intervals.
+The primer follows one invented example (is this customer service reply polite?) from labeling to reporting.
+`numbers.py` recomputes every number in it, including the Section 6 intervals.
 
 Status: draft, for Bryan's review and edit before it goes on bfalkowski.github.io.

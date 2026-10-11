@@ -1,13 +1,14 @@
-"""Recompute every number in the primer's worked examples.
+"""Recompute every number in the primer (the polite-reply example).
 
   python primer/numbers.py
 
-Intervals are percentile bootstraps (20,000 draws, seed 7): the judge's TPR,
-its TNR and its raw score on the run are each redrawn from a binomial with
-the observed rate and count, and the correction is applied to each draw.
+The example's counts are invented for teaching; this script checks that the
+arithmetic built on them is right. Intervals are percentile bootstraps
+(20,000 draws, seed 7): the judge's TPR, its TNR and its raw score on the
+run are each redrawn from a binomial with the observed rate and count, and
+the correction is applied to each draw.
 """
 
-import math
 import random
 
 
@@ -31,31 +32,33 @@ def interval(n_good, n_bad, m, tpr, tnr, p_obs, iterations=20000, seed=7):
 
 
 def main():
-    print("Section 2-3: 20 items, TP 13 FN 1 FP 4 TN 2")
-    print(f"  TPR {13/14:.3f}  TNR {2/6:.3f}  accuracy {15/20:.2f}  p_obs {17/20:.2f}  "
-          f"corrected on the same items {corrected(17/20, 13/14, 2/6):.3f}")
-    print("Section 3: precision, TPR 0.9 TNR 0.8")
-    for good in (70, 30):
-        bad = 100 - good
-        tp, fp = 0.9 * good, 0.2 * bad
-        print(f"  {good} good / {bad} bad: passes {tp:.0f} + {fp:.0f} = {tp + fp:.0f}, precision {tp / (tp + fp):.2f}")
-    print("Section 4-5: theta 0.70, TPR 0.9, TNR 0.8")
-    p = 0.9 * 0.7 + 0.2 * 0.3
-    print(f"  p_obs {p:.2f}, corrected {corrected(p, 0.9, 0.8):.2f}; with TNR 0.5 p_obs {0.9 * 0.7 + 0.5 * 0.3:.2f}")
-    print("Section 6: error amplification 1/J")
-    for a, b in ((0.95, 0.95), (0.9, 0.8), (0.6, 0.5)):
-        print(f"  TPR {a} TNR {b}: J {a + b - 1:.2f}, 1 point -> {1 / (a + b - 1):.1f} points")
-    print("Section 7: rough 95% half-width for a rate near 0.9")
-    for n in (30, 50, 100, 200):
-        print(f"  n {n}: +-{1.96 * math.sqrt(0.09 / n):.2f}")
-    print("Section 8: TPR 88/100, TNR 91/100, run 122/200")
-    print(f"  corrected {corrected(0.61, 0.88, 0.91):.3f}")
-    for g, bd, m in ((100, 100, 200), (300, 300, 200), (100, 100, 1000), (300, 300, 1000), (1000, 1000, 5000)):
-        lo, hi = interval(g, bd, m, 0.88, 0.91, 0.61)
-        print(f"  labels {g}/{bd}, run {m}: {100 * lo:.1f}% to {100 * hi:.1f}%  width {100 * (hi - lo):.1f}")
-    theta = corrected(0.61, 0.88, 0.91)
-    lo, hi = interval(100, 100, 200, 0.97, 0.97, 0.97 * theta + 0.03 * (1 - theta))
-    print(f"  stronger judge (0.97/0.97), labels 100/100, run 200: width {100 * (hi - lo):.1f}")
+    print("Section 3, first judge on dev: polite 19 of 20 passed, rude 12 of 20 failed")
+    print(f"  TPR {19/20:.2f}  TNR {12/20:.2f}  accuracy {(19 + 12)/40:.3f}")
+    print("Section 4, improved judge on dev: polite 19/20, rude 18/20")
+    print(f"  TPR {19/20:.2f}  TNR {18/20:.2f}")
+    print("Section 4, test: polite 23/25, rude 22/25")
+    tpr, tnr = 23 / 25, 22 / 25
+    print(f"  TPR {tpr:.2f}  TNR {tnr:.2f}")
+    print("Section 5, new replies: 284 of 400 passed")
+    p = 284 / 400
+    theta = corrected(p, tpr, tnr)
+    print(f"  raw {p:.2f}  corrected ({p:.2f} + {tnr:.2f} - 1) / ({tpr:.2f} + {tnr:.2f} - 1) = "
+          f"{p + tnr - 1:.2f} / {tpr + tnr - 1:.2f} = {theta:.4f}")
+    print(f"  forward check: TPR x theta + (1 - TNR) x (1 - theta) = {tpr * theta + (1 - tnr) * (1 - theta):.3f}")
+    print("Section 6, range and how to tighten it (same corrected estimate in every row)")
+    rows = [(25, 25, 400, tpr, tnr), (100, 100, 400, tpr, tnr), (25, 25, 2000, tpr, tnr),
+            (25, 25, 400, 0.97, 0.97), (100, 100, 2000, tpr, tnr), (100, 100, 2000, 0.97, 0.97)]
+    for g, b, m, a, c in rows:
+        po = a * theta + (1 - c) * (1 - theta)
+        lo, hi = interval(g, b, m, a, c, po)
+        print(f"  test {g}/{b}, {m} replies, judge {a:.2f}/{c:.2f}: {100 * lo:.0f}% to {100 * hi:.0f}%  "
+              f"width {100 * hi - 100 * lo:.0f}")
+    print("Section 6, why a weak judge cannot be rescued: 1 point of error becomes 1/J points")
+    for a, c in ((0.92, 0.88), (0.6, 0.5)):
+        print(f"  TPR {a} TNR {c}: J {a + c - 1:.2f}, 1 point -> {1 / (a + c - 1):.1f} points")
+    print("Section 7, checking 100 random replies by hand instead")
+    import math
+    print(f"  74% +- {100 * 1.96 * math.sqrt(0.74 * 0.26 / 100):.0f} points")
 
 
 if __name__ == "__main__":
