@@ -27,9 +27,8 @@ def p2_state(item):
 
 
 # Step 1 (after error analysis of p2 on dev, gh38078843303): precise Pass/Fail
-# definitions. Of p2's 48 dev errors, 36 were time-window mistakes and 5 were
-# the $500 limit; in most, the customer asked for the wrong action or misstated
-# the dates.
+# definitions. Of p2's 48 dev errors, 35 were at the 14- or 30-day cutoffs and 5 were
+# the $500 limit.
 J1_INSTRUCTIONS = """Decide whether agent_resolution is the action the support policy requires for this ticket and order.
 PASS: agent_resolution is exactly the action the policy requires.
 FAIL: agent_resolution is any other action, even if it is what the customer asked for or would make them happier.
