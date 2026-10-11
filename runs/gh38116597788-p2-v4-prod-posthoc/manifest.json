@@ -1,0 +1,27 @@
+{
+ "run_id": "gh38116597788-p2-v4-prod-posthoc",
+ "variant": "p2",
+ "fingerprint": "96d1bb29eb343d55",
+ "model": "jev-latest",
+ "backend": "api",
+ "dataset": "v4",
+ "split": "prod",
+ "repeats": 1,
+ "n_items": 262,
+ "items_sha256": "be89ae4354a2cc262692510450463618699d596658876205f72a3f3b13afe66e",
+ "split_sha256": "0f6f4e7d39f0c690b1f364e2e289c99852e521ef958b07bc356a436a014d5779",
+ "git_commit": "a02fb3f33d4f1ce9486869f182ca1441f3778b16",
+ "frozen": {
+  "variant": "c3",
+  "fingerprint": "1b1bebcddff9f66c",
+  "threshold": 0.5,
+  "dev_run": "gh38104945965-c3-labeled-dev",
+  "git_commit": "70592d932633eae85d15149857546c9d6785a752",
+  "frozen_at": "2026-10-11T05:41:19Z"
+ },
+ "post_hoc": true,
+ "started_at": "2026-10-11T06:00:07Z",
+ "finished_at": "2026-10-11T06:00:37Z",
+ "errored_calls": 0,
+ "spend_usd": 0.006925
+}
