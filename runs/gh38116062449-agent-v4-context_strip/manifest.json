@@ -1,0 +1,13 @@
+{
+ "run_id": "gh38116062449-agent-v4-context_strip",
+ "dataset": "v4",
+ "config": "context_strip",
+ "p2_commit": "12a0eef7c90b3b77b84953c81946398f2d1f84d7",
+ "model": "jev-latest",
+ "backend": "api",
+ "n_tickets": 200,
+ "started_at": "2026-10-11T05:50:09Z",
+ "finished_at": "2026-10-11T05:50:32Z",
+ "errored": 0,
+ "spend_usd": 0.00585
+}
