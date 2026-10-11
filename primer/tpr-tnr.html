@@ -124,6 +124,8 @@
   .chip i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; font-style: normal; align-self: center; }
   .chip.out { border-color: var(--accent); }
   .op { font-family: var(--font-mono); font-size: 18px; color: var(--muted); }
+  td.hit { background: var(--ok-bg); color: var(--ok-ink); font-weight: 600; }
+  td.miss { background: var(--no-bg); color: var(--no-ink); font-weight: 600; }
   .btn { font: 600 14.5px var(--font-body); color: var(--accent); background: var(--bg); border: 1.5px solid var(--accent);
          border-radius: 6px; padding: 6px 12px; cursor: pointer; }
   .btn:hover { background: var(--alt-bg); }
@@ -176,8 +178,8 @@ Reply: {{REPLY}}</pre>
   <div class="table-wrap"><table>
     <thead><tr><th></th><th>Judge says PASS</th><th>Judge says FAIL</th></tr></thead>
     <tbody>
-      <tr><th><strong>You said polite (20)</strong></th><td class="n">19</td><td class="n">1</td></tr>
-      <tr><th><strong>You said rude (20)</strong></th><td class="n">8</td><td class="n">12</td></tr>
+      <tr><th><strong>You said polite (20)</strong></th><td class="n hit">19</td><td class="n miss">1</td></tr>
+      <tr><th><strong>You said rude (20)</strong></th><td class="n miss">8</td><td class="n hit">12</td></tr>
     </tbody>
   </table></div>
   <ul><li><strong>True positive:</strong> polite, and the judge passed it (19)</li><li><strong>False fail:</strong> polite, but the judge failed it (1). Also called a false negative</li><li><strong>False pass:</strong> rude, but the judge passed it (8). Also called a false positive</li><li><strong>True negative:</strong> rude, and the judge failed it (12)</li></ul>
@@ -219,7 +221,7 @@ Reply: {{REPLY}}</pre>
   <p>Move θ, TPR and TNR below to watch the matrix and the raw score change. It starts at this example's numbers.</p>
   <section class="lab" aria-labelledby="lab-title">
     <p class="lab-title" id="lab-title">Try it</p>
-    <p class="lab-note">100 replies sorted into the confusion matrix from Section 3. Blue dots are polite replies, orange are rude; filled dots are ones the judge passed. Green cells (✓) are where the judge agreed with you; red cells (✗) are its mistakes. Counts are rounded to whole replies; the formulas below use exact values.</p>
+    <p class="lab-note">100 replies sorted into the confusion matrix from Section 3. Blue dots are polite replies, orange are rude; filled dots are ones the judge passed. Counts are rounded to whole replies; the formulas below use exact values.</p>
     <div class="lab-grid">
       <div class="controls">
         <div class="ctl">
