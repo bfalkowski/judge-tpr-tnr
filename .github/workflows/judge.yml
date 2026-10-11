@@ -42,8 +42,10 @@ jobs:
           JEV_BACKEND: ${{ inputs.backend == 'stub' && 'stub' || '' }}
           MAX_SPEND_USD: ${{ inputs.max_spend_usd }}
         run: |
+          set -o pipefail
           python run_judge.py --variant ${{ inputs.variant }} --dataset ${{ inputs.dataset }} \
-            --split ${{ inputs.split }} --repeats ${{ inputs.repeats }} --run-id $RUN_ID
+            --split ${{ inputs.split }} --repeats ${{ inputs.repeats }} --run-id $RUN_ID 2>&1 | tee judge.log \
+            || { echo "::error title=run_judge::$(tail -n 5 judge.log | tr '\n' ' ' | cut -c1-900)"; exit 1; }
       - name: Rates
         if: always() && hashFiles(format('runs/{0}/judgments.jsonl', env.RUN_ID)) != ''
         run: python analysis/rates.py runs/$RUN_ID | tee -a $GITHUB_STEP_SUMMARY
