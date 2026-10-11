@@ -1,4 +1,4 @@
-# TPR and TNR for LLM Judges
+# Can You Trust Your Judge's Score? A Primer on TPR and TNR for LLM Judges
 
 Bryan Falkowski · October 2026
 

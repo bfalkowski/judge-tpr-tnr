@@ -1,4 +1,4 @@
-# Primer: TPR and TNR for LLM Judges
+# Can You Trust Your Judge's Score? A Primer on TPR and TNR for LLM Judges
 
 A short explainer the calculation paper (`paper/draft.md`) links back to for definitions.
 
