@@ -7,6 +7,8 @@ A short explainer the calculation paper (`paper/draft.md`) links back to for def
   worked examples in the text (checked with node before publishing).
 
 Section anchors for links from other papers: `#accuracy`, `#matrix`, `#tpr-tnr`, `#mix`, `#correction`,
-`#youden`, `#labels`, `#assumption`, `#glossary`.
+`#youden`, `#labels`, `#using`, `#assumption`, `#glossary`.
+
+`numbers.py` recomputes every number in the worked examples, including the Section 8 intervals.
 
 Status: draft, for Bryan's review and edit before it goes on bfalkowski.github.io.

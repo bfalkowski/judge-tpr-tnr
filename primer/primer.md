@@ -144,7 +144,45 @@ Two more practical points:
 - **Count distinct cases.** If the same input appears many times, those repeats are not independent evidence. Ten copies of one hard case count closer to one.
 - **Report an interval, not just a number.** Recompute the corrected estimate on many resamples of your data (a bootstrap; Efron and Tibshirani 1993) and report the range that holds the middle 95%. A corrected 80% that could be anywhere from 72% to 89% should be reported that way.
 
-## 8. The assumption underneath
+## 8. Using the numbers
+
+Here is the whole procedure on one run, the way you would report it to someone who only wants to know how good the outputs are.
+
+**Step 1: measure the judge once, on labeled items.** Say you labeled 100 good and 100 bad outputs. The judge passed 88 of the good ones and failed 91 of the bad ones, so TPR = 0.88 and TNR = 0.91.
+
+**Step 2: run the judge on new outputs.** A new run has 200 outputs. The judge passes 122 of them, so its raw score is p_obs = 122 / 200 = 61%. This is not the run's real pass rate. It still contains the judge's mistakes: the good outputs it missed and the bad ones it let through.
+
+**Step 3: correct the raw score.**
+
+θ = (0.61 + 0.91 − 1) / (0.88 + 0.91 − 1) = 0.52 / 0.79 = 0.66
+
+The best estimate of the run's real pass rate is 66%. Here the correction moved the number up, because this judge's bigger problem is missing good outputs (12% of them) rather than passing bad ones (9%). For a judge whose bigger problem is passing bad outputs, the correction moves the number down.
+
+**Step 4: put a range on it.** Resample the labeled items and the run many times, recompute the corrected estimate each time, and keep the middle 95%. For these counts the range is about 56% to 76%.
+
+**Step 5: report the result with what it rests on.**
+
+> Pass rate: 66% (95% range 56% to 76%). The judge passed 61% of the 200 outputs in this run; that was corrected for its measured error rates. It passes 88% of good outputs and fails 91% of bad ones, measured on 200 labeled examples (100 good, 100 bad), last checked on [date].
+
+The person reading this gets the number they care about, how sure it is, and why it can be trusted.
+
+**Making the range narrower.** (All numbers in this section are recomputed by `primer/numbers.py`.) The range comes from three sources of uncertainty: the judge's raw score on the run, its TPR, and its TNR. For the same judge (TPR 0.88, TNR 0.91, raw score 61%):
+
+| Labeled items (good / bad) | Outputs in the run | 95% range | Width |
+|---|---|---|---|
+| 100 / 100 | 200 | 56% to 76% | 21 points |
+| 300 / 300 | 200 | 57% to 75% | 18 points |
+| 100 / 100 | 1,000 | 59% to 73% | 14 points |
+| 300 / 300 | 1,000 | 61% to 71% | 10 points |
+| 1,000 / 1,000 | 5,000 | 63% to 68% | 5 points |
+
+With only 200 outputs, more labels barely help; the run itself is the main source of uncertainty. A better judge also narrows the range, because the correction divides everything by TPR + TNR − 1 (Section 6). With TPR and TNR both 0.97 and the first row's counts, the range is 15 points wide instead of 21.
+
+**Keeping the numbers current.** TPR and TNR describe the judge on the kinds of outputs it was checked on. Re-check them on a fresh labeled sample when the system changes, its inputs change, or the judge's model or prompt changes. Section 9 explains why.
+
+**When the correction barely moves the number.** If the judge is strong and its two kinds of mistakes are about equal, the raw score and the corrected estimate will be close. In my companion paper the raw score was within 1.5 points of the truth for a strong judge. The correction is still worth running, because it is what gives you the range.
+
+## 9. The assumption underneath
 
 The correction assumes the judge makes mistakes on the new outputs at the same rates it made them on the labeled set. That is the price of using two numbers to describe a judge.
 
@@ -156,7 +194,7 @@ Practical consequences:
 - Re-measure TPR and TNR on fresh labels when the system or its inputs change.
 - Prefer a strong judge. Its errors are fewer, so there is less for the assumption to get wrong.
 
-## 9. Glossary
+## 10. Glossary
 
 | Term | Meaning |
 |---|---|

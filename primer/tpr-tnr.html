@@ -209,7 +209,7 @@ TNR = TN / (TN + FP)    of the items that should fail, the share the judge faile
     </div>
     <div class="part2">
       <p class="lab-title">Correct it (Section 5)</p>
-      <label class="check"><input type="checkbox" id="linked" checked><span>The TPR and TNR I measured on my labeled set match the judge's real ones. Untick to see what happens when your measurement is off (Sections 6 and 8).</span></label>
+      <label class="check"><input type="checkbox" id="linked" checked><span>The TPR and TNR I measured on my labeled set match the judge's real ones. Untick to see what happens when your measurement is off (Sections 6 and 9).</span></label>
       <div class="measured" id="measured" hidden>
         <div class="ctl">
           <label for="mtpr">Measured TPR <output id="mtpr-out" for="mtpr">0.90</output></label>
@@ -274,7 +274,33 @@ p_obs − (1 − TNR) = (TPR + TNR − 1) × θ
     <li><strong>Report an interval, not just a number.</strong> Recompute the corrected estimate on many resamples of your data (a bootstrap; Efron and Tibshirani 1993) and report the range that holds the middle 95%. A corrected 80% that could be anywhere from 72% to 89% should be reported that way.</li>
   </ul>
 
-  <h2 id="assumption"><span class="num">8.</span>The assumption underneath</h2>
+  <h2 id="using"><span class="num">8.</span>Using the numbers</h2>
+  <p>Here is the whole procedure on one run, the way you would report it to someone who only wants to know how good the outputs are.</p>
+  <p><strong>Step 1: measure the judge once, on labeled items.</strong> Say you labeled 100 good and 100 bad outputs. The judge passed 88 of the good ones and failed 91 of the bad ones, so TPR = 0.88 and TNR = 0.91.</p>
+  <p><strong>Step 2: run the judge on new outputs.</strong> A new run has 200 outputs. The judge passes 122 of them, so its raw score is p<sub>obs</sub> = 122 / 200 = 61%. This is not the run's real pass rate. It still contains the judge's mistakes: the good outputs it missed and the bad ones it let through.</p>
+  <p><strong>Step 3: correct the raw score.</strong></p>
+  <span class="eq">θ = (0.61 + 0.91 − 1) / (0.88 + 0.91 − 1) = 0.52 / 0.79 = 0.66</span>
+  <p>The best estimate of the run's real pass rate is 66%. Here the correction moved the number up, because this judge's bigger problem is missing good outputs (12% of them) rather than passing bad ones (9%). For a judge whose bigger problem is passing bad outputs, the correction moves the number down.</p>
+  <p><strong>Step 4: put a range on it.</strong> Resample the labeled items and the run many times, recompute the corrected estimate each time, and keep the middle 95%. For these counts the range is about 56% to 76%.</p>
+  <p><strong>Step 5: report the result with what it rests on.</strong></p>
+  <div class="abstract"><p><strong>Pass rate: 66% (95% range 56% to 76%).</strong> The judge passed 61% of the 200 outputs in this run; that was corrected for its measured error rates. It passes 88% of good outputs and fails 91% of bad ones, measured on 200 labeled examples (100 good, 100 bad), last checked on [date].</p></div>
+  <p>The person reading this gets the number they care about, how sure it is, and why it can be trusted.</p>
+  <p><strong>Making the range narrower.</strong> The range comes from three sources of uncertainty: the judge's raw score on the run, its TPR, and its TNR. For the same judge (TPR 0.88, TNR 0.91, raw score 61%):</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th class="n">Labeled items (good / bad)</th><th class="n">Outputs in the run</th><th class="n">95% range</th><th class="n">Width</th></tr></thead>
+    <tbody>
+      <tr><td class="n">100 / 100</td><td class="n">200</td><td class="n">56% to 76%</td><td class="n">21 points</td></tr>
+      <tr><td class="n">300 / 300</td><td class="n">200</td><td class="n">57% to 75%</td><td class="n">18 points</td></tr>
+      <tr><td class="n">100 / 100</td><td class="n">1,000</td><td class="n">59% to 73%</td><td class="n">14 points</td></tr>
+      <tr><td class="n">300 / 300</td><td class="n">1,000</td><td class="n">61% to 71%</td><td class="n">10 points</td></tr>
+      <tr><td class="n">1,000 / 1,000</td><td class="n">5,000</td><td class="n">63% to 68%</td><td class="n">5 points</td></tr>
+    </tbody>
+  </table></div>
+  <p>With only 200 outputs, more labels barely help; the run itself is the main source of uncertainty. A better judge also narrows the range, because the correction divides everything by TPR + TNR − 1 (Section 6). With TPR and TNR both 0.97 and the first row's counts, the range is 15 points wide instead of 21.</p>
+  <p><strong>Keeping the numbers current.</strong> TPR and TNR describe the judge on the kinds of outputs it was checked on. Re-check them on a fresh labeled sample when the system changes, its inputs change, or the judge's model or prompt changes. Section 9 explains why.</p>
+  <p><strong>When the correction barely moves the number.</strong> If the judge is strong and its two kinds of mistakes are about equal, the raw score and the corrected estimate will be close. In my companion paper the raw score was within 1.5 points of the truth for a strong judge. The correction is still worth running, because it is what gives you the range.</p>
+
+  <h2 id="assumption"><span class="num">9.</span>The assumption underneath</h2>
   <p>The correction assumes the judge makes mistakes on the new outputs at the same rates it made them on the labeled set. That is the price of using two numbers to describe a judge.</p>
   <p>It can fail. If a judge is good at catching some kinds of failure and bad at others, its TNR on a new batch depends on which kinds of failure that batch contains. In my companion paper, one judge measured TNR 0.53 on its labeled set. On four new batches its actual TNR was 0.19, 0.22, 0.42 and 0.67, depending on what kinds of mistakes the system made in each batch, and the corrected estimates were badly wrong. A strong judge's rates held steady across the same batches.</p>
   <ul>
@@ -283,7 +309,7 @@ p_obs − (1 − TNR) = (TPR + TNR − 1) × θ
     <li>Prefer a strong judge. Its errors are fewer, so there is less for the assumption to get wrong.</li>
   </ul>
 
-  <h2 id="glossary"><span class="num">9.</span>Glossary</h2>
+  <h2 id="glossary"><span class="num">10.</span>Glossary</h2>
   <div class="table-wrap"><table>
     <thead><tr><th>Term</th><th>Meaning</th></tr></thead>
     <tbody>
