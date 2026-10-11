@@ -172,7 +172,7 @@
   <p>The first version of the judge:</p>
   <pre class="prompt">Is this customer service reply polite? Answer Pass or Fail.
 Reply: {{REPLY}}</pre>
-  <p>Run it on the 40 dev replies and sort the results into four cells:</p>
+  <p>Run it on the 40 dev replies and sort the results into a <b>confusion matrix</b>. It is a table with what you said down the side and what the judge said across the top, so every reply lands in one of four cells:</p>
   <div class="table-wrap"><table>
     <thead><tr><th></th><th>Judge says PASS</th><th>Judge says FAIL</th></tr></thead>
     <tbody>
@@ -180,7 +180,9 @@ Reply: {{REPLY}}</pre>
       <tr><th><strong>You said rude (20)</strong></th><td class="n">8</td><td class="n">12</td></tr>
     </tbody>
   </table></div>
-  <p>Two numbers come out of this table, one per row:</p>
+  <ul><li><strong>True positive:</strong> polite, and the judge passed it (19)</li><li><strong>False fail:</strong> polite, but the judge failed it (1). Also called a false negative</li><li><strong>False pass:</strong> rude, but the judge passed it (8). Also called a false positive</li><li><strong>True negative:</strong> rude, and the judge failed it (12)</li></ul>
+  <p>The two true cells are where the judge agrees with you. The two false cells are its mistakes, and the matrix shows which kind it makes.</p>
+  <p>Two numbers come out of the matrix, one per row:</p>
   <ul><li><strong>TPR (true positive rate)</strong> = polite replies it passed / all polite replies = 19 / 20 = <strong>0.95</strong></li><li><strong>TNR (true negative rate)</strong> = rude replies it failed / all rude replies = 12 / 20 = <strong>0.60</strong></li></ul>
   <p>TPR says how well the judge recognizes good outputs. TNR says how well it catches bad ones. This judge is good at the first and poor at the second: it let 8 of 20 rude replies through.</p>
   <p>Why two numbers and not one? This judge's accuracy is (19 + 12) / 40 = 78%, which sounds acceptable and hides the problem. Keeping the rows separate shows exactly which kind of mistake the judge makes. Each rate also only looks at its own row, so it does not change when the mix of polite and rude replies changes. That matters in Section 5.</p>
@@ -362,6 +364,7 @@ Reply: {{REPLY}}</pre>
   <div class="table-wrap"><table>
     <thead><tr><th>Term</th><th>Meaning</th></tr></thead>
     <tbody>
+      <tr><td>Confusion matrix</td><td>A table of what you said against what the judge said. Its four cells are true positives, false fails, false passes and true negatives</td></tr>
       <tr><td>TPR</td><td>Of the outputs that should pass, the share the judge passes. Sensitivity</td></tr>
       <tr><td>TNR</td><td>Of the outputs that should fail, the share the judge fails. Specificity</td></tr>
       <tr><td>Train / dev / test</td><td>Labeled sets for prompt examples, for improving the judge, and for the one final measurement</td></tr>

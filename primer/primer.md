@@ -40,14 +40,21 @@ Is this customer service reply polite? Answer Pass or Fail.
 Reply: {{REPLY}}
 ```
 
-Run it on the 40 dev replies and sort the results into four cells:
+Run it on the 40 dev replies and sort the results into a **confusion matrix**. It is a table with what you said down the side and what the judge said across the top, so every reply lands in one of four cells:
 
 | | Judge says PASS | Judge says FAIL |
 |---|---|---|
 | **You said polite (20)** | 19 | 1 |
 | **You said rude (20)** | 8 | 12 |
 
-Two numbers come out of this table, one per row:
+- **True positive:** polite, and the judge passed it (19)
+- **False fail:** polite, but the judge failed it (1). Also called a false negative
+- **False pass:** rude, but the judge passed it (8). Also called a false positive
+- **True negative:** rude, and the judge failed it (12)
+
+The two true cells are where the judge agrees with you. The two false cells are its mistakes, and the matrix shows which kind it makes.
+
+Two numbers come out of the matrix, one per row:
 
 - **TPR (true positive rate)** = polite replies it passed / all polite replies = 19 / 20 = **0.95**
 - **TNR (true negative rate)** = rude replies it failed / all rude replies = 12 / 20 = **0.60**
@@ -167,6 +174,7 @@ The interactive version of this page shows the 400 replies as one bar, with slid
 
 | Term | Meaning |
 |---|---|
+| Confusion matrix | A table of what you said against what the judge said. Its four cells are true positives, false fails, false passes and true negatives |
 | TPR | Of the outputs that should pass, the share the judge passes. Sensitivity |
 | TNR | Of the outputs that should fail, the share the judge fails. Specificity |
 | Train / dev / test | Labeled sets for prompt examples, for improving the judge, and for the one final measurement |
