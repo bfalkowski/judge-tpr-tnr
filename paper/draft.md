@@ -14,7 +14,7 @@ Four steps on dev took the judge from TPR 0.84 and TNR 0.52 to TPR 0.95 and TNR 
 
 In [my previous paper](https://bfalkowski.github.io/writing/run-valid.html), a judge asked whether a support agent's resolution followed the policy. Asked twice about the same item, it gave the same answer 96.5% of the time. Compared with a deterministic check, its first answer was wrong on 24.5% of items. A judge can be consistent and still be wrong, and asking it twice does not tell you which.
 
-The fix is to compare the judge against labels it has not seen. That comparison has a standard form, taught in Hamel Husain and Shreya Shankar's course AI Evaluation for Engineers and PMs and published in Husain's [guide to LLM-as-a-judge](https://hamel.dev/blog/posts/llm-judge/) and their [`validate-evaluator` skill](https://github.com/ai-evals-course/evals-skills). This paper runs that procedure from start to finish on one judge, with an answer key, so each step can be checked.
+The fix is to compare the judge against labels it has not seen. That comparison has a standard form, taught in Hamel Husain and Shreya Shankar's course AI Evaluation for Engineers and PMs and published in Husain's [guide to LLM-as-a-judge](https://hamel.dev/blog/posts/llm-judge/) and their [`validate-evaluator` skill](https://github.com/ai-evals-course/evals-skills). This paper follows that skill as of commit `80d5f7b` (September 24, 2026); an unmodified copy is in the repo under `vendor/`, because the upstream file can change. It runs that procedure from start to finish on one judge, with an answer key, so each step can be checked.
 
 This is a worked example, not a recommendation to judge this task with an LLM. A rule that can be written as code should be checked by code, which is why paper 2 used a deterministic scorer. Here the policy stands in for a criterion that would normally need a person's judgment. The procedure is the same either way. The answer key only makes it checkable.
 
@@ -60,6 +60,16 @@ The denominator, TPR + TNR − 1, is Youden's J (Youden 1950). It is 1 for a per
 A 95% interval comes from the bootstrap (Efron and Tibshirani 1993): resample, recompute TPR, TNR and θ̂, and take the 2.5th and 97.5th percentiles. The reference implementation, [judgy](https://github.com/ai-evals-course/judgy), resamples test items and holds p_obs fixed. In this study items come in clusters, several per ticket, so I resample tickets instead (Field and Welsh 2007), on both the test set and the new run. Section 9.4 shows why that matters.
 
 The correction rests on one assumption: the judge makes mistakes on the new traces at the rates measured on test.
+
+### 2.5 Where this study departs from the skill
+
+The full step-by-step comparison is in `paper/method_mapping.md`. The departures that matter:
+
+- Labels come from a policy function, not a domain expert, and there is one criterion rather than one judge per failure mode.
+- Splits are by ticket rather than by item, because several items share a ticket.
+- The few-shot examples sit exactly on the day cutoffs, where the judge failed, rather than being clear-cut cases.
+- The interval resamples tickets on both the test set and the new run, instead of resampling test items with p_obs fixed.
+- The generated tickets use code and phrase banks instead of the skill's two-step LLM generation and user review of tuples (Section 3).
 
 ## 3. Setup
 
@@ -231,7 +241,7 @@ Not affiliated with TypeSafe, Anthropic or Parlance Labs.
 - Efron and Tibshirani. An Introduction to the Bootstrap. Chapman and Hall, 1993.
 - Field and Welsh. Bootstrapping clustered data. Journal of the Royal Statistical Society, Series B, 2007.
 - Husain. [Using LLM-as-a-Judge For Evaluation: A Complete Guide](https://hamel.dev/blog/posts/llm-judge/). 2024.
-- Husain and Shankar. [evals-skills](https://github.com/ai-evals-course/evals-skills): `validate-evaluator` and `generate-synthetic-data`.
+- Husain and Shankar. [evals-skills](https://github.com/ai-evals-course/evals-skills): `validate-evaluator` and `generate-synthetic-data`, commit `80d5f7b`, Apache 2.0. Unmodified copies in the repo under `vendor/evals-skills/`.
 - Husain and Shankar. AI Evaluation for Engineers and PMs (course). [maven.com/parlance-labs/evals](https://maven.com/parlance-labs/evals).
 - [judgy](https://github.com/ai-evals-course/judgy). Version 0.1.0.
 - Rogan and Gladen. Estimating prevalence from the results of a screening test. American Journal of Epidemiology, 1978.

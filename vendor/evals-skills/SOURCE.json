@@ -1,0 +1,24 @@
+{
+ "repo": "https://github.com/ai-evals-course/evals-skills",
+ "commit": "80d5f7b0127c7572ed9e9339937adbfd7240ffeb",
+ "copied_on": "2026-10-11",
+ "license": "Apache-2.0 (LICENSE in this folder)",
+ "modified": false,
+ "files": {
+  "skills/validate-evaluator/SKILL.md": {
+   "sha256": "dd601ca58d2165f51798e12934170a435af9a7938832b67bb00986b881752355",
+   "git_blob": "8b677b3f02ce26bb784de8404914545dd4faaf20",
+   "last_changed_in": "920297c87c8cac17e4a7f46e85734119b260a9b0 2026-09-24"
+  },
+  "skills/generate-synthetic-data/SKILL.md": {
+   "sha256": "37b8e12ceb020f0fdf7c9c8bf7f3d3fce3dd506f1dfecdc64c25f80c10130da2",
+   "git_blob": "0954334c590cbd3329f31d8555f1ffa8d7fdaf45",
+   "last_changed_in": "3ded0176c7e06beb9e9fd4db4f03f3d8b8dac743 2026-08-15"
+  },
+  "LICENSE": {
+   "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+   "git_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+   "last_changed_in": "f6f41468d99ba13a39a03805b60e7ce3fa75cd5e 2026-09-24"
+  }
+ }
+}

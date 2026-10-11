@@ -42,6 +42,7 @@ The method follows the judge-validation loop taught in AI Evaluation for Enginee
 | `analysis/climb.py` | Rebuilds the climb table from the runs listed in `paper/climb.json` |
 | `freeze.py` | Freezes a judge and threshold before the test split |
 | `phase0/`, `paper/preliminary.md` | Earlier results: paper 2's judge on its own runs, and on constructed wrong actions |
+| `vendor/evals-skills/` | Unmodified copies of the `validate-evaluator` and `generate-synthetic-data` skills at commit `80d5f7b` (Apache 2.0), with hashes; `paper/method_mapping.md` compares each step with this study |
 | `.github/workflows/` | `ci`, `secrets`, `agent`, `judge`, `collect` |
 
 ## Running it
