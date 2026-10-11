@@ -8,6 +8,7 @@
     --text: #2c2c2c; --muted: #5f6470; --line: #e0e2e6; --alt-bg: #f7f8fa; --bg: #ffffff;
     --accent: #1d3f72; --on-accent: #ffffff;
     --good: #2a5aa8; --bad: #c0562b; --dot-ring: #ffffff;
+    --ok-bg: #e9f5ed; --ok-line: #2f8a4f; --ok-ink: #1f6b3a; --no-bg: #fbeceb; --no-line: #c23b32; --no-ink: #a12a22;
     --font-body: "Source Sans 3", "Source Sans Pro", "Segoe UI", Helvetica, Arial, sans-serif;
     --font-mono: "Roboto Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
   }
@@ -16,12 +17,14 @@
       --text: #e4e6ea; --muted: #a0a6b2; --line: #2e333c; --alt-bg: #1c2027; --bg: #15181d;
       --accent: #8fb0e3; --on-accent: #10141a;
       --good: #6a95d8; --bad: #d6764a; --dot-ring: #15181d; color-scheme: dark;
+      --ok-bg: #15281c; --ok-line: #4caf72; --ok-ink: #7fd39d; --no-bg: #2e1817; --no-line: #e0605a; --no-ink: #f08a84;
     }
   }
   :root[data-theme="dark"] {
     --text: #e4e6ea; --muted: #a0a6b2; --line: #2e333c; --alt-bg: #1c2027; --bg: #15181d;
     --accent: #8fb0e3; --on-accent: #10141a;
     --good: #6a95d8; --bad: #d6764a; --dot-ring: #15181d; color-scheme: dark;
+      --ok-bg: #15281c; --ok-line: #4caf72; --ok-ink: #7fd39d; --no-bg: #2e1817; --no-line: #e0605a; --no-ink: #f08a84;
   }
   * { box-sizing: border-box; }
   [hidden] { display: none !important; }
@@ -75,8 +78,10 @@
   table.cm thead th { font-weight: 600; text-align: center; padding-bottom: 2px; background: none; color: var(--text); }
   table.cm th.rowh { text-align: left; font-weight: 600; width: 22%; padding-top: 8px; }
   table.cm th.rowh small, table.cm td.rate small { display: block; color: var(--muted); font-weight: 400; font-size: 13px; }
-  table.cm td.cell { border: 1px solid var(--line); border-radius: 6px; padding: 8px; }
-  table.cm td.cell.err { background: var(--alt-bg); border-style: dashed; }
+  table.cm td.cell { border: 1.5px solid var(--ok-line); background: var(--ok-bg); border-radius: 6px; padding: 8px; }
+  table.cm td.cell.err { border: 1.5px dashed var(--no-line); background: var(--no-bg); }
+  .cell-head .mark { font-weight: 700; color: var(--ok-ink); }
+  table.cm td.cell.err .cell-head .mark { color: var(--no-ink); }
   .cell-head { display: flex; justify-content: space-between; gap: 6px; font-size: 13px; color: var(--muted); }
   .cell-head b { font-family: var(--font-mono); font-size: 17px; color: var(--text); font-weight: 500; }
   .cell-dots { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 6px; min-height: 10px; }
@@ -185,7 +190,7 @@ Reply: {{REPLY}}</pre>
   <p>Move θ, TPR and TNR below to watch the raw score and the correction change. It starts at this example's numbers.</p>
   <section class="lab" aria-labelledby="lab-title">
     <p class="lab-title" id="lab-title">Try it</p>
-    <p class="lab-note">100 replies sorted into the confusion matrix from Section 3. Blue dots are polite replies, orange are rude; filled dots are ones the judge passed. Shaded cells are the judge's mistakes. Counts are rounded to whole replies; the formulas below use exact values.</p>
+    <p class="lab-note">100 replies sorted into the confusion matrix from Section 3. Blue dots are polite replies, orange are rude; filled dots are ones the judge passed. Green cells (✓) are where the judge agreed with you; red cells (✗) are its mistakes. Counts are rounded to whole replies; the formulas below use exact values.</p>
     <div class="lab-grid">
       <div class="controls">
         <div class="ctl">
@@ -209,12 +214,12 @@ Reply: {{REPLY}}</pre>
           <thead><tr><th></th><th>Judge says PASS</th><th>Judge says FAIL</th><th></th></tr></thead>
           <tbody>
             <tr><th class="rowh">Polite <small id="n-pol"></small></th>
-              <td class="cell"><div class="cell-head"><span>true positive</span><b id="c-tp"></b></div><div class="cell-dots" id="d-tp"></div></td>
-              <td class="cell err"><div class="cell-head"><span>false fail</span><b id="c-fn"></b></div><div class="cell-dots" id="d-fn"></div></td>
+              <td class="cell"><div class="cell-head"><span class="mark">✓ true positive</span><b id="c-tp"></b></div><div class="cell-dots" id="d-tp"></div></td>
+              <td class="cell err"><div class="cell-head"><span class="mark">✗ false fail</span><b id="c-fn"></b></div><div class="cell-dots" id="d-fn"></div></td>
               <td class="rate">TPR <b id="r-tpr"></b><small id="r-tpr-f"></small></td></tr>
             <tr><th class="rowh">Rude <small id="n-rude"></small></th>
-              <td class="cell err"><div class="cell-head"><span>false pass</span><b id="c-fp"></b></div><div class="cell-dots" id="d-fp"></div></td>
-              <td class="cell"><div class="cell-head"><span>true negative</span><b id="c-tn"></b></div><div class="cell-dots" id="d-tn"></div></td>
+              <td class="cell err"><div class="cell-head"><span class="mark">✗ false pass</span><b id="c-fp"></b></div><div class="cell-dots" id="d-fp"></div></td>
+              <td class="cell"><div class="cell-head"><span class="mark">✓ true negative</span><b id="c-tn"></b></div><div class="cell-dots" id="d-tn"></div></td>
               <td class="rate">TNR <b id="r-tnr"></b><small id="r-tnr-f"></small></td></tr>
             <tr><th class="rowh">Judge total</th>
               <td class="tot"><b id="t-pass"></b><small>passed: the raw score</small></td>
