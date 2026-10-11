@@ -36,7 +36,7 @@ def _post(payload):
     if os.environ.get("JEV_BACKEND") == "stub":
         from judge.jev_stub import stub_backend
         return stub_backend(payload)
-    key = os.environ.get("TYPESAFE_API_KEY", "")
+    key = os.environ.get("TYPESAFE_API_KEY", "").strip()
     if not key:
         raise JevCallError("no_key", "TYPESAFE_API_KEY is not set (or use JEV_BACKEND=stub)")
     req = urllib.request.Request(TYPESAFE_URL, data=payload, method="POST", headers={

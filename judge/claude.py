@@ -35,7 +35,7 @@ def _post(body):
         noul = json.loads(stub_backend(json.dumps({"state": st, "questions": {"q": {}}}).encode()))["answers"]["q"]["noul"]
         text = json.dumps({"reasoning": "stub", "answer": "Pass" if noul >= 0.5 else "Fail"})
         return {"content": [{"type": "text", "text": text}], "usage": {"input_tokens": 0, "output_tokens": 0}}
-    key = os.environ.get("ANTHROPIC_API_KEY", "")
+    key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
     req = urllib.request.Request(URL, data=json.dumps(body).encode(), method="POST", headers={
         "x-api-key": key, "anthropic-version": VERSION, "content-type": "application/json"})
     with urllib.request.urlopen(req, timeout=float(os.environ.get("CLAUDE_TIMEOUT_S", "60"))) as r:
