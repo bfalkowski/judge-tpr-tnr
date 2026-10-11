@@ -49,7 +49,19 @@ Each rate is computed only within its own row. TPR uses only the items that shou
 
 **Other names.** In medical testing these are sensitivity (TPR) and specificity (TNR) (Altman and Bland 1994). In machine learning, TPR is the recall of the PASS class and TNR is the recall of the FAIL class. They are the same numbers.
 
-**Why not precision?** Precision asks a different question: of the items the judge passed, how many should have passed? It depends on how common good outputs are. Take a judge with TPR 0.9 and TNR 0.8. If 70% of outputs are good, its precision for PASS is 0.91. If only 30% are good, the same judge's precision is 0.66. The judge did not change; the mix did. TPR and TNR stay put when the mix changes, so they describe the judge itself.
+**Why not precision?** Precision asks a different question: of the items the judge passed, how many should have passed? The answer depends on how many good and bad items are in the batch, not only on the judge. Here is the same judge, with TPR 0.9 and TNR 0.8, on two batches of 100 outputs:
+
+| | Batch A | Batch B |
+|---|---|---|
+| Good outputs / bad outputs | 70 / 30 | 30 / 70 |
+| Good outputs it passes (90% of good) | 63 | 27 |
+| Bad outputs it passes (20% of bad) | 6 | 14 |
+| Total it passes | 69 | 41 |
+| Precision: good among those it passed | 63 / 69 = 0.91 | 27 / 41 = 0.66 |
+| TPR | 63 / 70 = 0.9 | 27 / 30 = 0.9 |
+| TNR | 24 / 30 = 0.8 | 56 / 70 = 0.8 |
+
+The judge treated every output the same way, but its precision fell from 0.91 to 0.66. Batch B has more bad outputs, so the same 20% slip rate on bad outputs produces more false passes, and they make up a bigger share of what it passed. TPR looks only at the good outputs and TNR only at the bad ones, so neither moves. That is why they are used to describe a judge: you measure them on one labeled set and carry them to new batches whose mix you do not know. Precision describes the judge on one particular batch.
 
 ## 4. How the judge's errors bend the pass rate
 
