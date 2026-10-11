@@ -63,24 +63,31 @@
   .lab { border: 1px solid var(--accent); border-radius: 8px; padding: 16px 18px 18px; margin: 8px 0 24px; }
   .lab-title { font-weight: 700; color: var(--accent); margin: 0 0 4px; }
   .lab-note { color: var(--muted); font-size: 14.5px; margin: 0 0 14px; }
-  .lab-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
-  .controls { display: grid; gap: 12px; min-width: 0; }
+  .lab-grid { display: grid; gap: 16px; }
+  .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px 20px; min-width: 0; }
   .ctl label { display: flex; justify-content: space-between; gap: 8px; font-size: 15px; font-weight: 600; }
   .ctl output { font-family: var(--font-mono); font-weight: 500; font-variant-numeric: tabular-nums; }
   .ctl .hint { display: block; color: var(--muted); font-size: 13.5px; font-weight: 400; }
   input[type=range] { width: 100%; accent-color: var(--accent); margin: 4px 0 0; }
-  .dots { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; max-width: 280px; width: 100%; }
-  .dot { aspect-ratio: 1; border-radius: 50%; border: 2.5px solid var(--good); background: transparent; }
+  .cm-wrap { overflow-x: auto; margin: 4px 0 0; }
+  table.cm { border-collapse: separate; border-spacing: 6px; width: 100%; min-width: 340px; font-size: 14.5px; table-layout: fixed; }
+  table.cm th, table.cm td { border: none; padding: 0; background: none; color: var(--text); vertical-align: top; }
+  table.cm thead th { font-weight: 600; text-align: center; padding-bottom: 2px; background: none; color: var(--text); }
+  table.cm th.rowh { text-align: left; font-weight: 600; width: 22%; padding-top: 8px; }
+  table.cm th.rowh small, table.cm td.rate small { display: block; color: var(--muted); font-weight: 400; font-size: 13px; }
+  table.cm td.cell { border: 1px solid var(--line); border-radius: 6px; padding: 8px; }
+  table.cm td.cell.err { background: var(--alt-bg); border-style: dashed; }
+  .cell-head { display: flex; justify-content: space-between; gap: 6px; font-size: 13px; color: var(--muted); }
+  .cell-head b { font-family: var(--font-mono); font-size: 17px; color: var(--text); font-weight: 500; }
+  .cell-dots { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 6px; min-height: 10px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; border: 2px solid var(--good); background: transparent; flex: none; }
   .dot.bad { border-color: var(--bad); }
-  .dot.passed { background: var(--good); box-shadow: 0 0 0 1px var(--dot-ring) inset; }
+  .dot.passed { background: var(--good); }
   .dot.bad.passed { background: var(--bad); }
-  .legend { display: grid; grid-template-columns: auto 1fr auto; gap: 4px 8px; align-items: center;
-            font-size: 14px; margin: 12px 0 0; max-width: 300px; font-variant-numeric: tabular-nums; }
-  .legend .sw { width: 13px; height: 13px; border-radius: 50%; border: 2.5px solid var(--good); }
-  .legend .sw.bad { border-color: var(--bad); }
-  .legend .sw.passed { background: var(--good); }
-  .legend .sw.bad.passed { background: var(--bad); }
-  .legend .ct { font-family: var(--font-mono); text-align: right; }
+  table.cm td.rate { width: 19%; padding-top: 8px; font-size: 14px; }
+  table.cm td.rate b, table.cm td.tot b { font-family: var(--font-mono); font-weight: 500; }
+  table.cm td.tot { text-align: center; font-size: 14px; padding-top: 2px; }
+  table.cm td.tot small { display: block; color: var(--muted); font-size: 13px; }
   .readout { margin: 14px 0 0; display: grid; gap: 8px; }
   .readout .eq { margin: 0; white-space: pre; }
   .big { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 15px; }
@@ -96,8 +103,11 @@
     h1 { font-size: 28px; }
     .lab { padding: 14px; }
     .lab-grid, .measured { grid-template-columns: minmax(0, 1fr); }
+    .cell-head { flex-direction: column-reverse; align-items: flex-start; gap: 0; }
+    table.cm td.rate { padding-left: 4px; font-size: 13px; }
+    table.cm { border-spacing: 4px; }
   }
-  @media (prefers-reduced-motion: no-preference) { .dot { transition: background-color .15s, border-color .15s; } }
+
 </style>
 
 <div class="topbar"><div class="container">
@@ -175,7 +185,7 @@ Reply: {{REPLY}}</pre>
   <p>Move θ, TPR and TNR below to watch the raw score and the correction change. It starts at this example's numbers.</p>
   <section class="lab" aria-labelledby="lab-title">
     <p class="lab-title" id="lab-title">Try it</p>
-    <p class="lab-note">100 replies. Blue are polite (should pass), orange are rude (should fail). A filled dot is one the judge passed; a hollow dot is one it failed. Dot counts are rounded to whole outputs; the formulas use exact values.</p>
+    <p class="lab-note">100 replies sorted into the confusion matrix from Section 3. Blue dots are polite replies, orange are rude; filled dots are ones the judge passed. Shaded cells are the judge's mistakes. Counts are rounded to whole replies; the formulas below use exact values.</p>
     <div class="lab-grid">
       <div class="controls">
         <div class="ctl">
@@ -194,14 +204,23 @@ Reply: {{REPLY}}</pre>
           <input type="range" id="tnr" min="0" max="100" step="1" value="88">
         </div>
       </div>
-      <div style="min-width:0">
-        <div class="dots" id="dots" role="img" aria-label="Grid of 100 outputs"></div>
-        <div class="legend" aria-live="polite">
-          <span class="sw passed"></span><span>Polite, passed (TP)</span><span class="ct" id="c-tp"></span>
-          <span class="sw"></span><span>Polite, failed (FN)</span><span class="ct" id="c-fn"></span>
-          <span class="sw bad passed"></span><span>Rude, passed (FP)</span><span class="ct" id="c-fp"></span>
-          <span class="sw bad"></span><span>Rude, failed (TN)</span><span class="ct" id="c-tn"></span>
-        </div>
+      <div class="cm-wrap" aria-live="polite">
+        <table class="cm">
+          <thead><tr><th></th><th>Judge says PASS</th><th>Judge says FAIL</th><th></th></tr></thead>
+          <tbody>
+            <tr><th class="rowh">Polite <small id="n-pol"></small></th>
+              <td class="cell"><div class="cell-head"><span>true positive</span><b id="c-tp"></b></div><div class="cell-dots" id="d-tp"></div></td>
+              <td class="cell err"><div class="cell-head"><span>false fail</span><b id="c-fn"></b></div><div class="cell-dots" id="d-fn"></div></td>
+              <td class="rate">TPR <b id="r-tpr"></b><small id="r-tpr-f"></small></td></tr>
+            <tr><th class="rowh">Rude <small id="n-rude"></small></th>
+              <td class="cell err"><div class="cell-head"><span>false pass</span><b id="c-fp"></b></div><div class="cell-dots" id="d-fp"></div></td>
+              <td class="cell"><div class="cell-head"><span>true negative</span><b id="c-tn"></b></div><div class="cell-dots" id="d-tn"></div></td>
+              <td class="rate">TNR <b id="r-tnr"></b><small id="r-tnr-f"></small></td></tr>
+            <tr><th class="rowh">Judge total</th>
+              <td class="tot"><b id="t-pass"></b><small>passed: the raw score</small></td>
+              <td class="tot"><b id="t-fail"></b><small>failed</small></td><td></td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
     <div class="readout" aria-live="polite">
@@ -294,10 +313,14 @@ Reply: {{REPLY}}</pre>
   }
   window.primerMath = { observed, corrected, counts };
 
-  const dots = $("dots");
-  for (let i = 0; i < 100; i++) { const d = document.createElement("span"); d.className = "dot"; dots.appendChild(d); }
-  const names = { tp: "Should pass, judge passed (true positive)", fn: "Should pass, judge failed (false negative)",
-                  fp: "Should fail, judge passed (false positive)", tn: "Should fail, judge failed (true negative)" };
+  const names = { tp: "Polite, judge passed (true positive)", fn: "Polite, judge failed (false fail)",
+                  fp: "Rude, judge passed (false pass)", tn: "Rude, judge failed (true negative)" };
+  function fill(k, n) {
+    const box = $("d-" + k), cls = "dot" + (k === "fp" || k === "tn" ? " bad" : "") + (k === "tp" || k === "fp" ? " passed" : "");
+    while (box.children.length < n) { const d = document.createElement("span"); box.appendChild(d); }
+    while (box.children.length > n) box.lastChild.remove();
+    [...box.children].forEach(d => { d.className = cls; d.title = names[k]; });
+  }
 
   function update() {
     const theta = $("theta").value / 100, tpr = $("tpr").value / 100, tnr = $("tnr").value / 100;
@@ -310,14 +333,13 @@ Reply: {{REPLY}}</pre>
     $("mtpr-out").textContent = f2(mtpr); $("mtnr-out").textContent = f2(mtnr);
 
     const c = counts(theta, tpr, tnr);
-    const order = [].concat(Array(c.tp).fill("tp"), Array(c.fn).fill("fn"), Array(c.fp).fill("fp"), Array(c.tn).fill("tn"));
-    [...dots.children].forEach((d, i) => {
-      const k = order[i];
-      d.className = "dot" + (k === "fp" || k === "tn" ? " bad" : "") + (k === "tp" || k === "fp" ? " passed" : "");
-      d.title = names[k];
-    });
-    dots.setAttribute("aria-label", `100 outputs: ${c.tp} true positives, ${c.fn} false negatives, ${c.fp} false positives, ${c.tn} true negatives`);
-    ["tp", "fn", "fp", "tn"].forEach(k => $("c-" + k).textContent = c[k]);
+    ["tp", "fn", "fp", "tn"].forEach(k => { $("c-" + k).textContent = c[k]; fill(k, c[k]); });
+    const pol = c.tp + c.fn, rude = c.fp + c.tn;
+    $("n-pol").textContent = pol + " replies"; $("n-rude").textContent = rude + " replies";
+    $("r-tpr").textContent = f2(tpr); $("r-tnr").textContent = f2(tnr);
+    $("r-tpr-f").textContent = pol ? `${c.tp} of ${pol} passed` : "no polite replies";
+    $("r-tnr-f").textContent = rude ? `${c.tn} of ${rude} failed` : "no rude replies";
+    $("t-pass").textContent = c.tp + c.fp; $("t-fail").textContent = c.fn + c.tn;
 
     const a = tpr * theta, b = (1 - tnr) * (1 - theta), p = a + b;
     $("eq-pobs").textContent =
