@@ -70,5 +70,29 @@
    0.9016393442622951
   ],
   "spend_usd": 0.023351
+ },
+ {
+  "step": 3,
+  "variant": "c3",
+  "run": "gh38104945965-c3-labeled-dev",
+  "change": "Same definitions and examples on Claude Haiku 4.5 (a different model from the agent), reasoning then answer",
+  "model": "claude-haiku-4-5-20251001",
+  "fingerprint": "1b1bebcddff9f66c",
+  "n": 158,
+  "tp": 83,
+  "fn": 4,
+  "fp": 2,
+  "tn": 69,
+  "tpr": 0.9540229885057471,
+  "tnr": 0.971830985915493,
+  "tpr_ci": [
+   0.9069767441860465,
+   0.989247311827957
+  ],
+  "tnr_ci": [
+   0.9295774647887324,
+   1.0
+  ],
+  "spend_usd": 0.57499
  }
 ]

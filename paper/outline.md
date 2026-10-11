@@ -65,7 +65,7 @@ reader is not quoted. Each technical piece has a public source:
 |---|---|
 | Labeled data and splits | Done: 402 items, dev 87/71, test 96/62 |
 | Climb steps 0 to 2 (Jev) | Done: TPR 0.84 to 0.91, TNR 0.52 to 0.82 |
-| Climb step 3 (Claude) | Built; waiting for `ANTHROPIC_API_KEY` |
+| Climb step 3 (Claude) | Done: TPR 0.95, TNR 0.97, past the 0.9 target. Two of its six errors are a label question (damage reported on an order not yet delivered) |
 | Freeze and test | Not run |
 | Correction on agent runs | Estimator built; not run |
 | Phase 0 and constructed-items results | Done (`phase0/RESULTS.md`, `paper/preliminary.md`) |

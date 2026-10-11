@@ -13,7 +13,7 @@ The method follows the judge-validation loop taught in AI Evaluation for Enginee
 | 0 | Paper 2's judge: one sentence, no definitions or examples | Jev | 0.84 | 0.52 |
 | 1 | Precise Pass/Fail definitions from step 0's errors | Jev | 0.94 | 0.73 |
 | 2 | Four train examples with critiques at the day cutoffs | Jev | 0.91 | 0.82 |
-| 3 | Same definitions and examples on Claude, reasoning then answer | Claude Haiku 4.5 | pending | pending |
+| 3 | Same definitions and examples on Claude, reasoning then answer | Claude Haiku 4.5 | 0.95 | 0.97 |
 
 158 dev items (87 pass, 71 fail), every one a real agent decision. Intervals and error counts: [`paper/climb_table.md`](paper/climb_table.md). Target: both above 0.9.
 
@@ -61,7 +61,7 @@ gh workflow run judge.yml -f variant=j2 -f dataset=labeled -f split=dev -f backe
 git fetch origin data && python analysis/climb.py
 ```
 
-A Jev step on dev costs about a cent; a Claude Haiku step well under a dollar.
+A Jev step on dev costs about a cent; the Claude Haiku step cost $0.57.
 
 ## Sources
 
