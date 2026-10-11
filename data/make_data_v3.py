@@ -1,6 +1,7 @@
 """Generate dataset v3: support tickets from structured dimensions.
 
   python data/make_data_v3.py [--n 240] [--seed 20261010]
+  python data/make_data_v3.py --version v4 --n 200 --seed 20261011   # the correction batch
 
 v2 has 60 hand-written tickets, and the paper 2 agent makes only 28 distinct
 mistakes on them across every run on record. The judge-validation method
@@ -20,8 +21,9 @@ is built in two steps:
      The text comes from phrase banks for each issue and framing.
 
 The expected action comes from the reference policy (judge/policy.py), the
-same function paper 2 used. Writes data/v3/tickets.jsonl and
-data/v3/orders.json and updates data/CHECKSUMS.json.
+same function paper 2 used. Writes data/<version>/tickets.jsonl and
+data/<version>/orders.json and updates data/CHECKSUMS.json. v3 uses ticket IDs
+W001.. and orders 3001..; v4 uses X001.. and orders 4001...
 """
 
 import argparse
@@ -37,7 +39,7 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 sys.path.insert(0, ROOT)
 from judge.policy import TODAY, resolve  # noqa: E402
 
-OUT = os.path.join(ROOT, "data", "v3")
+PREFIX = {"v3": ("W", 3001), "v4": ("X", 4001)}
 
 # sku: (product, price, stock). Prices sit on both sides of the $500 limit.
 PRODUCTS = {
@@ -148,13 +150,14 @@ def make_text(rng, issue, status, days):
     return framing, rng.choice(TEXT[(issue, framing)])
 
 
-def build(n, seed):
+def build(n, seed, version="v3"):
+    letter, first_order = PREFIX[version]
     rng = random.Random(seed)
     stock = {sku: v[2] for sku, v in PRODUCTS.items()}
     orders, tickets = {}, []
     for i in range(n):
         issue, sku, status, days = make_facts(rng)
-        oid = 3001 + i
+        oid = first_order + i
         name, price, _ = PRODUCTS[sku]
         o = {"id": oid, "customer": NAMES[i % len(NAMES)], "sku": sku, "product": name, "total": price,
              "status": status, "shipped_on": None, "delivered_on": None}
@@ -166,7 +169,7 @@ def build(n, seed):
         framing, text = make_text(rng, issue, status, days)
         text = text.format(id=oid, p=name, other=rng.randint(1000, 2999))
         orders[str(oid)] = o
-        tickets.append({"ticket_id": f"W{i + 1:03d}", "order_id": oid, "customer": o["customer"], "text": text,
+        tickets.append({"ticket_id": f"{letter}{i + 1:03d}", "order_id": oid, "customer": o["customer"], "text": text,
                         "issue": issue, "tag": framing, "expected": resolve(issue, o, stock[sku])})
     return {"orders": orders, "stock": stock}, tickets
 
@@ -175,8 +178,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--n", type=int, default=240)
     ap.add_argument("--seed", type=int, default=20261010)
+    ap.add_argument("--version", default="v3", choices=sorted(PREFIX))
     a = ap.parse_args()
-    fixture, tickets = build(a.n, a.seed)
+    fixture, tickets = build(a.n, a.seed, a.version)
+    OUT = os.path.join(ROOT, "data", a.version)
     os.makedirs(OUT, exist_ok=True)
     with open(os.path.join(OUT, "orders.json"), "w") as f:
         json.dump(fixture, f, indent=1)
@@ -185,7 +190,7 @@ def main():
             f.write(json.dumps(t) + "\n")
     sums_path = os.path.join(ROOT, "data", "CHECKSUMS.json")
     sums = json.load(open(sums_path))
-    for name in ("v3/orders.json", "v3/tickets.jsonl"):
+    for name in (f"{a.version}/orders.json", f"{a.version}/tickets.jsonl"):
         sums[name] = hashlib.sha256(open(os.path.join(ROOT, "data", name), "rb").read()).hexdigest()
     json.dump(sums, open(sums_path, "w"), indent=1)
     print(f"{len(tickets)} tickets")

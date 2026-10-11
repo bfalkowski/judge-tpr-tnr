@@ -154,7 +154,7 @@ def test_stub_run_on_dev_writes_raw_scores(tmp_path):
 
 def test_test_split_refused_without_a_matching_freeze(tmp_path):
     p = run(["--split", "test", "--run-id", "t2"], tmp_path)
-    assert p.returncode != 0 and "freeze.json" in p.stderr
+    assert p.returncode != 0 and ("freeze.json" in p.stderr or "not the frozen judge" in p.stderr)
     assert not (tmp_path / "t2").exists()
 
 

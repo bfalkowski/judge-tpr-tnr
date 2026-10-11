@@ -8,8 +8,8 @@ per item per call with the raw `noul` value. The verdict threshold is not
 applied here; analysis applies it, so a threshold can be chosen on dev without
 calling Jev again.
 
-The test split only runs for a variant frozen in freeze.json, with the same
-fingerprint. That keeps test labels out of the loop while the judge is tuned.
+The test split, and the "prod" split of the correction batch (v4), only run
+for the variant frozen in freeze.json, with the same fingerprint. That keeps test labels out of the loop while the judge is tuned.
 
 Environment:
   TYPESAFE_API_KEY  Jev key (not needed with JEV_BACKEND=stub)
@@ -63,7 +63,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--variant", default="p2", choices=sorted(judges.VARIANTS))
     ap.add_argument("--dataset", default="v2")
-    ap.add_argument("--split", required=True, choices=["train", "dev", "test", "all"])
+    ap.add_argument("--split", required=True, choices=["train", "dev", "test", "prod", "all"])
     ap.add_argument("--repeats", type=int, default=2, help="calls per item (paper 2 used 2)")
     ap.add_argument("--run-id", default=time.strftime("run-%Y%m%d-%H%M%S"))
     ap.add_argument("--limit", type=int, default=None, help="first N items only (smoke tests)")
@@ -74,7 +74,7 @@ def main():
     if os.environ.get("JEV_BACKEND") != "stub" and not os.environ.get(need):
         sys.exit(f"{need} is not set: add it to .env, or as a repository secret for the "
                  "judge workflow, or use JEV_BACKEND=stub")
-    frozen = check_frozen(a.variant) if a.split == "test" else None
+    frozen = check_frozen(a.variant) if a.split in ("test", "prod") else None
     if a.split == "all" and "test" in set(data.load_split(a.dataset).values()):
         sys.exit("--split all would include test tickets; run the splits separately")
     items = data.load_items(a.dataset) if a.split == "all" else data.items_for(a.dataset, a.split)

@@ -1,0 +1,2022 @@
+{
+ "orders": {
+  "4001": {
+   "id": 4001,
+   "customer": "Avery Brooks",
+   "sku": "IP-790",
+   "product": "projector",
+   "total": 899.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-19",
+   "delivered_on": null
+  },
+  "4002": {
+   "id": 4002,
+   "customer": "Bianca Silva",
+   "sku": "IP-790",
+   "product": "projector",
+   "total": 899.0,
+   "status": "Lost",
+   "shipped_on": "2026-08-31",
+   "delivered_on": null
+  },
+  "4003": {
+   "id": 4003,
+   "customer": "Caleb Osei",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-11",
+   "delivered_on": "2026-08-16"
+  },
+  "4004": {
+   "id": 4004,
+   "customer": "Dana Kowalski",
+   "sku": "GP-570",
+   "product": "gaming chair",
+   "total": 501.0,
+   "status": "Shipped",
+   "shipped_on": "2026-08-29",
+   "delivered_on": null
+  },
+  "4005": {
+   "id": 4005,
+   "customer": "Emeka Obi",
+   "sku": "PS-560",
+   "product": "smart speaker",
+   "total": 99.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-17",
+   "delivered_on": null
+  },
+  "4006": {
+   "id": 4006,
+   "customer": "Farah Aziz",
+   "sku": "MR-230",
+   "product": "robot vacuum",
+   "total": 549.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-15",
+   "delivered_on": null
+  },
+  "4007": {
+   "id": 4007,
+   "customer": "Gabe Lindstrom",
+   "sku": "FR-560",
+   "product": "air purifier",
+   "total": 500.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-29",
+   "delivered_on": "2026-09-04"
+  },
+  "4008": {
+   "id": 4008,
+   "customer": "Hana Kim",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-18",
+   "delivered_on": "2026-08-22"
+  },
+  "4009": {
+   "id": 4009,
+   "customer": "Ivan Petrov",
+   "sku": "FR-560",
+   "product": "air purifier",
+   "total": 500.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-15",
+   "delivered_on": null
+  },
+  "4010": {
+   "id": 4010,
+   "customer": "Jade Thompson",
+   "sku": "HT-680",
+   "product": "home theater soundbar",
+   "total": 649.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-09",
+   "delivered_on": null
+  },
+  "4011": {
+   "id": 4011,
+   "customer": "Kofi Mensah",
+   "sku": "MR-230",
+   "product": "robot vacuum",
+   "total": 549.0,
+   "status": "Delivered",
+   "shipped_on": "2026-09-23",
+   "delivered_on": "2026-09-28"
+  },
+  "4012": {
+   "id": 4012,
+   "customer": "Lena Fischer",
+   "sku": "MR-230",
+   "product": "robot vacuum",
+   "total": 549.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-13",
+   "delivered_on": null
+  },
+  "4013": {
+   "id": 4013,
+   "customer": "Mateo Cruz",
+   "sku": "JK-800",
+   "product": "electric kettle",
+   "total": 39.0,
+   "status": "Processing",
+   "shipped_on": null,
+   "delivered_on": null
+  },
+  "4014": {
+   "id": 4014,
+   "customer": "Nadia Rahman",
+   "sku": "JK-800",
+   "product": "electric kettle",
+   "total": 39.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-29",
+   "delivered_on": "2026-09-04"
+  },
+  "4015": {
+   "id": 4015,
+   "customer": "Owen Gallagher",
+   "sku": "MR-230",
+   "product": "robot vacuum",
+   "total": 549.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-07",
+   "delivered_on": null
+  },
+  "4016": {
+   "id": 4016,
+   "customer": "Paula Ortiz",
+   "sku": "IP-790",
+   "product": "projector",
+   "total": 899.0,
+   "status": "Lost",
+   "shipped_on": "2026-08-31",
+   "delivered_on": null
+  },
+  "4017": {
+   "id": 4017,
+   "customer": "Quinn Murphy",
+   "sku": "KM-910",
+   "product": "ergonomic keyboard",
+   "total": 159.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-16",
+   "delivered_on": null
+  },
+  "4018": {
+   "id": 4018,
+   "customer": "Rosa Delgado",
+   "sku": "PS-560",
+   "product": "smart speaker",
+   "total": 99.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-25",
+   "delivered_on": "2026-08-31"
+  },
+  "4019": {
+   "id": 4019,
+   "customer": "Sanjay Iyer",
+   "sku": "JK-800",
+   "product": "electric kettle",
+   "total": 39.0,
+   "status": "Processing",
+   "shipped_on": null,
+   "delivered_on": null
+  },
+  "4020": {
+   "id": 4020,
+   "customer": "Tessa Novak",
+   "sku": "DS-440",
+   "product": "document scanner",
+   "total": 249.0,
+   "status": "Delivered",
+   "shipped_on": "2026-09-06",
+   "delivered_on": "2026-09-09"
+  },
+  "4021": {
+   "id": 4021,
+   "customer": "Uma Reddy",
+   "sku": "PS-560",
+   "product": "smart speaker",
+   "total": 99.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-25",
+   "delivered_on": "2026-08-29"
+  },
+  "4022": {
+   "id": 4022,
+   "customer": "Victor Hale",
+   "sku": "MR-230",
+   "product": "robot vacuum",
+   "total": 549.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-19",
+   "delivered_on": "2026-08-23"
+  },
+  "4023": {
+   "id": 4023,
+   "customer": "Wen Zhao",
+   "sku": "HT-680",
+   "product": "home theater soundbar",
+   "total": 649.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-01",
+   "delivered_on": null
+  },
+  "4024": {
+   "id": 4024,
+   "customer": "Yusuf Kaya",
+   "sku": "MR-230",
+   "product": "robot vacuum",
+   "total": 549.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-21",
+   "delivered_on": null
+  },
+  "4025": {
+   "id": 4025,
+   "customer": "Avery Brooks",
+   "sku": "NB-340",
+   "product": "portable monitor",
+   "total": 299.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-01",
+   "delivered_on": "2026-08-07"
+  },
+  "4026": {
+   "id": 4026,
+   "customer": "Bianca Silva",
+   "sku": "HT-680",
+   "product": "home theater soundbar",
+   "total": 649.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-30",
+   "delivered_on": "2026-09-01"
+  },
+  "4027": {
+   "id": 4027,
+   "customer": "Caleb Osei",
+   "sku": "FR-560",
+   "product": "air purifier",
+   "total": 500.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-15",
+   "delivered_on": null
+  },
+  "4028": {
+   "id": 4028,
+   "customer": "Dana Kowalski",
+   "sku": "HT-680",
+   "product": "home theater soundbar",
+   "total": 649.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-19",
+   "delivered_on": null
+  },
+  "4029": {
+   "id": 4029,
+   "customer": "Emeka Obi",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-12",
+   "delivered_on": null
+  },
+  "4030": {
+   "id": 4030,
+   "customer": "Farah Aziz",
+   "sku": "NB-340",
+   "product": "portable monitor",
+   "total": 299.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-17",
+   "delivered_on": null
+  },
+  "4031": {
+   "id": 4031,
+   "customer": "Gabe Lindstrom",
+   "sku": "NB-340",
+   "product": "portable monitor",
+   "total": 299.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-10",
+   "delivered_on": null
+  },
+  "4032": {
+   "id": 4032,
+   "customer": "Hana Kim",
+   "sku": "AK-110",
+   "product": "desk lamp",
+   "total": 45.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-07",
+   "delivered_on": "2026-08-13"
+  },
+  "4033": {
+   "id": 4033,
+   "customer": "Ivan Petrov",
+   "sku": "MR-230",
+   "product": "robot vacuum",
+   "total": 549.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-08",
+   "delivered_on": null
+  },
+  "4034": {
+   "id": 4034,
+   "customer": "Jade Thompson",
+   "sku": "MR-230",
+   "product": "robot vacuum",
+   "total": 549.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-27",
+   "delivered_on": "2026-09-02"
+  },
+  "4035": {
+   "id": 4035,
+   "customer": "Kofi Mensah",
+   "sku": "OV-450",
+   "product": "countertop oven",
+   "total": 189.0,
+   "status": "Delivered",
+   "shipped_on": "2026-09-02",
+   "delivered_on": "2026-09-04"
+  },
+  "4036": {
+   "id": 4036,
+   "customer": "Lena Fischer",
+   "sku": "GP-570",
+   "product": "gaming chair",
+   "total": 501.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-15",
+   "delivered_on": null
+  },
+  "4037": {
+   "id": 4037,
+   "customer": "Mateo Cruz",
+   "sku": "MR-230",
+   "product": "robot vacuum",
+   "total": 549.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-27",
+   "delivered_on": "2026-09-02"
+  },
+  "4038": {
+   "id": 4038,
+   "customer": "Nadia Rahman",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-18",
+   "delivered_on": null
+  },
+  "4039": {
+   "id": 4039,
+   "customer": "Owen Gallagher",
+   "sku": "HT-680",
+   "product": "home theater soundbar",
+   "total": 649.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-25",
+   "delivered_on": "2026-08-31"
+  },
+  "4040": {
+   "id": 4040,
+   "customer": "Paula Ortiz",
+   "sku": "GP-570",
+   "product": "gaming chair",
+   "total": 501.0,
+   "status": "Processing",
+   "shipped_on": null,
+   "delivered_on": null
+  },
+  "4041": {
+   "id": 4041,
+   "customer": "Quinn Murphy",
+   "sku": "HT-680",
+   "product": "home theater soundbar",
+   "total": 649.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-16",
+   "delivered_on": null
+  },
+  "4042": {
+   "id": 4042,
+   "customer": "Rosa Delgado",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-28",
+   "delivered_on": null
+  },
+  "4043": {
+   "id": 4043,
+   "customer": "Sanjay Iyer",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-11",
+   "delivered_on": "2026-08-15"
+  },
+  "4044": {
+   "id": 4044,
+   "customer": "Tessa Novak",
+   "sku": "GP-570",
+   "product": "gaming chair",
+   "total": 501.0,
+   "status": "Delivered",
+   "shipped_on": "2026-09-06",
+   "delivered_on": "2026-09-08"
+  },
+  "4045": {
+   "id": 4045,
+   "customer": "Uma Reddy",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-30",
+   "delivered_on": "2026-09-04"
+  },
+  "4046": {
+   "id": 4046,
+   "customer": "Victor Hale",
+   "sku": "IP-790",
+   "product": "projector",
+   "total": 899.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-08",
+   "delivered_on": "2026-08-14"
+  },
+  "4047": {
+   "id": 4047,
+   "customer": "Wen Zhao",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Delivered",
+   "shipped_on": "2026-07-30",
+   "delivered_on": "2026-08-05"
+  },
+  "4048": {
+   "id": 4048,
+   "customer": "Yusuf Kaya",
+   "sku": "OV-450",
+   "product": "countertop oven",
+   "total": 189.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-25",
+   "delivered_on": "2026-08-30"
+  },
+  "4049": {
+   "id": 4049,
+   "customer": "Avery Brooks",
+   "sku": "OV-450",
+   "product": "countertop oven",
+   "total": 189.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-17",
+   "delivered_on": null
+  },
+  "4050": {
+   "id": 4050,
+   "customer": "Bianca Silva",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-28",
+   "delivered_on": "2026-08-30"
+  },
+  "4051": {
+   "id": 4051,
+   "customer": "Caleb Osei",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Processing",
+   "shipped_on": null,
+   "delivered_on": null
+  },
+  "4052": {
+   "id": 4052,
+   "customer": "Dana Kowalski",
+   "sku": "NB-340",
+   "product": "portable monitor",
+   "total": 299.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-22",
+   "delivered_on": null
+  },
+  "4053": {
+   "id": 4053,
+   "customer": "Emeka Obi",
+   "sku": "AK-110",
+   "product": "desk lamp",
+   "total": 45.0,
+   "status": "Processing",
+   "shipped_on": null,
+   "delivered_on": null
+  },
+  "4054": {
+   "id": 4054,
+   "customer": "Farah Aziz",
+   "sku": "HT-680",
+   "product": "home theater soundbar",
+   "total": 649.0,
+   "status": "Processing",
+   "shipped_on": null,
+   "delivered_on": null
+  },
+  "4055": {
+   "id": 4055,
+   "customer": "Gabe Lindstrom",
+   "sku": "NB-340",
+   "product": "portable monitor",
+   "total": 299.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-16",
+   "delivered_on": null
+  },
+  "4056": {
+   "id": 4056,
+   "customer": "Hana Kim",
+   "sku": "MR-230",
+   "product": "robot vacuum",
+   "total": 549.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-27",
+   "delivered_on": "2026-09-02"
+  },
+  "4057": {
+   "id": 4057,
+   "customer": "Ivan Petrov",
+   "sku": "HT-680",
+   "product": "home theater soundbar",
+   "total": 649.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-28",
+   "delivered_on": null
+  },
+  "4058": {
+   "id": 4058,
+   "customer": "Jade Thompson",
+   "sku": "PS-560",
+   "product": "smart speaker",
+   "total": 99.0,
+   "status": "Delivered",
+   "shipped_on": "2026-09-02",
+   "delivered_on": "2026-09-04"
+  },
+  "4059": {
+   "id": 4059,
+   "customer": "Kofi Mensah",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-16",
+   "delivered_on": null
+  },
+  "4060": {
+   "id": 4060,
+   "customer": "Lena Fischer",
+   "sku": "LT-120",
+   "product": "standing desk mat",
+   "total": 69.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-19",
+   "delivered_on": null
+  },
+  "4061": {
+   "id": 4061,
+   "customer": "Mateo Cruz",
+   "sku": "KM-910",
+   "product": "ergonomic keyboard",
+   "total": 159.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-29",
+   "delivered_on": "2026-09-03"
+  },
+  "4062": {
+   "id": 4062,
+   "customer": "Nadia Rahman",
+   "sku": "CM-330",
+   "product": "coffee grinder",
+   "total": 129.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-29",
+   "delivered_on": "2026-09-02"
+  },
+  "4063": {
+   "id": 4063,
+   "customer": "Owen Gallagher",
+   "sku": "PS-560",
+   "product": "smart speaker",
+   "total": 99.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-15",
+   "delivered_on": null
+  },
+  "4064": {
+   "id": 4064,
+   "customer": "Paula Ortiz",
+   "sku": "IP-790",
+   "product": "projector",
+   "total": 899.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-30",
+   "delivered_on": "2026-09-03"
+  },
+  "4065": {
+   "id": 4065,
+   "customer": "Quinn Murphy",
+   "sku": "MR-230",
+   "product": "robot vacuum",
+   "total": 549.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-17",
+   "delivered_on": null
+  },
+  "4066": {
+   "id": 4066,
+   "customer": "Rosa Delgado",
+   "sku": "BT-220",
+   "product": "bluetooth earbuds",
+   "total": 79.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-09",
+   "delivered_on": null
+  },
+  "4067": {
+   "id": 4067,
+   "customer": "Sanjay Iyer",
+   "sku": "LT-120",
+   "product": "standing desk mat",
+   "total": 69.0,
+   "status": "Delivered",
+   "shipped_on": "2026-09-10",
+   "delivered_on": "2026-09-14"
+  },
+  "4068": {
+   "id": 4068,
+   "customer": "Tessa Novak",
+   "sku": "GP-570",
+   "product": "gaming chair",
+   "total": 501.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-02",
+   "delivered_on": null
+  },
+  "4069": {
+   "id": 4069,
+   "customer": "Uma Reddy",
+   "sku": "MR-230",
+   "product": "robot vacuum",
+   "total": 549.0,
+   "status": "Processing",
+   "shipped_on": null,
+   "delivered_on": null
+  },
+  "4070": {
+   "id": 4070,
+   "customer": "Victor Hale",
+   "sku": "IP-790",
+   "product": "projector",
+   "total": 899.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-27",
+   "delivered_on": "2026-08-29"
+  },
+  "4071": {
+   "id": 4071,
+   "customer": "Wen Zhao",
+   "sku": "DS-440",
+   "product": "document scanner",
+   "total": 249.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-18",
+   "delivered_on": null
+  },
+  "4072": {
+   "id": 4072,
+   "customer": "Yusuf Kaya",
+   "sku": "CM-330",
+   "product": "coffee grinder",
+   "total": 129.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-30",
+   "delivered_on": null
+  },
+  "4073": {
+   "id": 4073,
+   "customer": "Avery Brooks",
+   "sku": "FR-560",
+   "product": "air purifier",
+   "total": 500.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-27",
+   "delivered_on": "2026-08-30"
+  },
+  "4074": {
+   "id": 4074,
+   "customer": "Bianca Silva",
+   "sku": "HT-680",
+   "product": "home theater soundbar",
+   "total": 649.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-26",
+   "delivered_on": "2026-08-30"
+  },
+  "4075": {
+   "id": 4075,
+   "customer": "Caleb Osei",
+   "sku": "OV-450",
+   "product": "countertop oven",
+   "total": 189.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-19",
+   "delivered_on": null
+  },
+  "4076": {
+   "id": 4076,
+   "customer": "Dana Kowalski",
+   "sku": "KM-910",
+   "product": "ergonomic keyboard",
+   "total": 159.0,
+   "status": "Lost",
+   "shipped_on": "2026-08-29",
+   "delivered_on": null
+  },
+  "4077": {
+   "id": 4077,
+   "customer": "Emeka Obi",
+   "sku": "DS-440",
+   "product": "document scanner",
+   "total": 249.0,
+   "status": "Delivered",
+   "shipped_on": "2026-09-01",
+   "delivered_on": "2026-09-03"
+  },
+  "4078": {
+   "id": 4078,
+   "customer": "Farah Aziz",
+   "sku": "KM-910",
+   "product": "ergonomic keyboard",
+   "total": 159.0,
+   "status": "Processing",
+   "shipped_on": null,
+   "delivered_on": null
+  },
+  "4079": {
+   "id": 4079,
+   "customer": "Gabe Lindstrom",
+   "sku": "BT-220",
+   "product": "bluetooth earbuds",
+   "total": 79.0,
+   "status": "Delivered",
+   "shipped_on": "2026-09-22",
+   "delivered_on": "2026-09-25"
+  },
+  "4080": {
+   "id": 4080,
+   "customer": "Hana Kim",
+   "sku": "MR-230",
+   "product": "robot vacuum",
+   "total": 549.0,
+   "status": "Processing",
+   "shipped_on": null,
+   "delivered_on": null
+  },
+  "4081": {
+   "id": 4081,
+   "customer": "Ivan Petrov",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-26",
+   "delivered_on": "2026-08-31"
+  },
+  "4082": {
+   "id": 4082,
+   "customer": "Jade Thompson",
+   "sku": "FR-560",
+   "product": "air purifier",
+   "total": 500.0,
+   "status": "Delivered",
+   "shipped_on": "2026-09-15",
+   "delivered_on": "2026-09-21"
+  },
+  "4083": {
+   "id": 4083,
+   "customer": "Kofi Mensah",
+   "sku": "FR-560",
+   "product": "air purifier",
+   "total": 500.0,
+   "status": "Shipped",
+   "shipped_on": "2026-08-29",
+   "delivered_on": null
+  },
+  "4084": {
+   "id": 4084,
+   "customer": "Lena Fischer",
+   "sku": "BT-220",
+   "product": "bluetooth earbuds",
+   "total": 79.0,
+   "status": "Processing",
+   "shipped_on": null,
+   "delivered_on": null
+  },
+  "4085": {
+   "id": 4085,
+   "customer": "Mateo Cruz",
+   "sku": "KM-910",
+   "product": "ergonomic keyboard",
+   "total": 159.0,
+   "status": "Delivered",
+   "shipped_on": "2026-09-08",
+   "delivered_on": "2026-09-14"
+  },
+  "4086": {
+   "id": 4086,
+   "customer": "Nadia Rahman",
+   "sku": "CM-330",
+   "product": "coffee grinder",
+   "total": 129.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-12",
+   "delivered_on": null
+  },
+  "4087": {
+   "id": 4087,
+   "customer": "Owen Gallagher",
+   "sku": "GP-570",
+   "product": "gaming chair",
+   "total": 501.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-18",
+   "delivered_on": null
+  },
+  "4088": {
+   "id": 4088,
+   "customer": "Paula Ortiz",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-27",
+   "delivered_on": "2026-09-02"
+  },
+  "4089": {
+   "id": 4089,
+   "customer": "Quinn Murphy",
+   "sku": "GP-570",
+   "product": "gaming chair",
+   "total": 501.0,
+   "status": "Delivered",
+   "shipped_on": "2026-09-26",
+   "delivered_on": "2026-09-30"
+  },
+  "4090": {
+   "id": 4090,
+   "customer": "Rosa Delgado",
+   "sku": "LT-120",
+   "product": "standing desk mat",
+   "total": 69.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-08",
+   "delivered_on": null
+  },
+  "4091": {
+   "id": 4091,
+   "customer": "Sanjay Iyer",
+   "sku": "MR-230",
+   "product": "robot vacuum",
+   "total": 549.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-18",
+   "delivered_on": null
+  },
+  "4092": {
+   "id": 4092,
+   "customer": "Tessa Novak",
+   "sku": "HT-680",
+   "product": "home theater soundbar",
+   "total": 649.0,
+   "status": "Delivered",
+   "shipped_on": "2026-09-16",
+   "delivered_on": "2026-09-20"
+  },
+  "4093": {
+   "id": 4093,
+   "customer": "Uma Reddy",
+   "sku": "MR-230",
+   "product": "robot vacuum",
+   "total": 549.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-10",
+   "delivered_on": "2026-08-16"
+  },
+  "4094": {
+   "id": 4094,
+   "customer": "Victor Hale",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-15",
+   "delivered_on": null
+  },
+  "4095": {
+   "id": 4095,
+   "customer": "Wen Zhao",
+   "sku": "MR-230",
+   "product": "robot vacuum",
+   "total": 549.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-29",
+   "delivered_on": null
+  },
+  "4096": {
+   "id": 4096,
+   "customer": "Yusuf Kaya",
+   "sku": "FR-560",
+   "product": "air purifier",
+   "total": 500.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-18",
+   "delivered_on": "2026-08-20"
+  },
+  "4097": {
+   "id": 4097,
+   "customer": "Avery Brooks",
+   "sku": "DS-440",
+   "product": "document scanner",
+   "total": 249.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-31",
+   "delivered_on": "2026-09-02"
+  },
+  "4098": {
+   "id": 4098,
+   "customer": "Bianca Silva",
+   "sku": "GP-570",
+   "product": "gaming chair",
+   "total": 501.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-12",
+   "delivered_on": "2026-08-15"
+  },
+  "4099": {
+   "id": 4099,
+   "customer": "Caleb Osei",
+   "sku": "MR-230",
+   "product": "robot vacuum",
+   "total": 549.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-17",
+   "delivered_on": null
+  },
+  "4100": {
+   "id": 4100,
+   "customer": "Dana Kowalski",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-16",
+   "delivered_on": null
+  },
+  "4101": {
+   "id": 4101,
+   "customer": "Emeka Obi",
+   "sku": "HT-680",
+   "product": "home theater soundbar",
+   "total": 649.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-16",
+   "delivered_on": null
+  },
+  "4102": {
+   "id": 4102,
+   "customer": "Farah Aziz",
+   "sku": "BT-220",
+   "product": "bluetooth earbuds",
+   "total": 79.0,
+   "status": "Processing",
+   "shipped_on": null,
+   "delivered_on": null
+  },
+  "4103": {
+   "id": 4103,
+   "customer": "Gabe Lindstrom",
+   "sku": "AK-110",
+   "product": "desk lamp",
+   "total": 45.0,
+   "status": "Delivered",
+   "shipped_on": "2026-09-07",
+   "delivered_on": "2026-09-11"
+  },
+  "4104": {
+   "id": 4104,
+   "customer": "Hana Kim",
+   "sku": "GP-570",
+   "product": "gaming chair",
+   "total": 501.0,
+   "status": "Shipped",
+   "shipped_on": "2026-08-29",
+   "delivered_on": null
+  },
+  "4105": {
+   "id": 4105,
+   "customer": "Ivan Petrov",
+   "sku": "FR-560",
+   "product": "air purifier",
+   "total": 500.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-10",
+   "delivered_on": null
+  },
+  "4106": {
+   "id": 4106,
+   "customer": "Jade Thompson",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-29",
+   "delivered_on": "2026-09-01"
+  },
+  "4107": {
+   "id": 4107,
+   "customer": "Kofi Mensah",
+   "sku": "DS-440",
+   "product": "document scanner",
+   "total": 249.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-29",
+   "delivered_on": "2026-09-04"
+  },
+  "4108": {
+   "id": 4108,
+   "customer": "Lena Fischer",
+   "sku": "MR-230",
+   "product": "robot vacuum",
+   "total": 549.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-28",
+   "delivered_on": "2026-09-01"
+  },
+  "4109": {
+   "id": 4109,
+   "customer": "Mateo Cruz",
+   "sku": "NB-340",
+   "product": "portable monitor",
+   "total": 299.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-21",
+   "delivered_on": null
+  },
+  "4110": {
+   "id": 4110,
+   "customer": "Nadia Rahman",
+   "sku": "GP-570",
+   "product": "gaming chair",
+   "total": 501.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-18",
+   "delivered_on": null
+  },
+  "4111": {
+   "id": 4111,
+   "customer": "Owen Gallagher",
+   "sku": "DS-440",
+   "product": "document scanner",
+   "total": 249.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-17",
+   "delivered_on": null
+  },
+  "4112": {
+   "id": 4112,
+   "customer": "Paula Ortiz",
+   "sku": "NB-340",
+   "product": "portable monitor",
+   "total": 299.0,
+   "status": "Lost",
+   "shipped_on": "2026-08-30",
+   "delivered_on": null
+  },
+  "4113": {
+   "id": 4113,
+   "customer": "Quinn Murphy",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-14",
+   "delivered_on": null
+  },
+  "4114": {
+   "id": 4114,
+   "customer": "Rosa Delgado",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Delivered",
+   "shipped_on": "2026-09-11",
+   "delivered_on": "2026-09-16"
+  },
+  "4115": {
+   "id": 4115,
+   "customer": "Sanjay Iyer",
+   "sku": "NB-340",
+   "product": "portable monitor",
+   "total": 299.0,
+   "status": "Processing",
+   "shipped_on": null,
+   "delivered_on": null
+  },
+  "4116": {
+   "id": 4116,
+   "customer": "Tessa Novak",
+   "sku": "LT-120",
+   "product": "standing desk mat",
+   "total": 69.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-19",
+   "delivered_on": "2026-08-23"
+  },
+  "4117": {
+   "id": 4117,
+   "customer": "Uma Reddy",
+   "sku": "BT-220",
+   "product": "bluetooth earbuds",
+   "total": 79.0,
+   "status": "Delivered",
+   "shipped_on": "2026-09-18",
+   "delivered_on": "2026-09-22"
+  },
+  "4118": {
+   "id": 4118,
+   "customer": "Victor Hale",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-30",
+   "delivered_on": "2026-09-03"
+  },
+  "4119": {
+   "id": 4119,
+   "customer": "Wen Zhao",
+   "sku": "IP-790",
+   "product": "projector",
+   "total": 899.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-30",
+   "delivered_on": null
+  },
+  "4120": {
+   "id": 4120,
+   "customer": "Yusuf Kaya",
+   "sku": "AK-110",
+   "product": "desk lamp",
+   "total": 45.0,
+   "status": "Delivered",
+   "shipped_on": "2026-09-19",
+   "delivered_on": "2026-09-22"
+  },
+  "4121": {
+   "id": 4121,
+   "customer": "Avery Brooks",
+   "sku": "FR-560",
+   "product": "air purifier",
+   "total": 500.0,
+   "status": "Delivered",
+   "shipped_on": "2026-09-05",
+   "delivered_on": "2026-09-11"
+  },
+  "4122": {
+   "id": 4122,
+   "customer": "Bianca Silva",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-19",
+   "delivered_on": null
+  },
+  "4123": {
+   "id": 4123,
+   "customer": "Caleb Osei",
+   "sku": "MR-230",
+   "product": "robot vacuum",
+   "total": 549.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-24",
+   "delivered_on": "2026-08-29"
+  },
+  "4124": {
+   "id": 4124,
+   "customer": "Dana Kowalski",
+   "sku": "HT-680",
+   "product": "home theater soundbar",
+   "total": 649.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-28",
+   "delivered_on": "2026-08-30"
+  },
+  "4125": {
+   "id": 4125,
+   "customer": "Emeka Obi",
+   "sku": "MR-230",
+   "product": "robot vacuum",
+   "total": 549.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-24",
+   "delivered_on": null
+  },
+  "4126": {
+   "id": 4126,
+   "customer": "Farah Aziz",
+   "sku": "AK-110",
+   "product": "desk lamp",
+   "total": 45.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-17",
+   "delivered_on": null
+  },
+  "4127": {
+   "id": 4127,
+   "customer": "Gabe Lindstrom",
+   "sku": "DS-440",
+   "product": "document scanner",
+   "total": 249.0,
+   "status": "Processing",
+   "shipped_on": null,
+   "delivered_on": null
+  },
+  "4128": {
+   "id": 4128,
+   "customer": "Hana Kim",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-09",
+   "delivered_on": null
+  },
+  "4129": {
+   "id": 4129,
+   "customer": "Ivan Petrov",
+   "sku": "AK-110",
+   "product": "desk lamp",
+   "total": 45.0,
+   "status": "Processing",
+   "shipped_on": null,
+   "delivered_on": null
+  },
+  "4130": {
+   "id": 4130,
+   "customer": "Jade Thompson",
+   "sku": "IP-790",
+   "product": "projector",
+   "total": 899.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-15",
+   "delivered_on": null
+  },
+  "4131": {
+   "id": 4131,
+   "customer": "Kofi Mensah",
+   "sku": "OV-450",
+   "product": "countertop oven",
+   "total": 189.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-30",
+   "delivered_on": "2026-09-01"
+  },
+  "4132": {
+   "id": 4132,
+   "customer": "Lena Fischer",
+   "sku": "LT-120",
+   "product": "standing desk mat",
+   "total": 69.0,
+   "status": "Delivered",
+   "shipped_on": "2026-09-24",
+   "delivered_on": "2026-09-30"
+  },
+  "4133": {
+   "id": 4133,
+   "customer": "Mateo Cruz",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Processing",
+   "shipped_on": null,
+   "delivered_on": null
+  },
+  "4134": {
+   "id": 4134,
+   "customer": "Nadia Rahman",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Delivered",
+   "shipped_on": "2026-09-13",
+   "delivered_on": "2026-09-18"
+  },
+  "4135": {
+   "id": 4135,
+   "customer": "Owen Gallagher",
+   "sku": "OV-450",
+   "product": "countertop oven",
+   "total": 189.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-01",
+   "delivered_on": null
+  },
+  "4136": {
+   "id": 4136,
+   "customer": "Paula Ortiz",
+   "sku": "HT-680",
+   "product": "home theater soundbar",
+   "total": 649.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-28",
+   "delivered_on": "2026-09-02"
+  },
+  "4137": {
+   "id": 4137,
+   "customer": "Quinn Murphy",
+   "sku": "PS-560",
+   "product": "smart speaker",
+   "total": 99.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-23",
+   "delivered_on": "2026-08-29"
+  },
+  "4138": {
+   "id": 4138,
+   "customer": "Rosa Delgado",
+   "sku": "FR-560",
+   "product": "air purifier",
+   "total": 500.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-27",
+   "delivered_on": "2026-08-31"
+  },
+  "4139": {
+   "id": 4139,
+   "customer": "Sanjay Iyer",
+   "sku": "IP-790",
+   "product": "projector",
+   "total": 899.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-15",
+   "delivered_on": null
+  },
+  "4140": {
+   "id": 4140,
+   "customer": "Tessa Novak",
+   "sku": "IP-790",
+   "product": "projector",
+   "total": 899.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-08",
+   "delivered_on": null
+  },
+  "4141": {
+   "id": 4141,
+   "customer": "Uma Reddy",
+   "sku": "DS-440",
+   "product": "document scanner",
+   "total": 249.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-19",
+   "delivered_on": null
+  },
+  "4142": {
+   "id": 4142,
+   "customer": "Victor Hale",
+   "sku": "GP-570",
+   "product": "gaming chair",
+   "total": 501.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-19",
+   "delivered_on": null
+  },
+  "4143": {
+   "id": 4143,
+   "customer": "Wen Zhao",
+   "sku": "JK-800",
+   "product": "electric kettle",
+   "total": 39.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-24",
+   "delivered_on": "2026-08-29"
+  },
+  "4144": {
+   "id": 4144,
+   "customer": "Yusuf Kaya",
+   "sku": "GP-570",
+   "product": "gaming chair",
+   "total": 501.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-16",
+   "delivered_on": null
+  },
+  "4145": {
+   "id": 4145,
+   "customer": "Avery Brooks",
+   "sku": "IP-790",
+   "product": "projector",
+   "total": 899.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-18",
+   "delivered_on": null
+  },
+  "4146": {
+   "id": 4146,
+   "customer": "Bianca Silva",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-15",
+   "delivered_on": null
+  },
+  "4147": {
+   "id": 4147,
+   "customer": "Caleb Osei",
+   "sku": "GP-570",
+   "product": "gaming chair",
+   "total": 501.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-02",
+   "delivered_on": "2026-08-04"
+  },
+  "4148": {
+   "id": 4148,
+   "customer": "Dana Kowalski",
+   "sku": "PS-560",
+   "product": "smart speaker",
+   "total": 99.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-19",
+   "delivered_on": null
+  },
+  "4149": {
+   "id": 4149,
+   "customer": "Emeka Obi",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-27",
+   "delivered_on": "2026-09-02"
+  },
+  "4150": {
+   "id": 4150,
+   "customer": "Farah Aziz",
+   "sku": "HT-680",
+   "product": "home theater soundbar",
+   "total": 649.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-10",
+   "delivered_on": null
+  },
+  "4151": {
+   "id": 4151,
+   "customer": "Gabe Lindstrom",
+   "sku": "FR-560",
+   "product": "air purifier",
+   "total": 500.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-17",
+   "delivered_on": null
+  },
+  "4152": {
+   "id": 4152,
+   "customer": "Hana Kim",
+   "sku": "HT-680",
+   "product": "home theater soundbar",
+   "total": 649.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-21",
+   "delivered_on": null
+  },
+  "4153": {
+   "id": 4153,
+   "customer": "Ivan Petrov",
+   "sku": "FR-560",
+   "product": "air purifier",
+   "total": 500.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-14",
+   "delivered_on": null
+  },
+  "4154": {
+   "id": 4154,
+   "customer": "Jade Thompson",
+   "sku": "DS-440",
+   "product": "document scanner",
+   "total": 249.0,
+   "status": "Delivered",
+   "shipped_on": "2026-09-23",
+   "delivered_on": "2026-09-25"
+  },
+  "4155": {
+   "id": 4155,
+   "customer": "Kofi Mensah",
+   "sku": "IP-790",
+   "product": "projector",
+   "total": 899.0,
+   "status": "Delivered",
+   "shipped_on": "2026-09-17",
+   "delivered_on": "2026-09-19"
+  },
+  "4156": {
+   "id": 4156,
+   "customer": "Lena Fischer",
+   "sku": "IP-790",
+   "product": "projector",
+   "total": 899.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-19",
+   "delivered_on": null
+  },
+  "4157": {
+   "id": 4157,
+   "customer": "Mateo Cruz",
+   "sku": "MR-230",
+   "product": "robot vacuum",
+   "total": 549.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-31",
+   "delivered_on": "2026-09-04"
+  },
+  "4158": {
+   "id": 4158,
+   "customer": "Nadia Rahman",
+   "sku": "NB-340",
+   "product": "portable monitor",
+   "total": 299.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-15",
+   "delivered_on": null
+  },
+  "4159": {
+   "id": 4159,
+   "customer": "Owen Gallagher",
+   "sku": "JK-800",
+   "product": "electric kettle",
+   "total": 39.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-25",
+   "delivered_on": "2026-08-31"
+  },
+  "4160": {
+   "id": 4160,
+   "customer": "Paula Ortiz",
+   "sku": "GP-570",
+   "product": "gaming chair",
+   "total": 501.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-18",
+   "delivered_on": null
+  },
+  "4161": {
+   "id": 4161,
+   "customer": "Quinn Murphy",
+   "sku": "HT-680",
+   "product": "home theater soundbar",
+   "total": 649.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-29",
+   "delivered_on": "2026-09-04"
+  },
+  "4162": {
+   "id": 4162,
+   "customer": "Rosa Delgado",
+   "sku": "IP-790",
+   "product": "projector",
+   "total": 899.0,
+   "status": "Processing",
+   "shipped_on": null,
+   "delivered_on": null
+  },
+  "4163": {
+   "id": 4163,
+   "customer": "Sanjay Iyer",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-22",
+   "delivered_on": null
+  },
+  "4164": {
+   "id": 4164,
+   "customer": "Tessa Novak",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-22",
+   "delivered_on": null
+  },
+  "4165": {
+   "id": 4165,
+   "customer": "Uma Reddy",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-19",
+   "delivered_on": null
+  },
+  "4166": {
+   "id": 4166,
+   "customer": "Victor Hale",
+   "sku": "BT-220",
+   "product": "bluetooth earbuds",
+   "total": 79.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-04",
+   "delivered_on": "2026-08-08"
+  },
+  "4167": {
+   "id": 4167,
+   "customer": "Wen Zhao",
+   "sku": "IP-790",
+   "product": "projector",
+   "total": 899.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-29",
+   "delivered_on": null
+  },
+  "4168": {
+   "id": 4168,
+   "customer": "Yusuf Kaya",
+   "sku": "HT-680",
+   "product": "home theater soundbar",
+   "total": 649.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-28",
+   "delivered_on": "2026-09-01"
+  },
+  "4169": {
+   "id": 4169,
+   "customer": "Avery Brooks",
+   "sku": "JK-800",
+   "product": "electric kettle",
+   "total": 39.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-18",
+   "delivered_on": null
+  },
+  "4170": {
+   "id": 4170,
+   "customer": "Bianca Silva",
+   "sku": "CM-330",
+   "product": "coffee grinder",
+   "total": 129.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-25",
+   "delivered_on": null
+  },
+  "4171": {
+   "id": 4171,
+   "customer": "Caleb Osei",
+   "sku": "IP-790",
+   "product": "projector",
+   "total": 899.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-19",
+   "delivered_on": null
+  },
+  "4172": {
+   "id": 4172,
+   "customer": "Dana Kowalski",
+   "sku": "IP-790",
+   "product": "projector",
+   "total": 899.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-29",
+   "delivered_on": "2026-09-02"
+  },
+  "4173": {
+   "id": 4173,
+   "customer": "Emeka Obi",
+   "sku": "IP-790",
+   "product": "projector",
+   "total": 899.0,
+   "status": "Delivered",
+   "shipped_on": "2026-09-22",
+   "delivered_on": "2026-09-26"
+  },
+  "4174": {
+   "id": 4174,
+   "customer": "Farah Aziz",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-31",
+   "delivered_on": "2026-09-03"
+  },
+  "4175": {
+   "id": 4175,
+   "customer": "Gabe Lindstrom",
+   "sku": "HT-680",
+   "product": "home theater soundbar",
+   "total": 649.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-27",
+   "delivered_on": "2026-09-01"
+  },
+  "4176": {
+   "id": 4176,
+   "customer": "Hana Kim",
+   "sku": "NB-340",
+   "product": "portable monitor",
+   "total": 299.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-31",
+   "delivered_on": "2026-09-02"
+  },
+  "4177": {
+   "id": 4177,
+   "customer": "Ivan Petrov",
+   "sku": "FR-560",
+   "product": "air purifier",
+   "total": 500.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-19",
+   "delivered_on": null
+  },
+  "4178": {
+   "id": 4178,
+   "customer": "Jade Thompson",
+   "sku": "IP-790",
+   "product": "projector",
+   "total": 899.0,
+   "status": "Processing",
+   "shipped_on": null,
+   "delivered_on": null
+  },
+  "4179": {
+   "id": 4179,
+   "customer": "Kofi Mensah",
+   "sku": "LT-120",
+   "product": "standing desk mat",
+   "total": 69.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-22",
+   "delivered_on": null
+  },
+  "4180": {
+   "id": 4180,
+   "customer": "Lena Fischer",
+   "sku": "BT-220",
+   "product": "bluetooth earbuds",
+   "total": 79.0,
+   "status": "Delivered",
+   "shipped_on": "2026-09-11",
+   "delivered_on": "2026-09-14"
+  },
+  "4181": {
+   "id": 4181,
+   "customer": "Mateo Cruz",
+   "sku": "PS-560",
+   "product": "smart speaker",
+   "total": 99.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-19",
+   "delivered_on": null
+  },
+  "4182": {
+   "id": 4182,
+   "customer": "Nadia Rahman",
+   "sku": "KM-910",
+   "product": "ergonomic keyboard",
+   "total": 159.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-15",
+   "delivered_on": null
+  },
+  "4183": {
+   "id": 4183,
+   "customer": "Owen Gallagher",
+   "sku": "OV-450",
+   "product": "countertop oven",
+   "total": 189.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-28",
+   "delivered_on": "2026-08-31"
+  },
+  "4184": {
+   "id": 4184,
+   "customer": "Paula Ortiz",
+   "sku": "MR-230",
+   "product": "robot vacuum",
+   "total": 549.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-17",
+   "delivered_on": null
+  },
+  "4185": {
+   "id": 4185,
+   "customer": "Quinn Murphy",
+   "sku": "KM-910",
+   "product": "ergonomic keyboard",
+   "total": 159.0,
+   "status": "Processing",
+   "shipped_on": null,
+   "delivered_on": null
+  },
+  "4186": {
+   "id": 4186,
+   "customer": "Rosa Delgado",
+   "sku": "FR-560",
+   "product": "air purifier",
+   "total": 500.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-21",
+   "delivered_on": "2026-08-26"
+  },
+  "4187": {
+   "id": 4187,
+   "customer": "Sanjay Iyer",
+   "sku": "DS-440",
+   "product": "document scanner",
+   "total": 249.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-13",
+   "delivered_on": null
+  },
+  "4188": {
+   "id": 4188,
+   "customer": "Tessa Novak",
+   "sku": "OV-450",
+   "product": "countertop oven",
+   "total": 189.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-17",
+   "delivered_on": "2026-08-22"
+  },
+  "4189": {
+   "id": 4189,
+   "customer": "Uma Reddy",
+   "sku": "JK-800",
+   "product": "electric kettle",
+   "total": 39.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-28",
+   "delivered_on": "2026-09-01"
+  },
+  "4190": {
+   "id": 4190,
+   "customer": "Victor Hale",
+   "sku": "IP-790",
+   "product": "projector",
+   "total": 899.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-15",
+   "delivered_on": null
+  },
+  "4191": {
+   "id": 4191,
+   "customer": "Wen Zhao",
+   "sku": "HT-680",
+   "product": "home theater soundbar",
+   "total": 649.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-27",
+   "delivered_on": "2026-08-29"
+  },
+  "4192": {
+   "id": 4192,
+   "customer": "Yusuf Kaya",
+   "sku": "DS-440",
+   "product": "document scanner",
+   "total": 249.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-18",
+   "delivered_on": null
+  },
+  "4193": {
+   "id": 4193,
+   "customer": "Avery Brooks",
+   "sku": "AK-110",
+   "product": "desk lamp",
+   "total": 45.0,
+   "status": "Delivered",
+   "shipped_on": "2026-07-29",
+   "delivered_on": "2026-08-02"
+  },
+  "4194": {
+   "id": 4194,
+   "customer": "Bianca Silva",
+   "sku": "MR-230",
+   "product": "robot vacuum",
+   "total": 549.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-17",
+   "delivered_on": null
+  },
+  "4195": {
+   "id": 4195,
+   "customer": "Caleb Osei",
+   "sku": "AK-110",
+   "product": "desk lamp",
+   "total": 45.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-08",
+   "delivered_on": "2026-08-14"
+  },
+  "4196": {
+   "id": 4196,
+   "customer": "Dana Kowalski",
+   "sku": "HT-680",
+   "product": "home theater soundbar",
+   "total": 649.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-12",
+   "delivered_on": null
+  },
+  "4197": {
+   "id": 4197,
+   "customer": "Emeka Obi",
+   "sku": "OV-450",
+   "product": "countertop oven",
+   "total": 189.0,
+   "status": "Delivered",
+   "shipped_on": "2026-08-30",
+   "delivered_on": "2026-09-02"
+  },
+  "4198": {
+   "id": 4198,
+   "customer": "Farah Aziz",
+   "sku": "NB-340",
+   "product": "portable monitor",
+   "total": 299.0,
+   "status": "Shipped",
+   "shipped_on": "2026-09-16",
+   "delivered_on": null
+  },
+  "4199": {
+   "id": 4199,
+   "customer": "Gabe Lindstrom",
+   "sku": "FR-560",
+   "product": "air purifier",
+   "total": 500.0,
+   "status": "Delivered",
+   "shipped_on": "2026-09-15",
+   "delivered_on": "2026-09-17"
+  },
+  "4200": {
+   "id": 4200,
+   "customer": "Hana Kim",
+   "sku": "EC-550",
+   "product": "espresso machine",
+   "total": 499.0,
+   "status": "Lost",
+   "shipped_on": "2026-09-17",
+   "delivered_on": null
+  }
+ },
+ "stock": {
+  "AK-110": 30,
+  "BT-220": 0,
+  "CM-330": 14,
+  "DS-440": 0,
+  "EC-550": 3,
+  "FR-560": 5,
+  "GP-570": 0,
+  "HT-680": 6,
+  "IP-790": 0,
+  "JK-800": 50,
+  "KM-910": 0,
+  "LT-120": 22,
+  "MR-230": 2,
+  "NB-340": 8,
+  "OV-450": 0,
+  "PS-560": 40
+ }
+}
