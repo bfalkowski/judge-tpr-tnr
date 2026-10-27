@@ -1,0 +1,16 @@
+{
+ "run_id": "gh40595353015-climb-lenient-r3-v1",
+ "dataset": "v5",
+ "config": "clean",
+ "reps": 2,
+ "artifact_fingerprint": "a17a226f20de2dd1",
+ "artifact_path": "hillclimb/lenient-r3/v1/artifact.json",
+ "model": "jev-latest",
+ "backend": "api",
+ "n_tickets": 400,
+ "started_at": "2026-10-27T22:30:51Z",
+ "finished_at": "2026-10-27T22:32:44Z",
+ "errored": 0,
+ "stopped_at_spend_cap": false,
+ "spend_usd": 0.027679
+}
