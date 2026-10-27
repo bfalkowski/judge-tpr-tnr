@@ -355,6 +355,34 @@ def kind(t):
     return c or "other"
 
 
+def breaks_by_kind(arm, splits=("climb_train", "climb_test")):
+    """Each round's truly broken rows, against the version it was compared with, split into damage_open tickets and the
+    rest, with what the grader did: charged (pass -> fail), credited (fail -> pass) or unchanged."""
+    T = hc.tickets()
+    st = hc.state(arm)
+    cur, out = "baseline", []
+    for h in [h for h in st["history"] if h["decision"] != "none"]:
+        a = {(x["ticket_id"], x["rep"]): x for x in sealed(arm, cur)}
+        row = {"round": h["round"], "decision": h["decision"]}
+        for k in ("damage_open", "rest"):
+            row[k] = {"broken": 0, "charged": 0, "credited": 0}
+        for x in sealed(arm, h["round"]):
+            if x["split"] not in splits:
+                continue
+            o = a[(x["ticket_id"], x["rep"])]
+            if (o["true"], x["true"]) != (1, 0):
+                continue
+            k = "damage_open" if category(T[x["ticket_id"]]) == "damage_open" else "rest"
+            row[k]["broken"] += 1
+            d = x["grader"] - o["grader"]
+            row[k]["charged"] += d < 0
+            row[k]["credited"] += d > 0
+        out.append(row)
+        if h["decision"] == "keep":
+            cur = h["round"]
+    return out
+
+
 def holdout_change_by_kind(arm):
     """Each round's true change on holdout against the version it was compared with, in points, split by kind."""
     T = hc.tickets()
@@ -400,7 +428,7 @@ def replicate_summary(base):
     return rows
 
 
-def tnr_drop_c3():
+def tnr_drop_c3(arm="c3"):
     """c3's TNR on test and holdout mistakes, baseline against winner, counted per row and with one rep per ticket."""
     def fisher(a, b, c, d):
         import math
@@ -408,11 +436,11 @@ def tnr_drop_c3():
         pr = lambda x: math.comb(r1, x) * math.comb(n - r1, c1 - x) / math.comb(n, c1)
         p0 = pr(a)
         return sum(pr(x) for x in range(max(0, c1 - (n - r1)), min(r1, c1) + 1) if pr(x) <= p0 + 1e-12)
-    st = hc.state("c3")
+    st = hc.state(arm)
     out = {}
     for label, reps in (("rows", (0, 1)), ("rep0", (0,))):
-        b = [r for r in sealed("c3", "baseline") if r["split"] in ("climb_test", "holdout") and not r["true"] and r["rep"] in reps]
-        w = [r for r in sealed("c3", st["best"]["name"]) if r["split"] in ("climb_test", "holdout") and not r["true"] and r["rep"] in reps]
+        b = [r for r in sealed(arm, "baseline") if r["split"] in ("climb_test", "holdout") and not r["true"] and r["rep"] in reps]
+        w = [r for r in sealed(arm, st["best"]["name"]) if r["split"] in ("climb_test", "holdout") and not r["true"] and r["rep"] in reps]
         bt, wt = sum(1 - r["grader"] for r in b), sum(1 - r["grader"] for r in w)
         out[label] = {"baseline": [bt, len(b)], "winner": [wt, len(w)], "p": fisher(bt, len(b) - bt, wt, len(w) - wt)}
     return out
@@ -454,7 +482,9 @@ def main():
     res["holdout_change_by_kind"] = {arm: holdout_change_by_kind(arm) for arm in ARMS}
     res["tnr_drop_c3"] = tnr_drop_c3()
     res["replicates"] = {base: replicate_summary(base) for base in RUNS if len(RUNS[base]) > 1}
+    res["tnr_drop_c3_runs"] = {arm: tnr_drop_c3(arm) for arm in RUNS["c3"]}
     res["visibility"] = {arm: visibility_by_round(arm) for arm in ARMS}
+    res["breaks_by_kind"] = {arm: breaks_by_kind(arm) for arm in ARMS if hc.ARMS[arm]["grader"] == "judge"}
     res["label_the_diff"] = {arm: label_the_diff(arm) for arm in ARMS}
     res["rates_without_open_case"] = {arm: rates_without_open(arm) for arm in ORIGINAL}
     res["open_case_verdicts"] = open_case_verdicts()
@@ -552,6 +582,12 @@ def report(res):
         for v in vs:
             L.append(f"| {arm} | {v['round']} | {v['against']} | {v['decision']} | {v['fixed']} | {v['fix_credit']} | {f2(v['j_fix'])} | "
                      f"{v['broken']} | {v['break_charge']} | {f2(v['j_break'])} | {v['true_change_rows']:+d} | {v['grader_change_rows']:+d} |")
+    L += ["", "Truly broken rows on damage_open tickets and on the rest, and what the grader did with them (charged = pass to fail, credited = fail to pass):", "",
+          "| Arm | Round | Decision | damage_open: broken / charged / credited | rest: broken / charged / credited |", "|---|---|---|---|---|"]
+    for arm, vs in res["breaks_by_kind"].items():
+        for v in vs:
+            d, r = v["damage_open"], v["rest"]
+            L.append(f"| {arm} | {v['round']} | {v['decision']} | {d['broken']} / {d['charged']} / {d['credited']} | {r['broken']} / {r['charged']} / {r['credited']} |")
     L += ["", "## Labelling only the changed rows (retrospective)", "",
           "If a person had labelled k random rows whose action changed (climb_train and climb_test), how often the labelled net change has the same sign as the true net change (5,000 draws; a labelled net of 0 counts as a miss).", "",
           "| Arm | Round | Changed rows (of all) | True net change | k = 10 | k = 20 | k = 30 |", "|---|---|---|---|---|---|---|"]
@@ -589,6 +625,11 @@ def report(res):
                      f"{100 * r['true_val']:+.1f} | {100 * r['true_holdout']:+.1f} {pci(r['true_holdout_ci'])} | {p(r['winner_true_holdout'])} | "
                      f"{r['tnr_baseline']:.3f} -> {r['tnr_winner']:.3f} | {r['open_mistakes_winner']} ({r['open_passed_winner']}) | "
                      f"{', '.join(f2(x) for x in r['j_fix'])} | {', '.join(f2(x) for x in r['j_break'])} |")
+    L += ["", "c3's TNR on test and holdout mistakes, baseline against winner, in each run:", ""]
+    for arm, t in res["tnr_drop_c3_runs"].items():
+        r, q = t["rows"], t["rep0"]
+        L.append(f"- {arm}: per row {r['baseline'][0]} of {r['baseline'][1]} against {r['winner'][0]} of {r['winner'][1]} (Fisher p = {r['p']:.3f}); "
+                 f"one rep per ticket {q['baseline'][0]} of {q['baseline'][1]} against {q['winner'][0]} of {q['winner'][1]} (p = {q['p']:.3f})")
     L += ["", "## Stall categorization", ""]
     for arm, c in res["categorization"].items():
         if c:

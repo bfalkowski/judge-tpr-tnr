@@ -10,6 +10,10 @@ Scores are pass rates in percent over (ticket, rep) rows. Grader = the arm's gra
 | c3 | v3 | 3 | 77.1 -> 81.7 | +4.6 [-1.3, +10.8] | +4.2 [-2.1, +10.4] | +5.0 [-0.9, +10.9] | +6.6 |
 | p2 | baseline | 2 | 83.8 -> 83.8 | +0.0 [+0.0, +0.0] | +0.0 [+0.0, +0.0] | +0.0 [+0.0, +0.0] | +0.0 |
 | lenient | baseline | 2 | 89.2 -> 89.2 | +0.0 [+0.0, +0.0] | +0.0 [+0.0, +0.0] | +0.0 [+0.0, +0.0] | +0.0 |
+| c3-r2 | v2 | 2 | 77.1 -> 86.7 | +9.6 [+2.5, +17.1] | +4.2 [-3.7, +12.1] | +6.9 [+0.0, +13.8] | +11.6 |
+| c3-r3 | v2 | 2 | 77.1 -> 82.9 | +5.8 [-1.2, +12.9] | +7.1 [-0.4, +14.6] | +7.8 [+1.3, +14.7] | +9.4 |
+| lenient-r2 | baseline | 2 | 89.2 -> 89.2 | +0.0 [+0.0, +0.0] | +0.0 [+0.0, +0.0] | +0.0 [+0.0, +0.0] | +0.0 |
+| lenient-r3 | baseline | 2 | 89.2 -> 89.2 | +0.0 [+0.0, +0.0] | +0.0 [+0.0, +0.0] | +0.0 [+0.0, +0.0] | +0.0 |
 
 ## Levels
 
@@ -23,6 +27,14 @@ Scores are pass rates in percent over (ticket, rep) rows. Grader = the arm's gra
 | p2 | winner | 83.8 | 79.2 | 81.9 | 79.4 |
 | lenient | baseline | 89.2 | 79.2 | 88.8 | 79.4 |
 | lenient | winner | 89.2 | 79.2 | 88.8 | 79.4 |
+| c3-r2 | baseline | 77.1 | 79.2 | 76.6 | 79.4 |
+| c3-r2 | winner | 86.7 | 83.3 | 88.1 | 86.2 |
+| c3-r3 | baseline | 77.1 | 79.2 | 76.6 | 79.4 |
+| c3-r3 | winner | 82.9 | 86.2 | 85.9 | 87.2 |
+| lenient-r2 | baseline | 89.2 | 79.2 | 88.8 | 79.4 |
+| lenient-r2 | winner | 89.2 | 79.2 | 88.8 | 79.4 |
+| lenient-r3 | baseline | 89.2 | 79.2 | 88.8 | 79.4 |
+| lenient-r3 | winner | 89.2 | 79.2 | 88.8 | 79.4 |
 
 ## Each version: the grader's error rates and the correction
 
@@ -44,6 +56,18 @@ TPR and TNR on climb_test and holdout rows of that version. Corrected holdout us
 | lenient | baseline |  | 0.977 | 0.448 | 64 of 116 | 89.2 | 79.2 | 88.8 | 89.1 | 79.4 |
 | lenient | v1 | revert | 0.948 | 0.525 | 56 of 118 | 84.6 | 78.3 | 85.0 | 82.9 | 79.4 |
 | lenient | v2 | revert | 0.944 | 0.468 | 50 of 94 | 86.2 | 81.7 | 88.4 | 88.6 | 84.4 |
+| c3-r2 | baseline |  | 0.953 | 0.940 | 7 of 116 | 77.1 | 79.2 | 76.6 | 79.3 | 79.4 |
+| c3-r2 | v1 | keep | 0.963 | 0.910 | 9 of 100 | 79.2 | 80.0 | 81.9 | 85.3 | 83.8 |
+| c3-r2 | v2 | keep | 0.983 | 0.738 | 22 of 84 | 86.7 | 83.3 | 88.1 | 92.4 | 86.2 |
+| c3-r3 | baseline |  | 0.953 | 0.940 | 7 of 116 | 77.1 | 79.2 | 76.6 | 79.3 | 79.4 |
+| c3-r3 | v1 | keep | 0.956 | 0.923 | 8 of 104 | 78.8 | 80.4 | 79.7 | 82.8 | 82.2 |
+| c3-r3 | v2 | keep | 0.951 | 0.838 | 12 of 74 | 82.9 | 86.2 | 85.9 | 89.9 | 87.2 |
+| lenient-r2 | baseline |  | 0.977 | 0.448 | 64 of 116 | 89.2 | 79.2 | 88.8 | 89.1 | 79.4 |
+| lenient-r2 | v1 | revert | 0.940 | 0.514 | 54 of 111 | 84.6 | 79.6 | 85.3 | 83.4 | 80.6 |
+| lenient-r2 | v2 | revert | 0.944 | 0.469 | 51 of 96 | 86.7 | 82.5 | 87.8 | 87.5 | 83.1 |
+| lenient-r3 | baseline |  | 0.977 | 0.448 | 64 of 116 | 89.2 | 79.2 | 88.8 | 89.1 | 79.4 |
+| lenient-r3 | v1 | revert | 0.942 | 0.519 | 52 of 108 | 85.0 | 80.8 | 85.6 | 83.9 | 80.6 |
+| lenient-r3 | v2 | revert | 0.942 | 0.532 | 36 of 77 | 84.6 | 83.3 | 90.0 | 91.2 | 88.4 |
 
 ## Keep and revert calls against the same rule on answer-key scores
 
@@ -63,6 +87,18 @@ TPR and TNR on climb_test and holdout rows of that version. Corrected holdout us
 | lenient | v1 | revert | revert | +0.0 |
 | lenient | v2 | revert | keep | +5.0 |
 | lenient | | agree: 1 of 2 | | |
+| c3-r2 | v1 | keep | keep | +4.4 |
+| c3-r2 | v2 | keep | revert | +2.5 |
+| c3-r2 | | agree: 1 of 2 | | |
+| c3-r3 | v1 | keep | keep | +2.8 |
+| c3-r3 | v2 | keep | keep | +5.0 |
+| c3-r3 | | agree: 2 of 2 | | |
+| lenient-r2 | v1 | revert | keep | +1.3 |
+| lenient-r2 | v2 | revert | keep | +3.8 |
+| lenient-r2 | | agree: 0 of 2 | | |
+| lenient-r3 | v1 | revert | keep | +1.3 |
+| lenient-r3 | v2 | revert | keep | +9.1 |
+| lenient-r3 | | agree: 0 of 2 | | |
 
 ## Grader checks on the baseline's train decisions
 
@@ -110,6 +146,18 @@ TPR and TNR on the baseline's train decisions without the damage_open tickets: k
 | lenient | baseline | 2 of 16 | 0 of 2 | 0 of 1 | 62 of 97 |
 | lenient | v1 | 0 of 0 | 0 of 6 | 0 of 2 | 56 of 110 |
 | lenient | v2 | 0 of 0 | 0 of 4 | 0 of 0 | 50 of 90 |
+| c3-r2 | baseline | 2 of 16 | 2 of 2 | 0 of 1 | 3 of 97 |
+| c3-r2 | v1 | 0 of 0 | 4 of 4 | 0 of 1 | 5 of 95 |
+| c3-r2 | v2 | 0 of 0 | 16 of 16 | 0 of 0 | 6 of 68 |
+| c3-r3 | baseline | 2 of 16 | 2 of 2 | 0 of 1 | 3 of 97 |
+| c3-r3 | v1 | 0 of 0 | 3 of 3 | 0 of 2 | 5 of 99 |
+| c3-r3 | v2 | 0 of 0 | 12 of 12 | 0 of 0 | 0 of 62 |
+| lenient-r2 | baseline | 2 of 16 | 0 of 2 | 0 of 1 | 62 of 97 |
+| lenient-r2 | v1 | 0 of 0 | 0 of 4 | 0 of 2 | 54 of 105 |
+| lenient-r2 | v2 | 0 of 0 | 0 of 2 | 0 of 1 | 51 of 93 |
+| lenient-r3 | baseline | 2 of 16 | 0 of 2 | 0 of 1 | 62 of 97 |
+| lenient-r3 | v1 | 0 of 0 | 0 of 4 | 0 of 2 | 52 of 102 |
+| lenient-r3 | v2 | 0 of 0 | 0 of 4 | 0 of 1 | 36 of 72 |
 
 ## lenient v2 against baseline: rows whose action changed (climb_test and holdout)
 
@@ -138,6 +186,34 @@ J_fix is the grader's net credit per truly fixed row; J_break its net charge per
 | p2 | v2 | baseline | revert | 5 | 1 | 0.20 | 37 | 6 | 0.16 | -32 | -8 |
 | lenient | v1 | baseline | revert | 36 | 0 | 0.00 | 23 | 15 | 0.65 | +13 | -15 |
 | lenient | v2 | baseline | revert | 36 | 0 | 0.00 | 10 | 7 | 0.70 | +26 | -7 |
+| c3-r2 | v1 | baseline | keep | 35 | 32 | 0.91 | 16 | 9 | 0.56 | +19 | +23 |
+| c3-r2 | v2 | v1 | keep | 45 | 40 | 0.89 | 37 | 7 | 0.19 | +8 | +36 |
+| c3-r3 | v1 | baseline | keep | 36 | 31 | 0.86 | 12 | 9 | 0.75 | +24 | +22 |
+| c3-r3 | v2 | v1 | keep | 44 | 34 | 0.77 | 27 | 3 | 0.11 | +17 | +31 |
+| lenient-r2 | v1 | baseline | revert | 33 | -1 | -0.03 | 21 | 18 | 0.86 | +12 | -19 |
+| lenient-r2 | v2 | baseline | revert | 39 | 0 | 0.00 | 10 | 8 | 0.80 | +29 | -8 |
+| lenient-r3 | v1 | baseline | revert | 37 | -1 | -0.03 | 19 | 16 | 0.84 | +18 | -17 |
+| lenient-r3 | v2 | baseline | revert | 49 | -4 | -0.08 | 15 | 8 | 0.53 | +34 | -12 |
+
+Truly broken rows on damage_open tickets and on the rest, and what the grader did with them (charged = pass to fail, credited = fail to pass):
+
+| Arm | Round | Decision | damage_open: broken / charged / credited | rest: broken / charged / credited |
+|---|---|---|---|---|
+| c3 | v1 | keep | 2 / 0 / 2 | 10 / 8 / 0 |
+| c3 | v2 | revert | 10 / 0 / 10 | 36 / 30 / 1 |
+| c3 | v3 | keep | 9 / 0 / 9 | 11 / 11 / 0 |
+| p2 | v1 | revert | 12 / 2 / 0 | 56 / 17 / 1 |
+| p2 | v2 | revert | 12 / 2 / 0 | 25 / 5 / 1 |
+| lenient | v1 | revert | 2 / 0 / 0 | 21 / 16 / 1 |
+| lenient | v2 | revert | 2 / 0 / 0 | 8 / 7 / 0 |
+| c3-r2 | v1 | keep | 2 / 0 / 2 | 14 / 11 / 0 |
+| c3-r2 | v2 | keep | 10 / 0 / 10 | 27 / 21 / 4 |
+| c3-r3 | v1 | keep | 1 / 0 / 1 | 11 / 10 / 0 |
+| c3-r3 | v2 | keep | 9 / 0 / 9 | 18 / 14 / 2 |
+| lenient-r2 | v1 | revert | 2 / 0 / 0 | 19 / 18 / 0 |
+| lenient-r2 | v2 | revert | 1 / 0 / 0 | 9 / 8 / 0 |
+| lenient-r3 | v1 | revert | 2 / 0 / 0 | 17 / 16 / 0 |
+| lenient-r3 | v2 | revert | 4 / 2 / 0 | 11 / 7 / 1 |
 
 ## Labelling only the changed rows (retrospective)
 
@@ -155,6 +231,14 @@ If a person had labelled k random rows whose action changed (climb_train and cli
 | p2 | v2 | 57 of 480 | -32 | 100% | 100% | 100% |
 | lenient | v1 | 69 of 480 | +13 | 70% | 83% | 91% |
 | lenient | v2 | 56 of 480 | +26 | 96% | 100% | 100% |
+| c3-r2 | v1 | 61 of 480 | +19 | 85% | 97% | 100% |
+| c3-r2 | v2 | 86 of 480 | +8 | 53% | 64% | 70% |
+| c3-r3 | v1 | 58 of 480 | +24 | 93% | 100% | 100% |
+| c3-r3 | v2 | 71 of 480 | +17 | 69% | 86% | 94% |
+| lenient-r2 | v1 | 64 of 480 | +12 | 71% | 84% | 92% |
+| lenient-r2 | v2 | 59 of 480 | +29 | 97% | 100% | 100% |
+| lenient-r3 | v1 | 66 of 480 | +18 | 82% | 93% | 98% |
+| lenient-r3 | v2 | 76 of 480 | +34 | 94% | 100% | 100% |
 
 ## True change on holdout by kind of ticket, each round against the version it was compared with (points)
 
@@ -168,6 +252,14 @@ If a person had labelled k random rows whose action changed (climb_train and cli
 - p2 v2: damage_early -0.9, damage_open -3.1, never_came_delivered -1.6, other +0.9, over_limit_out_of_stock +0.3; total -4.4
 - lenient v1: damage_early -0.3, damage_open -1.2, never_came_delivered -0.9, other -0.0, over_limit_out_of_stock +2.5; total +0.1
 - lenient v2: damage_early +0.3, damage_open -0.6, never_came_delivered -0.6, other +3.4, over_limit_out_of_stock +2.5; total +5.0
+- c3-r2 v1: damage_early +0.0, damage_open -0.6, never_came_delivered -1.2, other +3.8, over_limit_out_of_stock +2.5; total +4.5
+- c3-r2 v2: damage_early +0.3, damage_open -2.5, never_came_delivered +1.2, other +3.4, over_limit_out_of_stock +0.0; total +2.4
+- c3-r3 v1: damage_early -0.3, damage_open -0.3, never_came_delivered -0.6, other +1.6, over_limit_out_of_stock +2.5; total +2.9
+- c3-r3 v2: damage_early +0.6, damage_open -2.2, never_came_delivered +2.2, other +4.4, over_limit_out_of_stock +0.0; total +5.0
+- lenient-r2 v1: damage_early -0.3, damage_open -0.6, never_came_delivered -1.6, other +1.2, over_limit_out_of_stock +2.5; total +1.2
+- lenient-r2 v2: damage_early +0.0, damage_open +0.0, never_came_delivered -1.6, other +2.8, over_limit_out_of_stock +2.5; total +3.7
+- lenient-r3 v1: damage_early -0.3, damage_open -0.6, never_came_delivered -1.2, other +0.9, over_limit_out_of_stock +2.5; total +1.3
+- lenient-r3 v2: damage_early +0.0, damage_open +0.0, never_came_delivered +0.9, other +5.6, over_limit_out_of_stock +2.5; total +9.0
 
 c3's TNR on test and holdout mistakes, baseline against winner: per row 109 of 116 against 76 of 90 (Fisher p = 0.035, but the two reps of a ticket are not independent); one rep per ticket 53 of 57 against 38 of 45 (p = 0.207).
 
@@ -179,6 +271,10 @@ Re-running the same version (the baseline's two runs, validation split):
 - c3: 1 of 120 tickets graded differently between runs; 95% half-width for comparing two 2-run versions 1.2 points
 - p2: 1 of 120 tickets graded differently between runs; 95% half-width for comparing two 2-run versions 1.2 points
 - lenient: 0 of 120 tickets graded differently between runs; 95% half-width for comparing two 2-run versions 0.0 points
+- c3-r2: 1 of 120 tickets graded differently between runs; 95% half-width for comparing two 2-run versions 1.2 points
+- c3-r3: 1 of 120 tickets graded differently between runs; 95% half-width for comparing two 2-run versions 1.2 points
+- lenient-r2: 0 of 120 tickets graded differently between runs; 95% half-width for comparing two 2-run versions 0.0 points
+- lenient-r3: 0 of 120 tickets graded differently between runs; 95% half-width for comparing two 2-run versions 0.0 points
 
 Each round's change on the validation split (climb_test), with 95% paired intervals over tickets:
 
@@ -194,6 +290,33 @@ Each round's change on the validation split (climb_test), with 95% paired interv
 | p2 | v2 | baseline | revert | -2.9 [-5.8, -0.4] | -5.0 [-9.6, -1.2] |
 | lenient | v1 | baseline | revert | -4.6 [-8.3, -1.3] | -0.8 [-6.2, +4.2] |
 | lenient | v2 | baseline | revert | -2.9 [-6.2, -0.4] | +2.5 [-2.1, +7.1] |
+| c3-r2 | v1 | baseline | keep | +2.1 [-1.7, +6.2] | +0.8 [-3.3, +5.4] |
+| c3-r2 | v2 | v1 | keep | +7.5 [+0.4, +14.6] | +3.3 [-4.2, +10.8] |
+| c3-r3 | v1 | baseline | keep | +1.7 [-2.5, +6.2] | +1.3 [-2.9, +5.8] |
+| c3-r3 | v2 | v1 | keep | +4.2 [-2.5, +10.8] | +5.8 [-1.2, +12.9] |
+| lenient-r2 | v1 | baseline | revert | -4.6 [-8.3, -1.3] | +0.4 [-4.2, +5.4] |
+| lenient-r2 | v2 | baseline | revert | -2.5 [-5.4, -0.4] | +3.3 [-0.4, +7.5] |
+| lenient-r3 | v1 | baseline | revert | -4.2 [-7.9, -1.2] | +1.7 [-3.3, +6.7] |
+| lenient-r3 | v2 | baseline | revert | -4.6 [-8.3, -1.3] | +4.2 [-1.3, +10.0] |
+
+## Replicate runs
+
+Run 1 is the original arm. Validation is climb_test; true changes are against the baseline, in points.
+
+| Arm | Rounds | Kept | Winner | Reported (validation) | True (validation) | True (holdout) [95% CI] | Winner holdout | TNR baseline -> winner | Open-case mistakes at winner (passed) | J on fixes by round | J on breaks by round |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| c3 | 3 | v1, v3 | v3 | +4.6 | +4.2 | +5.0 [-0.9, +10.9] | 84.4 | 0.940 -> 0.844 | 14 (14) | 0.97, 0.75, 0.57 | 0.50, 0.41, 0.10 |
+| c3-r2 | 2 | v1, v2 | v2 | +9.6 | +4.2 | +6.9 [+0.0, +13.8] | 86.2 | 0.940 -> 0.738 | 16 (16) | 0.91, 0.89 | 0.56, 0.19 |
+| c3-r3 | 2 | v1, v2 | v2 | +5.8 | +7.1 | +7.8 [+1.3, +14.7] | 87.2 | 0.940 -> 0.838 | 12 (12) | 0.86, 0.77 | 0.75, 0.11 |
+| lenient | 2 | none | baseline | +0.0 | +0.0 | +0.0 [+0.0, +0.0] | 79.4 | 0.448 -> 0.448 | 2 (0) | 0.00, 0.00 | 0.65, 0.70 |
+| lenient-r2 | 2 | none | baseline | +0.0 | +0.0 | +0.0 [+0.0, +0.0] | 79.4 | 0.448 -> 0.448 | 2 (0) | -0.03, 0.00 | 0.86, 0.80 |
+| lenient-r3 | 2 | none | baseline | +0.0 | +0.0 | +0.0 [+0.0, +0.0] | 79.4 | 0.448 -> 0.448 | 2 (0) | -0.03, -0.08 | 0.84, 0.53 |
+
+c3's TNR on test and holdout mistakes, baseline against winner, in each run:
+
+- c3: per row 109 of 116 against 76 of 90 (Fisher p = 0.035); one rep per ticket 53 of 57 against 38 of 45 (p = 0.207)
+- c3-r2: per row 109 of 116 against 62 of 84 (Fisher p = 0.000); one rep per ticket 53 of 57 against 32 of 43 (p = 0.021)
+- c3-r3: per row 109 of 116 against 62 of 74 (Fisher p = 0.027); one rep per ticket 53 of 57 against 33 of 39 (p = 0.307)
 
 ## Stall categorization
 
@@ -201,3 +324,7 @@ Each round's change on the validation split (climb_test), with 95% paired interv
 - c3 (after v1): {'artifact_gap': 16, 'grader_disagreement': 6, 'harness': 0, 'structural': 12, 'variance': 1}. Grader-disagreement calls: 6, of which real judge errors: 2. Real false fails among the 35 train failures: 8.
 - p2 (after baseline): {'artifact_gap': 0, 'grader_disagreement': 34, 'harness': 0, 'structural': 22, 'variance': 1}. Grader-disagreement calls: 34, of which real judge errors: 34. Real false fails among the 57 train failures: 46.
 - lenient (after baseline): {'artifact_gap': 12, 'grader_disagreement': 7, 'harness': 0, 'structural': 19, 'variance': 1}. Grader-disagreement calls: 7, of which real judge errors: 7. Real false fails among the 39 train failures: 9.
+- c3-r2: no categorization round
+- c3-r3 (after v2): {'artifact_gap': 0, 'grader_disagreement': 4, 'harness': 0, 'structural': 6, 'variance': 4}. Grader-disagreement calls: 4, of which real judge errors: 4. Real false fails among the 14 train failures: 5.
+- lenient-r2 (after baseline): {'artifact_gap': 8, 'grader_disagreement': 7, 'harness': 0, 'structural': 22, 'variance': 2}. Grader-disagreement calls: 7, of which real judge errors: 7. Real false fails among the 39 train failures: 9.
+- lenient-r3 (after baseline): {'artifact_gap': 9, 'grader_disagreement': 7, 'harness': 0, 'structural': 23, 'variance': 0}. Grader-disagreement calls: 7, of which real judge errors: 7. Real false fails among the 39 train failures: 9.
