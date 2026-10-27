@@ -5,3 +5,5 @@
 | 2 | Keep the instructions as they are and put the $500 refund limit into t | 0.867 | 0.829 | revert |
 
 Best so far: baseline (test 0.892). Grader: the step 2 judge j2 (Jev), threshold 0.3; test TPR 1.000, TNR 0.645
+
+Stall categorization: {"artifact_gap": 8, "grader_disagreement": 7, "harness": 0, "structural": 22, "variance": 2}
