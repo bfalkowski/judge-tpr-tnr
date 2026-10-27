@@ -1,0 +1,4 @@
+{
+ "description": "Make the record decide the branch: compare shipped_on/delivered_on to 14- and 30-day cutoff dates, gate each rule on the record status, and say that the customer's account and demands do not change status or action. Mirror this in all four action descriptions.",
+ "target": "system_prompt"
+}

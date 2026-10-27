@@ -299,7 +299,10 @@ def write_narrative(arm):
     lines = ["| round | change (one line) | test | train | decision |", "|---|---|---|---|---|",
              f"| 0 | baseline | {b['test']:.3f} | {b['train']:.3f} | |"]
     for h in st["history"]:
-        lines.append(f"| {h['round'][1:]} | {h['change'][:70]} | {h['test']:.3f} | {h['train']:.3f} | {h['decision']} |")
+        if h["decision"] == "none":
+            lines.append(f"| {h['round'][1:]} | {h['change'][:70]} | | | no change proposed |")
+        else:
+            lines.append(f"| {h['round'][1:]} | {h['change'][:70]} | {h['test']:.3f} | {h['train']:.3f} | {h['decision']} |")
     best = st["best"]
     lines += ["", f"Best so far: {best['name']} (test {best['test_score']:.3f}). Grader: {st['grader']}"]
     if st.get("categorization"):
@@ -360,6 +363,11 @@ def cmd_sandbox(a):
                                           for h in st["history"]]
     if len(hist) == 2:
         hist.append("- none yet")
+    if st.get("categorization") and not a.categorize:
+        c = st["categorization"]
+        shutil.copy(flow(arm, f"categorize_after_{c['after']}", "change.md"), os.path.join(sb, "categorization.md"))
+        hist += ["", f"A categorization round ran after {c['after']}. Its summary is in categorization.md "
+                     "(read it; it is part of this round's input)."]
     hist += ["", f"The current version is {cur}. The traces and results here are the current version's."]
     open(os.path.join(sb, "history.md"), "w").write("\n".join(hist) + "\n")
     nf = st["noise_floor"]
@@ -383,7 +391,15 @@ def cmd_apply(a):
     os.makedirs(flow(arm, rnd), exist_ok=True)
     shutil.copy(change, flow(arm, rnd, "change.md"))
     if not os.path.exists(art_new):
-        print(f"{arm}/{rnd}: the analyzer proposed no change: {open(change).readline().strip()}")
+        # decisions.md 5: a round with no proposal ends the arm
+        line = open(change).readline().strip()
+        st["history"].append({"round": rnd, "change": line, "train": None, "test": None, "rerun_test": None,
+                              "decision": "none", "reason": "the analyzer proposed no change",
+                              "best_after": st["best"]["name"], "best_test_rise": 0.0})
+        st["stopped"] = "the analyzer proposed no change"
+        save_state(arm, st)
+        write_narrative(arm)
+        print(f"{arm}/{rnd}: the analyzer proposed no change; arm stopped: {line}")
         return
     shutil.copy(art_new, flow(arm, rnd, "artifact.json"))
     old = json.load(open(flow(arm, st["current"], "artifact.json")))

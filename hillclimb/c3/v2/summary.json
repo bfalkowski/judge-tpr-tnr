@@ -1,0 +1,4 @@
+{
+ "description": "Make rule selection record-first: compute today-minus-14 and today-minus-30 cutoff dates, pick the policy branch from the order's status and those cutoffs (not from what the ticket claims or asks for), and restate each action's description in those same terms.",
+ "target": "system_prompt"
+}

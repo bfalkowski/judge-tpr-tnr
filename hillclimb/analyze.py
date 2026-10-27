@@ -107,7 +107,7 @@ def pre_loop_checks(arm):
 
 def rounds_of(arm):
     st = hc.state(arm)
-    return st, ["baseline"] + [h["round"] for h in st["history"]]
+    return st, ["baseline"] + [h["round"] for h in st["history"] if h["decision"] != "none"]
 
 
 def arm_summary(arm):
@@ -147,7 +147,7 @@ def arm_summary(arm):
     # would the same rule on answer-key scores have made the same call?
     agree, calls = 0, []
     cur = "baseline"
-    for h in st["history"]:
+    for h in [h for h in st["history"] if h["decision"] != "none"]:
         n = h["round"]
         t = lambda name, sp: by_split(S[name], "true", [sp])
         c = {"train": t(cur, "climb_train"), "test": t(cur, "climb_test")}

@@ -1,0 +1,16 @@
+--- a/hillclimb/c3/v1/artifact.json
++++ b/hillclimb/c3/v3/artifact.json
+@@ -1,9 +1,9 @@
+ {
+- "decision_instructions": "Which action does the support policy call for on this ticket? If the matching rule gives refund, compare the order total with the policy's refund limit: a refund over the limit becomes escalate, whichever rule produced it (damaged or wrong item, or never arrived and out of stock). The limit applies only to refunds. It never turns reship or reply into escalate.",
++ "decision_instructions": "Which action does the support policy call for on this ticket? Take the kind of problem from the ticket, but take the order's delivery state only from the order record. A customer saying the order is lost, missing, late or never came does not change its state, and the policy's \"Lost\" means the record's status field is Lost. By the record, the order is in exactly one of these states:\n- Not yet due: status Processing, or status Shipped with delivered_on null and shipped 14 days ago or less. Rule 1 applies: reply, whatever the ticket reports (lost, missing, damaged or wrong item).\n- Never arrived: status Lost (however recently it shipped), or status Shipped with delivered_on null and shipped more than 14 days ago. Rule 3 applies to every ticket on it, including damaged or wrong-item reports and tickets that only ask for a status update: reship if stock is above 0, otherwise refund.\n- Delivered: status Delivered. Rule 2 for a damaged or wrong item, rule 5 for a change of mind. Any other ticket on a Delivered order, including one saying it never came, gets reply. A Delivered order is never reshipped.\nIf the matching rule gives refund, compare the order total with the policy's refund limit: a refund over the limit becomes escalate, whichever rule produced it (damaged or wrong item, or never arrived and out of stock). The limit applies only to refunds. It never turns reship or reply into escalate.",
+  "criteria": {
+   "0": "refund: refund the order. Not when the order total is over the policy's refund limit; that refund is escalated instead",
+-  "1": "reship: send a replacement",
+-  "2": "escalate: hand the ticket to a supervisor. This is also the action when a policy rule gives a refund but the order total is over the policy's refund limit, including never-arrived orders that are out of stock",
+-  "3": "reply: reply to the customer and take no other action"
++  "1": "reship: send a replacement. Only when the record shows the order never arrived (status Lost, or status Shipped with delivered_on null and shipped more than 14 days ago) and stock is above 0. Never for a Processing order, a Delivered order, or a Shipped order that shipped 14 days ago or less, whatever the ticket claims",
++  "2": "escalate: hand the ticket to a supervisor. This is also the action when a policy rule gives a refund but the order total is over the policy's refund limit, including orders the record shows as never arrived that are out of stock",
++  "3": "reply: reply to the customer and take no other action. The action for a Processing order or a Shipped order that shipped 14 days ago or less, whatever the ticket claims, and for any ticket on a Delivered order that reports no damaged or wrong item (a change of mind, or a claim that it never came)"
+  }
+ }

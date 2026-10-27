@@ -1,0 +1,12 @@
+--- a/hillclimb/p2/baseline/artifact.json
++++ b/hillclimb/p2/v2/artifact.json
+@@ -1,7 +1,7 @@
+ {
+- "decision_instructions": "Which action does the support policy call for on this ticket?",
++ "decision_instructions": "Which action does the support policy call for on this ticket?\n\nBefore applying the rules, check whether the ticket contradicts the order record about whether the customer received the order:\n- the customer describes a damaged or wrong item they have received, but the status is Shipped or Lost;\n- the customer says or implies they have not received the order, but the status is Delivered.\nIn either case choose refund, whatever the order total and whatever action the customer asks for. This check does not apply when the status is Processing. A disagreement only about when the order arrived is not a contradiction; apply the rules with the record's dates.",
+  "criteria": {
+-  "0": "refund: refund the order",
++  "0": "refund: refund the order; also the action when the ticket contradicts the order record about whether the customer received it and the status is not Processing",
+   "1": "reship: send a replacement",
+   "2": "escalate: hand the ticket to a supervisor",
+   "3": "reply: reply to the customer and take no other action"

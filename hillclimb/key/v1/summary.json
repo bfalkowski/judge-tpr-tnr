@@ -1,0 +1,4 @@
+{
+ "description": "Make the $500 refund cap (policy rule 4) an explicit second step that applies to every refund, including the out-of-stock refund on never-arrived/Lost orders, and say in the refund/escalate descriptions that refund is only for totals of $500 or less.",
+ "target": "system_prompt"
+}

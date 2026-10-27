@@ -1,0 +1,113 @@
+{
+ "counts": {
+  "artifact_gap": 0,
+  "grader_disagreement": 0,
+  "harness": 0,
+  "structural": 12,
+  "variance": 5
+ },
+ "failures": [
+  {
+   "case": "Y007",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Delivered 2026-09-03 (28 days), total $79, damaged: refund. Jev escalated (0.63). The artifact gives the 30-day cutoff 2026-09-01 and says a customer asking to escalate changes nothing. Fails both reps; passed in v1."
+  },
+  {
+   "case": "Y007",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Same as rep 0: escalate (0.64) on a Delivered-within-30-days $79 damaged item. The cutoff and the demand rule are both in the artifact."
+  },
+  {
+   "case": "Y017",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Delivered 2026-09-04, total exactly $500, wrong item: refund. Jev escalated (0.45). The artifact states the 30-day cutoff and that exactly $500 is not over $500. Fails both reps; passed in v1."
+  },
+  {
+   "case": "Y017",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Same as rep 0: escalate (0.44). Both the cutoff and the $500 boundary are in the artifact."
+  },
+  {
+   "case": "Y033",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Shipped 2026-09-16 (15 days, before the 14-day cutoff 2026-09-17), stock 8: reship. Jev replied (0.39), treating it as 14 days or less. The cutoff is in the artifact. Fails both reps; passed in v1."
+  },
+  {
+   "case": "Y033",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Same as rep 0: reply (0.44) on Shipped 2026-09-16. The 14-day cutoff date is in the artifact."
+  },
+  {
+   "case": "Y046",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Delivered 2026-09-02, total $69, wrong item: refund. Jev escalated (0.39). The 30-day cutoff is in the artifact. Fails both reps; 0.50 in v1, so a recurring failure."
+  },
+  {
+   "case": "Y046",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Same as rep 0: escalate (0.43) on Delivered-within-30-days $69. The rule exists in the artifact."
+  },
+  {
+   "case": "Y063",
+   "rep": 0,
+   "bucket": "variance",
+   "reason": "Shipped 2026-09-16, stock 2, total $549: reship. Rep 0 replied (0.35) and rep 1 reshipped (0.48) with the same artifact. Note: 0.00 in baseline and v1, so this case also keeps recurring at the 14-day boundary."
+  },
+  {
+   "case": "Y084",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Delivered 2026-09-03, total exactly $500, damaged: refund. Jev escalated (0.55). The artifact has the 30-day cutoff and the exactly-$500 rule. Fails both reps; passed in v1."
+  },
+  {
+   "case": "Y084",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Same as rep 0: escalate (0.37). Both rules are present in the artifact."
+  },
+  {
+   "case": "Y188",
+   "rep": 0,
+   "bucket": "variance",
+   "reason": "Delivered 2026-09-04, total $99, wrong item: refund. Rep 0 escalated (0.37) and rep 1 refunded (0.35) with the same artifact."
+  },
+  {
+   "case": "Y244",
+   "rep": 0,
+   "bucket": "variance",
+   "reason": "Shipped 2026-09-15, stock 2, total $549: reship. Rep 0 replied (0.52) and rep 1 reshipped (0.39) with the same artifact."
+  },
+  {
+   "case": "Y331",
+   "rep": 1,
+   "bucket": "variance",
+   "reason": "Delivered 2026-09-04, total $69, wrong item: refund. Rep 0 refunded (0.29) and rep 1 escalated (0.43) with the same artifact."
+  },
+  {
+   "case": "Y333",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Shipped 2026-09-15 (16 days), stock 3, total $499: reship. Jev replied (0.41), treating it as 14 days or less. The cutoff is in the artifact. Fails both reps; passed in v1."
+  },
+  {
+   "case": "Y333",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Same as rep 0: reply (0.35) on Shipped 2026-09-15. The 14-day cutoff date is in the artifact."
+  },
+  {
+   "case": "Y371",
+   "rep": 0,
+   "bucket": "variance",
+   "reason": "Shipped 2026-09-15, stock 0, total $159: refund. Rep 0 replied (0.33) and rep 1 refunded (0.43) with the same artifact."
+  }
+ ]
+}

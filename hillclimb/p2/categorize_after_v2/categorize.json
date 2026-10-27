@@ -1,0 +1,353 @@
+{
+ "counts": {
+  "artifact_gap": 0,
+  "grader_disagreement": 34,
+  "harness": 0,
+  "structural": 22,
+  "variance": 1
+ },
+ "failures": [
+  {
+   "case": "Y007",
+   "rep": 1,
+   "bucket": "variance",
+   "reason": "Same artifact: rep0 escalate (0.39) passed, rep1 refund (0.36) failed; a low-confidence flip, and the failing refund is what rule 2 calls for (damaged, delivered 28d, $79)."
+  },
+  {
+   "case": "Y027",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Wrong item claimed but record is Shipped 35d and never delivered (plus supervisor demand); no policy rule covers it, model guesses reply at 0.51; v1 (escalate) and v2 (refund) both targeted this and it stayed 0.00."
+  },
+  {
+   "case": "Y027",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Wrong item claimed but record is Shipped 35d and never delivered (plus supervisor demand); no policy rule covers it, model guesses reply at 0.51; v1 (escalate) and v2 (refund) both targeted this and it stayed 0.00."
+  },
+  {
+   "case": "Y030",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "'Where is it' but record is Delivered 28d ago; no rule covers it, model guesses reply at 0.33-0.39; still 0.00 after v1 and v2 contradiction content."
+  },
+  {
+   "case": "Y030",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "'Where is it' but record is Delivered 28d ago; no rule covers it, model guesses reply at 0.33-0.39; still 0.00 after v1 and v2 contradiction content."
+  },
+  {
+   "case": "Y046",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Wrong item, delivered 29d, $69: rule 2 says refund and the agent refunded; grader fails it, apparently wanting the reship the customer asked for (Y188, same pattern, passed with refund)."
+  },
+  {
+   "case": "Y046",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Wrong item, delivered 29d, $69: rule 2 says refund and the agent refunded; grader fails it, apparently wanting the reship the customer asked for (Y188, same pattern, passed with refund)."
+  },
+  {
+   "case": "Y063",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Shipped 15d, undelivered, in stock: rule 3 says reship; model replied at 0.41-0.45, missing the >14-day boundary on an indirect 'any update' ask; the rule is in the policy it was given."
+  },
+  {
+   "case": "Y063",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Shipped 15d, undelivered, in stock: rule 3 says reship; model replied at 0.41-0.45, missing the >14-day boundary on an indirect 'any update' ask; the rule is in the policy it was given."
+  },
+  {
+   "case": "Y089",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Rattling item in hand but record is Shipped 28d and undelivered; no rule covers it, model replies at 0.8; still 0.00 after v1 and v2 contradiction content."
+  },
+  {
+   "case": "Y089",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Rattling item in hand but record is Shipped 28d and undelivered; no rule covers it, model replies at 0.8; still 0.00 after v1 and v2 contradiction content."
+  },
+  {
+   "case": "Y112",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Lost, stock 6: rule 3 says reship and the agent reshipped (0.89-0.93); rule 4 covers refunds only; grader fails it, likely wanting the demanded escalation (Y082 and Y193 reship with the same demand passed)."
+  },
+  {
+   "case": "Y112",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Lost, stock 6: rule 3 says reship and the agent reshipped (0.89-0.93); rule 4 covers refunds only; grader fails it, likely wanting the demanded escalation (Y082 and Y193 reship with the same demand passed)."
+  },
+  {
+   "case": "Y119",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Shipped 24d, undelivered, stock 0, $899: rules 3 and 4 call for escalate; model chose refund (0.29) then reply (0.31) and never chained to rule 4, though both rules are present."
+  },
+  {
+   "case": "Y119",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Shipped 24d, undelivered, stock 0, $899: rules 3 and 4 call for escalate; model chose refund (0.29) then reply (0.31) and never chained to rule 4, though both rules are present."
+  },
+  {
+   "case": "Y133",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Someone else's item claimed but record is Shipped 30d and undelivered; no rule covers it, model guesses reship at 0.32-0.45; still 0.00 after v1 and v2 contradiction content."
+  },
+  {
+   "case": "Y133",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Someone else's item claimed but record is Shipped 30d and undelivered; no rule covers it, model guesses reship at 0.32-0.45; still 0.00 after v1 and v2 contradiction content."
+  },
+  {
+   "case": "Y148",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Status Processing: rule 1 says reply and take no other action; agent replied at 0.99; grader fails it, presumably wanting the demanded escalation, which the policy does not provide."
+  },
+  {
+   "case": "Y148",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Status Processing: rule 1 says reply and take no other action; agent replied at 0.99; grader fails it, presumably wanting the demanded escalation, which the policy does not provide."
+  },
+  {
+   "case": "Y149",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Status Processing: rule 1 says reply; agent replied at 0.95; grader fails it although Y309 and Y200 (damage claim on a Processing order) pass with reply."
+  },
+  {
+   "case": "Y149",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Status Processing: rule 1 says reply; agent replied at 0.95; grader fails it although Y309 and Y200 (damage claim on a Processing order) pass with reply."
+  },
+  {
+   "case": "Y161",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Changed mind on a delivered order: rule 5 says reply with return instructions; agent replied at 1.0; grader fails it, apparently wanting the demanded refund."
+  },
+  {
+   "case": "Y161",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Changed mind on a delivered order: rule 5 says reply with return instructions; agent replied at 1.0; grader fails it, apparently wanting the demanded refund."
+  },
+  {
+   "case": "Y169",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Changed mind on a delivered order: rule 5 says reply; agent replied at 0.96-0.97; grader fails it although the same ticket pattern in Y061 and Y085 passes with reply."
+  },
+  {
+   "case": "Y169",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Changed mind on a delivered order: rule 5 says reply; agent replied at 0.96-0.97; grader fails it although the same ticket pattern in Y061 and Y085 passes with reply."
+  },
+  {
+   "case": "Y194",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "'Waiting forever' but record is Delivered 33d ago; no rule covers it, model guesses reship at 0.31-0.43 with stock 0; still 0.00 after v1 and v2 contradiction content."
+  },
+  {
+   "case": "Y194",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "'Waiting forever' but record is Delivered 33d ago; no rule covers it, model guesses reship at 0.31-0.43 with stock 0; still 0.00 after v1 and v2 contradiction content."
+  },
+  {
+   "case": "Y212",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Status Processing: rule 1 says reply; agent replied at 0.96; grader fails it while Y209 (Processing, supervisor demand) passes with reply."
+  },
+  {
+   "case": "Y212",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Status Processing: rule 1 says reply; agent replied at 0.96; grader fails it while Y209 (Processing, supervisor demand) passes with reply."
+  },
+  {
+   "case": "Y222",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Shipped 3d, undelivered: rule 1 says reply; agent replied at 0.92-0.95; grader fails it, apparently wanting the demanded refund."
+  },
+  {
+   "case": "Y222",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Shipped 3d, undelivered: rule 1 says reply; agent replied at 0.92-0.95; grader fails it, apparently wanting the demanded refund."
+  },
+  {
+   "case": "Y225",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Wrong item, delivered 16d, $499: rule 2 says refund and the agent refunded at 0.75; grader fails it, likely wanting the demanded escalation."
+  },
+  {
+   "case": "Y225",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Wrong item, delivered 16d, $499: rule 2 says refund and the agent refunded at 0.75; grader fails it, likely wanting the demanded escalation."
+  },
+  {
+   "case": "Y263",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Shipped 6d, undelivered: rule 1 says reply; agent replied at 0.84-0.89; grader fails it, and v1 (escalate) and v2 (refund) also scored 0.00."
+  },
+  {
+   "case": "Y263",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Shipped 6d, undelivered: rule 1 says reply; agent replied at 0.84-0.89; grader fails it, and v1 (escalate) and v2 (refund) also scored 0.00."
+  },
+  {
+   "case": "Y266",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Shipped 5d, undelivered: rule 1 says reply; agent replied at 0.75; grader fails it, v1 and v2 alternatives also scored 0.00, and stock 0 rules out reship."
+  },
+  {
+   "case": "Y266",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Shipped 5d, undelivered: rule 1 says reply; agent replied at 0.75; grader fails it, v1 and v2 alternatives also scored 0.00, and stock 0 rules out reship."
+  },
+  {
+   "case": "Y270",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Shipped exactly 14d, undelivered: rule 1 ('14 days ago or less') says reply; agent replied at 0.56-0.6; grader fails it."
+  },
+  {
+   "case": "Y270",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Shipped exactly 14d, undelivered: rule 1 ('14 days ago or less') says reply; agent replied at 0.56-0.6; grader fails it."
+  },
+  {
+   "case": "Y273",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Shipped 12d, undelivered: rule 1 says reply; agent replied; grader fails it although Y327 (shipped 12d) passes with reply."
+  },
+  {
+   "case": "Y273",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Shipped 12d, undelivered: rule 1 says reply; agent replied; grader fails it although Y327 (shipped 12d) passes with reply."
+  },
+  {
+   "case": "Y293",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Shipped 5d, undelivered: rule 1 says reply; agent replied at 0.79-0.81; grader fails it."
+  },
+  {
+   "case": "Y293",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Shipped 5d, undelivered: rule 1 says reply; agent replied at 0.79-0.81; grader fails it."
+  },
+  {
+   "case": "Y303",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Changed mind on a delivered order: rule 5 says reply; agent replied at 0.92-0.93; grader fails it, presumably wanting the demanded escalation."
+  },
+  {
+   "case": "Y303",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Changed mind on a delivered order: rule 5 says reply; agent replied at 0.92-0.93; grader fails it, presumably wanting the demanded escalation."
+  },
+  {
+   "case": "Y338",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "'Hasn't arrived' but record is Delivered 32d ago; no rule covers it, model guesses reship at 0.24-0.31; still 0.00 after v1 and v2 contradiction content."
+  },
+  {
+   "case": "Y338",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "'Hasn't arrived' but record is Delivered 32d ago; no rule covers it, model guesses reship at 0.24-0.31; still 0.00 after v1 and v2 contradiction content."
+  },
+  {
+   "case": "Y342",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Status Processing: rule 1 says reply; agent replied at 0.92-0.93; grader fails it, presumably wanting the demanded escalation."
+  },
+  {
+   "case": "Y342",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Status Processing: rule 1 says reply; agent replied at 0.92-0.93; grader fails it, presumably wanting the demanded escalation."
+  },
+  {
+   "case": "Y344",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "'Where is it' but record is Delivered 28d ago; no rule covers it, model guesses reply (0.49) and reship (0.31) and both fail; still 0.00 after v1 and v2."
+  },
+  {
+   "case": "Y344",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "'Where is it' but record is Delivered 28d ago; no rule covers it, model guesses reply (0.49) and reship (0.31) and both fail; still 0.00 after v1 and v2."
+  },
+  {
+   "case": "Y360",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Changed mind on a delivered order: rule 5 says reply; agent replied at 0.97; grader fails it, presumably wanting the demanded escalation."
+  },
+  {
+   "case": "Y360",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Changed mind on a delivered order: rule 5 says reply; agent replied at 0.97; grader fails it, presumably wanting the demanded escalation."
+  },
+  {
+   "case": "Y362",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Status check plus refund demand on an order Delivered 33d ago; no rule covers it, model guesses reply at 0.25-0.40; still 0.00 after v1 and v2 contradiction content."
+  },
+  {
+   "case": "Y362",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Status check plus refund demand on an order Delivered 33d ago; no rule covers it, model guesses reply at 0.25-0.40; still 0.00 after v1 and v2 contradiction content."
+  },
+  {
+   "case": "Y396",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Cracked item in hand but record is Shipped 23d and undelivered (plus escalation demand); no rule covers it, model replies at 0.57-0.65; v1 (escalate) and v2 (refund) both left it at 0.00."
+  },
+  {
+   "case": "Y396",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Cracked item in hand but record is Shipped 23d and undelivered (plus escalation demand); no rule covers it, model replies at 0.57-0.65; v1 (escalate) and v2 (refund) both left it at 0.00."
+  }
+ ]
+}
