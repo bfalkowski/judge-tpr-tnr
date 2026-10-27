@@ -1,0 +1,4 @@
+{
+ "description": "Make the refund limit (policy rule 4) gate every refund, including the rule-3 out-of-stock fallback: the instructions now say to look for an overriding rule after reaching an outcome, the refund action says it is only for totals within the limit, and the escalate action names over-limit refunds as a trigger but not over-limit reships or replies.",
+ "target": "system_prompt"
+}

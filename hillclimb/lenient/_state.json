@@ -1,5 +1,5 @@
 {
- "current_round": 0,
+ "current_round": 1,
  "reps": 2,
  "approve_each_round": false,
  "goal": {
@@ -298,8 +298,20 @@
   "hillclimb/hc.py",
   "hillclimb/arms.json"
  ],
- "history": [],
- "flat_streak": 0,
+ "history": [
+  {
+   "round": "v1",
+   "change": "Make the refund limit (policy rule 4) gate every refund, including the rule-3 out-of-stock fallback: the instructions now say to look for an overriding rule after reaching an outcome, the refund action says it is only for totals within the limit, and the escalate action names over-limit refunds as a trigger but not over-limit reships or replies.",
+   "train": 0.8208333333333333,
+   "test": 0.8458333333333333,
+   "rerun_test": null,
+   "decision": "revert",
+   "reason": "test did not rise",
+   "best_after": "baseline",
+   "best_test_rise": 0.0
+  }
+ ],
+ "flat_streak": 1,
  "categorized": false,
  "stopped": null,
  "baseline_check": {
