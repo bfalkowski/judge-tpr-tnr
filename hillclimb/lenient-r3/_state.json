@@ -320,11 +320,22 @@
    "reason": "test did not rise",
    "best_after": "baseline",
    "best_test_rise": 0.0
+  },
+  {
+   "round": "v3",
+   "change": "No change proposed: the only behavior big enough to clear the noise floor (Jev skips the $500 limit on the rule-3 out-of-stock refund, 19 rows, 7.9 points) has already resisted both in-scope levers, and every other behavior costs 3 points or less.",
+   "train": null,
+   "test": null,
+   "rerun_test": null,
+   "decision": "none",
+   "reason": "the analyzer proposed no change",
+   "best_after": "baseline",
+   "best_test_rise": 0.0
   }
  ],
  "flat_streak": 2,
  "categorized": true,
- "stopped": null,
+ "stopped": "the analyzer proposed no change",
  "baseline_check": {
   "train": 0.8375,
   "test": 0.8916666666666667,
