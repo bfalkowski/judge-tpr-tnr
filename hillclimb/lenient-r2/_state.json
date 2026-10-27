@@ -320,11 +320,22 @@
    "reason": "test did not rise",
    "best_after": "baseline",
    "best_test_rise": 0.0
+  },
+  {
+   "round": "v3",
+   "change": "No change: the only failure big enough to clear the noise floor (the $500 cap skipped after rule 3's out-of-stock refund, 10 cases, 19 rows, 7.9 points) was already targeted through every in-scope lever in v1 and v2 for a net gain of 1 row, and every other failure costs 7 rows or fewer.",
+   "train": null,
+   "test": null,
+   "rerun_test": null,
+   "decision": "none",
+   "reason": "the analyzer proposed no change",
+   "best_after": "baseline",
+   "best_test_rise": 0.0
   }
  ],
  "flat_streak": 2,
  "categorized": true,
- "stopped": null,
+ "stopped": "the analyzer proposed no change",
  "baseline_check": {
   "train": 0.8375,
   "test": 0.8916666666666667,
