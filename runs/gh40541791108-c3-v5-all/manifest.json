@@ -1,0 +1,20 @@
+{
+ "run_id": "gh40541791108-c3-v5-all",
+ "variant": "c3",
+ "fingerprint": "1b1bebcddff9f66c",
+ "model": "claude-haiku-4-5-20251001",
+ "backend": "api",
+ "dataset": "v5",
+ "split": "all",
+ "repeats": 1,
+ "n_items": 1600,
+ "items_sha256": "9da3a3ecbdf6897a57221baf527c8ade4074d503637861c57d122f59177bd025",
+ "split_sha256": "0d6712903a0359d1ed144e4e9a38aca032784bbe7822574d722908fd17c7dd5a",
+ "git_commit": "d09cd14335e9b6241d9d5c36e518d6b7bfe1972f",
+ "frozen": null,
+ "post_hoc": false,
+ "started_at": "2026-10-27T16:31:56Z",
+ "finished_at": "2026-10-27T17:07:23Z",
+ "errored_calls": 0,
+ "spend_usd": 2.92527
+}
