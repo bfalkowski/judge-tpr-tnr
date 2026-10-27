@@ -1,0 +1,15 @@
+--- a/hillclimb/lenient-r3/baseline/artifact.json
++++ b/hillclimb/lenient-r3/v1/artifact.json
+@@ -1,9 +1,9 @@
+ {
+- "decision_instructions": "Which action does the support policy call for on this ticket?",
++ "decision_instructions": "Which action does the support policy call for on this ticket? After you find the action the matching rule gives, check it against the policy's limit on refunds by order total. The limit applies to every refund, including a refund that a rule gives only as its fallback when the item is out of stock: if the order total is over the limit, choose escalate instead of refund. The limit changes only refunds, never reships or replies, and a total exactly equal to the limit is not over it.",
+  "criteria": {
+-  "0": "refund: refund the order",
++  "0": "refund: refund the order, only when the order total is within the policy's refund limit",
+   "1": "reship: send a replacement",
+-  "2": "escalate: hand the ticket to a supervisor",
++  "2": "escalate: hand the ticket to a supervisor; this is also the action for any refund whose order total is over the policy's refund limit",
+   "3": "reply: reply to the customer and take no other action"
+  }
+ }
