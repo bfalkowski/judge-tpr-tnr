@@ -320,11 +320,22 @@
    "reason": "train and test both rose",
    "best_after": "v2",
    "best_test_rise": 0.04166666666666674
+  },
+  {
+   "round": "v3",
+   "change": "No change proposed: the largest remaining failure (escalate chosen when the step gives a refund at or under $500, or a reply) costs 7 of 240 train rows (2.9 points), and fixing every failing row would gain at most 5.8 points, which is inside the 6.5-point noise floor.",
+   "train": null,
+   "test": null,
+   "rerun_test": null,
+   "decision": "none",
+   "reason": "the analyzer proposed no change",
+   "best_after": "v2",
+   "best_test_rise": 0.0
   }
  ],
  "flat_streak": 2,
  "categorized": true,
- "stopped": null,
+ "stopped": "the analyzer proposed no change",
  "baseline_check": {
   "train": 0.7791666666666667,
   "test": 0.7708333333333334,
