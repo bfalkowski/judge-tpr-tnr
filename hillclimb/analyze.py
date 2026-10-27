@@ -22,6 +22,8 @@ import hc  # noqa: E402
 from judge.estimate import corrected, rates  # noqa: E402
 
 ARMS = list(hc.ARMS)
+ORIGINAL = [a for a in ARMS if "replicate_of" not in hc.ARMS[a]]
+RUNS = {base: [base] + sorted(a for a in ARMS if hc.ARMS[a].get("replicate_of") == base) for base in ORIGINAL}
 ITER = 5000
 
 
@@ -241,7 +243,7 @@ def category_verdicts():
     for c in CATEGORIES:
         ts = [t for t in T.values() if category(t) == c]
         out[c] = {"tickets": len(ts)}
-        for arm in ARMS:
+        for arm in ORIGINAL:
             g = hc.grader(arm)
             out[c][arm] = {"correct_passed": sum(g[(t["ticket_id"], t["key"])][0] for t in ts),
                            "wrong_passed": sum(g[(t["ticket_id"], a)][0] for t in ts
@@ -289,7 +291,7 @@ def open_case_verdicts():
     T = hc.tickets()
     ts = [t for t in T.values() if category(t) == "damage_open"]
     out = {"tickets": len(ts)}
-    for arm in ARMS:
+    for arm in ORIGINAL:
         g = hc.grader(arm)
         r3 = lambda t: resolve("not_arrived", t["order"], t["stock"])
         out[arm] = {"reply_passed": sum(g[(t["ticket_id"], "reply")][0] for t in ts),
@@ -370,6 +372,34 @@ def holdout_change_by_kind(arm):
     return out
 
 
+def replicate_summary(base):
+    """One row per run of an arm: what the loop reported and kept, what was true, and how the judge's errors moved."""
+    T = hc.tickets()
+    rows = []
+    for arm in RUNS[base]:
+        st = hc.state(arm)
+        rounds = [h for h in st["history"] if h["decision"] != "none"]
+        b, w = sealed(arm, "baseline"), sealed(arm, st["best"]["name"])
+        tnr = lambda rows_: judge_rates(rows_)["tnr"]
+        open_m = [r for r in w if r["split"] in ("climb_test", "holdout") and not r["true"] and category(T[r["ticket_id"]]) == "damage_open"]
+        all_m = [r for r in w if r["split"] in ("climb_test", "holdout") and not r["true"]]
+        vis = visibility_by_round(arm)
+        rows.append({"arm": arm, "rounds": len(rounds), "kept": [h["round"] for h in rounds if h["decision"] == "keep"],
+                     "winner": st["best"]["name"], "stopped": st["stopped"],
+                     "reported_val": by_split(w, "grader", ["climb_test"]) - by_split(b, "grader", ["climb_test"]),
+                     "true_val": by_split(w, "true", ["climb_test"]) - by_split(b, "true", ["climb_test"]),
+                     "true_holdout": by_split(w, "true", ["holdout"]) - by_split(b, "true", ["holdout"]),
+                     "true_holdout_ci": boot_diff(b, w, "true", ["holdout"]),
+                     "winner_true_holdout": by_split(w, "true", ["holdout"]),
+                     "tnr_baseline": tnr(b), "tnr_winner": tnr(w),
+                     "open_mistakes_winner": len(open_m), "open_passed_winner": sum(r["grader"] for r in open_m),
+                     "false_passes_winner": sum(r["grader"] for r in all_m),
+                     "j_fix": [v["j_fix"] for v in vis], "j_break": [v["j_break"] for v in vis],
+                     "round_true": [v["true_change_rows"] for v in vis], "round_grader": [v["grader_change_rows"] for v in vis],
+                     "categorization": st.get("categorization")})
+    return rows
+
+
 def tnr_drop_c3():
     """c3's TNR on test and holdout mistakes, baseline against winner, counted per row and with one rep per ticket."""
     def fisher(a, b, c, d):
@@ -423,17 +453,19 @@ def main():
     res["round_intervals"] = {arm: round_intervals(arm) for arm in ARMS}
     res["holdout_change_by_kind"] = {arm: holdout_change_by_kind(arm) for arm in ARMS}
     res["tnr_drop_c3"] = tnr_drop_c3()
+    res["replicates"] = {base: replicate_summary(base) for base in RUNS if len(RUNS[base]) > 1}
     res["visibility"] = {arm: visibility_by_round(arm) for arm in ARMS}
     res["label_the_diff"] = {arm: label_the_diff(arm) for arm in ARMS}
-    res["rates_without_open_case"] = {arm: rates_without_open(arm) for arm in ARMS}
+    res["rates_without_open_case"] = {arm: rates_without_open(arm) for arm in ORIGINAL}
     res["open_case_verdicts"] = open_case_verdicts()
-    res["agreement_check_power"] = {arm: agreement_check_power(arm) for arm in ARMS}
+    res["agreement_check_power"] = {arm: agreement_check_power(arm) for arm in ORIGINAL}
     res["category_verdicts"] = category_verdicts()
     res["drift_by_category"] = {arm: drift_by_category(arm) for arm in ARMS}
     res["lenient_v2_visibility"] = change_visibility("lenient", "baseline", "v2")
     for arm in ARMS:
         res["arms"][arm] = arm_summary(arm)
-        res["pre_loop"][arm] = pre_loop_checks(arm)
+        if arm in ORIGINAL:
+            res["pre_loop"][arm] = pre_loop_checks(arm)
         res["categorization"][arm] = categorization_check(arm)
     json.dump(res, open(os.path.join(HERE, "results.json"), "w"), indent=1)
     open(os.path.join(HERE, "RESULTS.md"), "w").write(report(res))
@@ -496,10 +528,10 @@ def report(res):
     for c, d in res["category_verdicts"].items():
         L.append(f"- **{c}** ({d['tickets']} tickets; {CATEGORIES[c]}): " + "; ".join(
             f"{arm} passes the correct action on {d[arm]['correct_passed']} and a wrong one on {d[arm]['wrong_passed']} of {d[arm]['wrong_total']}"
-            for arm in ARMS))
+            for arm in ORIGINAL))
     o = res["open_case_verdicts"]
     L += ["", f"On the {o['tickets']} damage_open tickets: " + "; ".join(
-        f"{arm} passes reply on {o[arm]['reply_passed']} and rule 3's action on {o[arm]['rule3_action_passed']}" for arm in ARMS), "",
+        f"{arm} passes reply on {o[arm]['reply_passed']} and rule 3's action on {o[arm]['rule3_action_passed']}" for arm in ORIGINAL), "",
         "TPR and TNR on the baseline's train decisions without the damage_open tickets: " + "; ".join(
         f"{arm} {r['tpr']:.3f} / {r['tnr']:.3f}" for arm, r in res["rates_without_open_case"].items())]
     L += ["", "## True mistakes by category on climb_test and holdout, and how many the grader passes", "",
@@ -546,6 +578,17 @@ def report(res):
         for v in vs:
             L.append(f"| {arm} | {v['round']} | {v['against']} | {v['decision']} | {100 * v['grader']:+.1f} {pci(v['grader_ci'])} | "
                      f"{100 * v['true']:+.1f} {pci(v['true_ci'])} |")
+    L += ["", "## Replicate runs", "",
+          "Run 1 is the original arm. Validation is climb_test; true changes are against the baseline, in points.", "",
+          "| Arm | Rounds | Kept | Winner | Reported (validation) | True (validation) | True (holdout) [95% CI] | Winner holdout | TNR baseline -> winner | Open-case mistakes at winner (passed) | J on fixes by round | J on breaks by round |",
+          "|---|---|---|---|---|---|---|---|---|---|---|---|"]
+    f2 = lambda v: "n/a" if v is None else f"{v:.2f}"
+    for base, rows in res["replicates"].items():
+        for r in rows:
+            L.append(f"| {r['arm']} | {r['rounds']} | {', '.join(r['kept']) or 'none'} | {r['winner']} | {100 * r['reported_val']:+.1f} | "
+                     f"{100 * r['true_val']:+.1f} | {100 * r['true_holdout']:+.1f} {pci(r['true_holdout_ci'])} | {p(r['winner_true_holdout'])} | "
+                     f"{r['tnr_baseline']:.3f} -> {r['tnr_winner']:.3f} | {r['open_mistakes_winner']} ({r['open_passed_winner']}) | "
+                     f"{', '.join(f2(x) for x in r['j_fix'])} | {', '.join(f2(x) for x in r['j_break'])} |")
     L += ["", "## Stall categorization", ""]
     for arm, c in res["categorization"].items():
         if c:

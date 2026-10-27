@@ -1,0 +1,273 @@
+# Categorization of baseline train failures
+
+## Counts
+
+39 failing rows (train, baseline artifact, 2 reps):
+
+| Bucket | Rows | Cases |
+|---|---|---|
+| structural | 23 | Y013, Y050, Y054, Y083, Y119 (rep 0), Y124, Y192, Y343, Y346, Y385 (rule 4 over-limit refund, 19 rows); Y039, Y282 (day boundary, 4 rows) |
+| artifact_gap | 9 | Y027, Y133 (damage or wrong-item claim on an order never delivered); Y194, Y338, Y344 (rep 1) (record says Delivered, customer says it never came) |
+| grader_disagreement | 7 | Y007 (rep 1), Y061, Y084, Y169 |
+| harness | 0 | |
+| variance | 0 | |
+
+Y007, Y119 and Y344 pass one rep and fail the other, so by the tell alone they would count as variance (variance 3, structural 22, artifact_gap 8, grader_disagreement 6). I bucketed them by root cause instead, because the transcripts show one. In Y007 the failing rep chose the action the policy calls for (refund). In Y119 neither rep chose the policy action (escalate). In Y344 the model is guessing at about 0.3 to 0.5 confidence where no rule applies. Rerunning would not fix any of them.
+
+## What each bucket needs instead of another content round
+
+- structural: Enforce rule 4 in code after the model picks an action, so any refund over $500 becomes escalate, and give the model precomputed day counts (days since shipped, days since delivered) so the 14-day and 30-day boundaries are not left to its date arithmetic. Two content rounds aimed at the over-limit cases (v1, v2) left all of them at 0. Before building this, check the v1 and v2 traces for these cases to confirm the model still chose refund. If it switched to escalate and still failed, these rows are grader_disagreement.
+- artifact_gap: The support policy has no rule for these situations, so someone who owns the policy (PM or SME) has to decide the correct action and label it. Writing artifact text first would only guess at what the grader wants. Current grades suggest it wants reply for delivered-but-missing.
+- grader_disagreement: Fix the judge, not the agent. Give it the expected action or a rubric that applies the policy literally: rule 5 is unconditional, $500 is not over the limit, and customer demands do not override the policy. Then measure its TPR and TNR against human labels. The judge is lenient in the other direction too. It passed 14 rows where the action contradicts the policy (Y007 rep 0, Y063, Y114, Y119 rep 1, Y138, Y258, Y304, Y318), which adds noise that will keep the test score inside the noise band.
+
+## Files read
+
+All paths are relative to /tmp/claude-0/-home-claude/40fc5258-ce58-5aa5-962d-6bf6187ebc29/scratchpad/sb/lenient-r3/v2-categorize/.
+
+- BRIEF.md
+- artifact.json
+- history.md
+- scores_train.tsv
+- results_train.jsonl
+- out/all_rows.txt (my own scratch table built from the traces)
+- traces/ (all 240 files, read by script):
+  - traces/Y007_rep0.json
+  - traces/Y007_rep1.json
+  - traces/Y011_rep0.json
+  - traces/Y011_rep1.json
+  - traces/Y012_rep0.json
+  - traces/Y012_rep1.json
+  - traces/Y013_rep0.json
+  - traces/Y013_rep1.json
+  - traces/Y016_rep0.json
+  - traces/Y016_rep1.json
+  - traces/Y017_rep0.json
+  - traces/Y017_rep1.json
+  - traces/Y024_rep0.json
+  - traces/Y024_rep1.json
+  - traces/Y025_rep0.json
+  - traces/Y025_rep1.json
+  - traces/Y026_rep0.json
+  - traces/Y026_rep1.json
+  - traces/Y027_rep0.json
+  - traces/Y027_rep1.json
+  - traces/Y028_rep0.json
+  - traces/Y028_rep1.json
+  - traces/Y030_rep0.json
+  - traces/Y030_rep1.json
+  - traces/Y031_rep0.json
+  - traces/Y031_rep1.json
+  - traces/Y033_rep0.json
+  - traces/Y033_rep1.json
+  - traces/Y039_rep0.json
+  - traces/Y039_rep1.json
+  - traces/Y046_rep0.json
+  - traces/Y046_rep1.json
+  - traces/Y050_rep0.json
+  - traces/Y050_rep1.json
+  - traces/Y052_rep0.json
+  - traces/Y052_rep1.json
+  - traces/Y054_rep0.json
+  - traces/Y054_rep1.json
+  - traces/Y055_rep0.json
+  - traces/Y055_rep1.json
+  - traces/Y061_rep0.json
+  - traces/Y061_rep1.json
+  - traces/Y063_rep0.json
+  - traces/Y063_rep1.json
+  - traces/Y064_rep0.json
+  - traces/Y064_rep1.json
+  - traces/Y068_rep0.json
+  - traces/Y068_rep1.json
+  - traces/Y076_rep0.json
+  - traces/Y076_rep1.json
+  - traces/Y080_rep0.json
+  - traces/Y080_rep1.json
+  - traces/Y081_rep0.json
+  - traces/Y081_rep1.json
+  - traces/Y082_rep0.json
+  - traces/Y082_rep1.json
+  - traces/Y083_rep0.json
+  - traces/Y083_rep1.json
+  - traces/Y084_rep0.json
+  - traces/Y084_rep1.json
+  - traces/Y085_rep0.json
+  - traces/Y085_rep1.json
+  - traces/Y088_rep0.json
+  - traces/Y088_rep1.json
+  - traces/Y089_rep0.json
+  - traces/Y089_rep1.json
+  - traces/Y110_rep0.json
+  - traces/Y110_rep1.json
+  - traces/Y112_rep0.json
+  - traces/Y112_rep1.json
+  - traces/Y114_rep0.json
+  - traces/Y114_rep1.json
+  - traces/Y116_rep0.json
+  - traces/Y116_rep1.json
+  - traces/Y118_rep0.json
+  - traces/Y118_rep1.json
+  - traces/Y119_rep0.json
+  - traces/Y119_rep1.json
+  - traces/Y121_rep0.json
+  - traces/Y121_rep1.json
+  - traces/Y123_rep0.json
+  - traces/Y123_rep1.json
+  - traces/Y124_rep0.json
+  - traces/Y124_rep1.json
+  - traces/Y131_rep0.json
+  - traces/Y131_rep1.json
+  - traces/Y133_rep0.json
+  - traces/Y133_rep1.json
+  - traces/Y138_rep0.json
+  - traces/Y138_rep1.json
+  - traces/Y144_rep0.json
+  - traces/Y144_rep1.json
+  - traces/Y148_rep0.json
+  - traces/Y148_rep1.json
+  - traces/Y149_rep0.json
+  - traces/Y149_rep1.json
+  - traces/Y161_rep0.json
+  - traces/Y161_rep1.json
+  - traces/Y162_rep0.json
+  - traces/Y162_rep1.json
+  - traces/Y166_rep0.json
+  - traces/Y166_rep1.json
+  - traces/Y169_rep0.json
+  - traces/Y169_rep1.json
+  - traces/Y179_rep0.json
+  - traces/Y179_rep1.json
+  - traces/Y180_rep0.json
+  - traces/Y180_rep1.json
+  - traces/Y188_rep0.json
+  - traces/Y188_rep1.json
+  - traces/Y190_rep0.json
+  - traces/Y190_rep1.json
+  - traces/Y192_rep0.json
+  - traces/Y192_rep1.json
+  - traces/Y193_rep0.json
+  - traces/Y193_rep1.json
+  - traces/Y194_rep0.json
+  - traces/Y194_rep1.json
+  - traces/Y200_rep0.json
+  - traces/Y200_rep1.json
+  - traces/Y206_rep0.json
+  - traces/Y206_rep1.json
+  - traces/Y209_rep0.json
+  - traces/Y209_rep1.json
+  - traces/Y212_rep0.json
+  - traces/Y212_rep1.json
+  - traces/Y214_rep0.json
+  - traces/Y214_rep1.json
+  - traces/Y215_rep0.json
+  - traces/Y215_rep1.json
+  - traces/Y222_rep0.json
+  - traces/Y222_rep1.json
+  - traces/Y225_rep0.json
+  - traces/Y225_rep1.json
+  - traces/Y231_rep0.json
+  - traces/Y231_rep1.json
+  - traces/Y232_rep0.json
+  - traces/Y232_rep1.json
+  - traces/Y237_rep0.json
+  - traces/Y237_rep1.json
+  - traces/Y240_rep0.json
+  - traces/Y240_rep1.json
+  - traces/Y243_rep0.json
+  - traces/Y243_rep1.json
+  - traces/Y244_rep0.json
+  - traces/Y244_rep1.json
+  - traces/Y247_rep0.json
+  - traces/Y247_rep1.json
+  - traces/Y250_rep0.json
+  - traces/Y250_rep1.json
+  - traces/Y251_rep0.json
+  - traces/Y251_rep1.json
+  - traces/Y252_rep0.json
+  - traces/Y252_rep1.json
+  - traces/Y255_rep0.json
+  - traces/Y255_rep1.json
+  - traces/Y258_rep0.json
+  - traces/Y258_rep1.json
+  - traces/Y263_rep0.json
+  - traces/Y263_rep1.json
+  - traces/Y265_rep0.json
+  - traces/Y265_rep1.json
+  - traces/Y266_rep0.json
+  - traces/Y266_rep1.json
+  - traces/Y270_rep0.json
+  - traces/Y270_rep1.json
+  - traces/Y273_rep0.json
+  - traces/Y273_rep1.json
+  - traces/Y277_rep0.json
+  - traces/Y277_rep1.json
+  - traces/Y282_rep0.json
+  - traces/Y282_rep1.json
+  - traces/Y290_rep0.json
+  - traces/Y290_rep1.json
+  - traces/Y292_rep0.json
+  - traces/Y292_rep1.json
+  - traces/Y293_rep0.json
+  - traces/Y293_rep1.json
+  - traces/Y303_rep0.json
+  - traces/Y303_rep1.json
+  - traces/Y304_rep0.json
+  - traces/Y304_rep1.json
+  - traces/Y309_rep0.json
+  - traces/Y309_rep1.json
+  - traces/Y312_rep0.json
+  - traces/Y312_rep1.json
+  - traces/Y315_rep0.json
+  - traces/Y315_rep1.json
+  - traces/Y318_rep0.json
+  - traces/Y318_rep1.json
+  - traces/Y323_rep0.json
+  - traces/Y323_rep1.json
+  - traces/Y327_rep0.json
+  - traces/Y327_rep1.json
+  - traces/Y331_rep0.json
+  - traces/Y331_rep1.json
+  - traces/Y333_rep0.json
+  - traces/Y333_rep1.json
+  - traces/Y334_rep0.json
+  - traces/Y334_rep1.json
+  - traces/Y338_rep0.json
+  - traces/Y338_rep1.json
+  - traces/Y342_rep0.json
+  - traces/Y342_rep1.json
+  - traces/Y343_rep0.json
+  - traces/Y343_rep1.json
+  - traces/Y344_rep0.json
+  - traces/Y344_rep1.json
+  - traces/Y346_rep0.json
+  - traces/Y346_rep1.json
+  - traces/Y354_rep0.json
+  - traces/Y354_rep1.json
+  - traces/Y356_rep0.json
+  - traces/Y356_rep1.json
+  - traces/Y358_rep0.json
+  - traces/Y358_rep1.json
+  - traces/Y360_rep0.json
+  - traces/Y360_rep1.json
+  - traces/Y362_rep0.json
+  - traces/Y362_rep1.json
+  - traces/Y364_rep0.json
+  - traces/Y364_rep1.json
+  - traces/Y365_rep0.json
+  - traces/Y365_rep1.json
+  - traces/Y371_rep0.json
+  - traces/Y371_rep1.json
+  - traces/Y380_rep0.json
+  - traces/Y380_rep1.json
+  - traces/Y383_rep0.json
+  - traces/Y383_rep1.json
+  - traces/Y385_rep0.json
+  - traces/Y385_rep1.json
+  - traces/Y386_rep0.json
+  - traces/Y386_rep1.json
+  - traces/Y389_rep0.json
+  - traces/Y389_rep1.json
+  - traces/Y396_rep0.json
+  - traces/Y396_rep1.json
+  - traces/Y400_rep0.json
+  - traces/Y400_rep1.json

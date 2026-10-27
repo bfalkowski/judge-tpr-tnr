@@ -1,0 +1,4 @@
+{
+ "description": "Make the refund limit a required second step after any rule gives refund (including rule 3's out-of-stock fallback), and say so in both the instructions and the refund/escalate action descriptions.",
+ "target": "system_prompt"
+}

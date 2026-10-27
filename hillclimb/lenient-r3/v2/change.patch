@@ -1,0 +1,14 @@
+--- a/hillclimb/lenient-r3/baseline/artifact.json
++++ b/hillclimb/lenient-r3/v2/artifact.json
+@@ -1,9 +1,9 @@
+ {
+  "decision_instructions": "Which action does the support policy call for on this ticket?",
+  "criteria": {
+-  "0": "refund: refund the order",
++  "0": "refund: refund the order. Only when the order total is $500 or less and either (a) the ticket says the order has not arrived or asks where it is, the order status is Lost or is Shipped with a ship date more than 14 days before today, and stock is 0; or (b) the ticket reports a damaged or wrong item and the order status is Delivered with a delivery date 30 days or less before today",
+   "1": "reship: send a replacement",
+-  "2": "escalate: hand the ticket to a supervisor",
++  "2": "escalate: hand the ticket to a supervisor. Choose it when (a) the ticket says the order has not arrived or asks where it is, the order status is Lost or is Shipped with a ship date more than 14 days before today, stock is 0, and the order total is over $500; or (b) the ticket reports a damaged or wrong item, the order status is Delivered with a delivery date 30 days or less before today, and the order total is over $500; or (c) the ticket reports a damaged or wrong item and the order status is Delivered with a delivery date more than 30 days before today",
+   "3": "reply: reply to the customer and take no other action"
+  }
+ }

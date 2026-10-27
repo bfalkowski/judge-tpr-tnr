@@ -1,0 +1,245 @@
+{
+ "counts": {
+  "artifact_gap": 8,
+  "grader_disagreement": 7,
+  "harness": 0,
+  "structural": 22,
+  "variance": 2
+ },
+ "failures": [
+  {
+   "case": "Y007",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Damaged earbuds delivered 28 days ago, $79: rule 2 says refund and the agent refunded, but the grader failed it while passing escalate on rep 0."
+  },
+  {
+   "case": "Y013",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Lost, out of stock, $501: rule 3 gives refund and rule 4 turns it into escalate; agent refunded at 0.91. Cap miss stayed 0.00 through v1 and v2, which put the cap in the artifact."
+  },
+  {
+   "case": "Y013",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Lost, out of stock, $501: rule 3 refund should become escalate under rule 4; agent refunded at 0.97. Stayed 0.00 through v1 and v2."
+  },
+  {
+   "case": "Y027",
+   "rep": 0,
+   "bucket": "artifact_gap",
+   "reason": "Wrong-item claim but the record shows Shipped 35 days ago and never delivered; no rule covers a damage or wrong-item claim on an undelivered order, agent guessed reply at 0.51."
+  },
+  {
+   "case": "Y027",
+   "rep": 1,
+   "bucket": "artifact_gap",
+   "reason": "Same uncovered conflict between ticket (wrong item received) and record (never delivered); agent guessed reply at 0.52."
+  },
+  {
+   "case": "Y039",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Damaged keyboard delivered exactly 30 days ago, $159: rule 2 says refund for 30 days or less, agent escalated at 0.45 (missed the day boundary or followed the customer's escalation demand)."
+  },
+  {
+   "case": "Y039",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Same 30-day boundary case: rule 2 says refund, agent escalated at 0.57."
+  },
+  {
+   "case": "Y050",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Lost projector, $899, out of stock: rule 3 refund should become escalate under rule 4; agent refunded at 0.99. Stayed 0.00 through v1 and v2."
+  },
+  {
+   "case": "Y050",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Lost projector, $899, out of stock: rule 4 cap not applied, agent refunded at 0.99."
+  },
+  {
+   "case": "Y054",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Shipped 16 days ago, not delivered, $899, out of stock: rule 3 refund should become escalate under rule 4; agent refunded at 0.67."
+  },
+  {
+   "case": "Y054",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Same case: rule 4 cap not applied after rule 3's out-of-stock refund, agent refunded at 0.76."
+  },
+  {
+   "case": "Y061",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Changed mind on a delivered order: rule 5 says reply with return instructions and the agent replied at 0.95; grader failed it though no refund is involved, so rule 4 does not apply."
+  },
+  {
+   "case": "Y061",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Same rule 5 case: agent replied at 0.96, grader failed it."
+  },
+  {
+   "case": "Y083",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Lost projector, $899, out of stock: rule 3 refund should become escalate under rule 4 (customer also asked for a manager); agent refunded at 0.87."
+  },
+  {
+   "case": "Y083",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Same case: rule 4 cap not applied, agent refunded at 0.87."
+  },
+  {
+   "case": "Y084",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Damaged, delivered 28 days ago, $500 (not over $500): rule 2 says refund and the agent refunded; grader failed it but passed refund on the $500 Y138, delivered 33 days ago."
+  },
+  {
+   "case": "Y084",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Same case: refund is what rule 2 calls for and rule 4 does not trigger at exactly $500; grader failed it."
+  },
+  {
+   "case": "Y119",
+   "rep": 0,
+   "bucket": "variance",
+   "reason": "Shipped 24 days, $899, out of stock: rep 0 picked refund at 0.29 and failed, rep 1 picked reply at 0.31 and passed; a near coin flip (the refund also breaks rule 4)."
+  },
+  {
+   "case": "Y124",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Lost projector, $899, out of stock: rule 3 refund should become escalate under rule 4; agent refunded at 0.99. Stayed 0.00 through v1 and v2."
+  },
+  {
+   "case": "Y124",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Same case: rule 4 cap not applied, agent refunded at 0.99."
+  },
+  {
+   "case": "Y133",
+   "rep": 0,
+   "bucket": "artifact_gap",
+   "reason": "Customer says they got someone else's item but the record shows Shipped 30 days ago, never delivered; no rule covers this, agent guessed reship at 0.32 (grader passed reply on similar Y089 and Y396)."
+  },
+  {
+   "case": "Y133",
+   "rep": 1,
+   "bucket": "artifact_gap",
+   "reason": "Same uncovered ticket-versus-record conflict; agent guessed reship at 0.45."
+  },
+  {
+   "case": "Y169",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Changed mind on a delivered soundbar: rule 5 says reply and the agent replied at 0.97; grader failed it though no refund is involved."
+  },
+  {
+   "case": "Y169",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Same rule 5 case: agent replied at 0.96, grader failed it."
+  },
+  {
+   "case": "Y192",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Lost gaming chair, $501, out of stock: rule 3 refund should become escalate under rule 4; agent refunded at 0.87. Stayed 0.00 through v1 and v2."
+  },
+  {
+   "case": "Y192",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Same case: rule 4 cap not applied, agent refunded at 0.96."
+  },
+  {
+   "case": "Y194",
+   "rep": 0,
+   "bucket": "artifact_gap",
+   "reason": "Record says Delivered 33 days ago but the customer says they are still waiting; no rule covers a delivered order reported missing, agent guessed reship at 0.31 even with stock 0."
+  },
+  {
+   "case": "Y194",
+   "rep": 1,
+   "bucket": "artifact_gap",
+   "reason": "Same delivered-but-reported-missing case; agent guessed reship at 0.43 with stock 0."
+  },
+  {
+   "case": "Y282",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Shipped exactly 14 days ago, not delivered: rule 1 says reply for 14 days or less, agent reshipped at 0.60, missing the day boundary."
+  },
+  {
+   "case": "Y282",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Same 14-day boundary case: rule 1 says reply, agent reshipped at 0.45."
+  },
+  {
+   "case": "Y338",
+   "rep": 0,
+   "bucket": "artifact_gap",
+   "reason": "Record says Delivered 32 days ago but the customer says it hasn't arrived; no rule covers this, agent guessed reship at 0.24."
+  },
+  {
+   "case": "Y338",
+   "rep": 1,
+   "bucket": "artifact_gap",
+   "reason": "Same delivered-but-reported-missing case; agent guessed reship at 0.31."
+  },
+  {
+   "case": "Y343",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Shipped 34 days ago, never delivered, $899, out of stock: rule 3 refund should become escalate under rule 4; agent refunded at 0.87."
+  },
+  {
+   "case": "Y343",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Same case: rule 4 cap not applied, agent refunded at 0.84."
+  },
+  {
+   "case": "Y344",
+   "rep": 1,
+   "bucket": "variance",
+   "reason": "Delivered order reported missing: rep 0 picked reply at 0.49 and passed, rep 1 picked reship at 0.31 and failed; same uncovered situation as Y194 and Y338."
+  },
+  {
+   "case": "Y346",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Lost gaming chair, $501, out of stock: rule 3 refund should become escalate under rule 4; agent refunded at 0.97. Stayed 0.00 through v1 and v2."
+  },
+  {
+   "case": "Y346",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Same case: rule 4 cap not applied, agent refunded at 0.95."
+  },
+  {
+   "case": "Y385",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Lost projector, $899, out of stock: rule 3 refund should become escalate under rule 4; agent refunded at 0.99. The one cap case v1 and v2 fixed, and both were reverted."
+  },
+  {
+   "case": "Y385",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Same case: rule 4 cap not applied, agent refunded at 0.99."
+  }
+ ]
+}

@@ -1,0 +1,4 @@
+{
+ "description": "Rewrite the refund and escalate descriptions as complete condition lists, so an undelivered order that is Lost or shipped more than 14 days ago, has stock 0 and a total over $500 matches escalate, and refund only matches totals of $500 or less.",
+ "target": "system_prompt"
+}

@@ -1,0 +1,14 @@
+--- a/hillclimb/lenient-r2/baseline/artifact.json
++++ b/hillclimb/lenient-r2/v2/artifact.json
+@@ -1,9 +1,9 @@
+ {
+  "decision_instructions": "Which action does the support policy call for on this ticket?",
+  "criteria": {
+-  "0": "refund: refund the order",
++  "0": "refund: refund the order. Only for an order whose total is $500 or less. If the policy's outcome is a refund and the order total is over $500, the action is escalate (rule 4), whichever rule produced the refund.",
+   "1": "reship: send a replacement",
+-  "2": "escalate: hand the ticket to a supervisor",
++  "2": "escalate: hand the ticket to a supervisor. Besides the cases the policy sends to a supervisor directly, this replaces every refund over $500, including rule 3's refund for a Lost order, or one shipped more than 14 days ago and not delivered, whose item is out of stock.",
+   "3": "reply: reply to the customer and take no other action"
+  }
+ }

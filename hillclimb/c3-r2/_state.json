@@ -1,5 +1,5 @@
 {
- "current_round": 0,
+ "current_round": 2,
  "reps": 2,
  "approve_each_round": false,
  "goal": {
@@ -8,12 +8,12 @@
   "hold": []
  },
  "best": {
-  "round": 0,
-  "name": "baseline",
-  "test_score": 0.7708333333333334,
-  "train_score": 0.7791666666666667
+  "round": 2,
+  "name": "v2",
+  "test_score": 0.8666666666666667,
+  "train_score": 0.9291666666666667
  },
- "current": "baseline",
+ "current": "v2",
  "train_ids": [
   "Y007",
   "Y011",
@@ -298,10 +298,44 @@
   "hillclimb/hc.py",
   "hillclimb/arms.json"
  ],
- "history": [],
+ "history": [
+  {
+   "round": "v1",
+   "change": "Make the rule 4 refund-limit check an explicit last step for every refund outcome (including rule 3's out-of-stock fallback) in the instructions and in the refund and escalate action descriptions, and say that the limit never converts reship or reply.",
+   "train": 0.8541666666666666,
+   "test": 0.7916666666666666,
+   "rerun_test": null,
+   "decision": "keep",
+   "reason": "train and test both rose",
+   "best_after": "v1",
+   "best_test_rise": 0.02083333333333326
+  },
+  {
+   "round": "v2",
+   "change": "Make the order record (status, shipped_on, delivered_on, stock), not the ticket's framing, pick the policy rule: add a status-first decision table to the instructions and state in the reship and reply descriptions which record states they cover, keeping the v1 refund-limit check as the last step.",
+   "train": 0.9291666666666667,
+   "test": 0.8666666666666667,
+   "rerun_test": null,
+   "decision": "keep",
+   "reason": "train and test both rose",
+   "best_after": "v2",
+   "best_test_rise": 0.07500000000000007
+  },
+  {
+   "round": "v3",
+   "change": "No change proposed: the top failure behavior (Jev misjudging whether shipped_on or delivered_on falls inside the 14-day or 30-day window when the date is within a few days of the cutoff) costs only 14 of 240 train rows (5.8 points), which is inside the 6.5-point noise floor even if fully fixed.",
+   "train": null,
+   "test": null,
+   "rerun_test": null,
+   "decision": "none",
+   "reason": "the analyzer proposed no change",
+   "best_after": "v2",
+   "best_test_rise": 0.0
+  }
+ ],
  "flat_streak": 0,
  "categorized": false,
- "stopped": null,
+ "stopped": "the analyzer proposed no change",
  "baseline_check": {
   "train": 0.7791666666666667,
   "test": 0.7708333333333334,

@@ -1,0 +1,4 @@
+{
+ "description": "Replace the decision instructions with a status-first decision table (Processing / Lost / Shipped up to 14 days / Shipped over 14 days / Delivered) driven by the order record and an explicit day-count method, saying the ticket's story and requests never override the record, and tighten the four action descriptions to the same status and day gates.",
+ "target": "system_prompt"
+}

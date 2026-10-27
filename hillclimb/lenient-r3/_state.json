@@ -1,5 +1,5 @@
 {
- "current_round": 0,
+ "current_round": 2,
  "reps": 2,
  "approve_each_round": false,
  "goal": {
@@ -298,14 +298,58 @@
   "hillclimb/hc.py",
   "hillclimb/arms.json"
  ],
- "history": [],
- "flat_streak": 0,
- "categorized": false,
- "stopped": null,
+ "history": [
+  {
+   "round": "v1",
+   "change": "Make the over-limit refund rule apply to every refund, including the out-of-stock fallback refund, by telling Jev to check each refund against the order-total limit and choose escalate when the total is over it (instructions plus the refund and escalate descriptions).",
+   "train": 0.8083333333333333,
+   "test": 0.85,
+   "rerun_test": null,
+   "decision": "revert",
+   "reason": "test did not rise",
+   "best_after": "baseline",
+   "best_test_rise": 0.0
+  },
+  {
+   "round": "v2",
+   "change": "Rewrite the refund and escalate descriptions as complete condition lists, so an undelivered order that is Lost or shipped more than 14 days ago, has stock 0 and a total over $500 matches escalate, and refund only matches totals of $500 or less.",
+   "train": 0.8333333333333334,
+   "test": 0.8458333333333333,
+   "rerun_test": null,
+   "decision": "revert",
+   "reason": "test did not rise",
+   "best_after": "baseline",
+   "best_test_rise": 0.0
+  },
+  {
+   "round": "v3",
+   "change": "No change proposed: the only behavior big enough to clear the noise floor (Jev skips the $500 limit on the rule-3 out-of-stock refund, 19 rows, 7.9 points) has already resisted both in-scope levers, and every other behavior costs 3 points or less.",
+   "train": null,
+   "test": null,
+   "rerun_test": null,
+   "decision": "none",
+   "reason": "the analyzer proposed no change",
+   "best_after": "baseline",
+   "best_test_rise": 0.0
+  }
+ ],
+ "flat_streak": 2,
+ "categorized": true,
+ "stopped": "the analyzer proposed no change",
  "baseline_check": {
   "train": 0.8375,
   "test": 0.8916666666666667,
   "gap": 0.054166666666666696,
   "within_noise": true
+ },
+ "categorization": {
+  "after": "v2",
+  "counts": {
+   "artifact_gap": 9,
+   "grader_disagreement": 7,
+   "harness": 0,
+   "structural": 23,
+   "variance": 0
+  }
  }
 }

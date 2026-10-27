@@ -1,5 +1,5 @@
 {
- "current_round": 0,
+ "current_round": 2,
  "reps": 2,
  "approve_each_round": false,
  "goal": {
@@ -298,14 +298,58 @@
   "hillclimb/hc.py",
   "hillclimb/arms.json"
  ],
- "history": [],
- "flat_streak": 0,
- "categorized": false,
- "stopped": null,
+ "history": [
+  {
+   "round": "v1",
+   "change": "Make the refund limit a required second step after any rule gives refund (including rule 3's out-of-stock fallback), and say so in both the instructions and the refund/escalate action descriptions.",
+   "train": 0.8041666666666667,
+   "test": 0.8458333333333333,
+   "rerun_test": null,
+   "decision": "revert",
+   "reason": "test did not rise",
+   "best_after": "baseline",
+   "best_test_rise": 0.0
+  },
+  {
+   "round": "v2",
+   "change": "Keep the instructions as they are and put the $500 refund limit into the refund and escalate action descriptions: refund is only allowed on orders of $500 or less, and escalate takes over every refund above $500, including rule 3's out-of-stock refund.",
+   "train": 0.8291666666666667,
+   "test": 0.8666666666666667,
+   "rerun_test": null,
+   "decision": "revert",
+   "reason": "test did not rise",
+   "best_after": "baseline",
+   "best_test_rise": 0.0
+  },
+  {
+   "round": "v3",
+   "change": "No change: the only failure big enough to clear the noise floor (the $500 cap skipped after rule 3's out-of-stock refund, 10 cases, 19 rows, 7.9 points) was already targeted through every in-scope lever in v1 and v2 for a net gain of 1 row, and every other failure costs 7 rows or fewer.",
+   "train": null,
+   "test": null,
+   "rerun_test": null,
+   "decision": "none",
+   "reason": "the analyzer proposed no change",
+   "best_after": "baseline",
+   "best_test_rise": 0.0
+  }
+ ],
+ "flat_streak": 2,
+ "categorized": true,
+ "stopped": "the analyzer proposed no change",
  "baseline_check": {
   "train": 0.8375,
   "test": 0.8916666666666667,
   "gap": 0.054166666666666696,
   "within_noise": true
+ },
+ "categorization": {
+  "after": "v2",
+  "counts": {
+   "artifact_gap": 8,
+   "grader_disagreement": 7,
+   "harness": 0,
+   "structural": 22,
+   "variance": 2
+  }
  }
 }

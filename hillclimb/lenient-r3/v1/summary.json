@@ -1,0 +1,4 @@
+{
+ "description": "Make the over-limit refund rule apply to every refund, including the out-of-stock fallback refund, by telling Jev to check each refund against the order-total limit and choose escalate when the total is over it (instructions plus the refund and escalate descriptions).",
+ "target": "system_prompt"
+}
