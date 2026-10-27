@@ -1,0 +1,4 @@
+{
+ "description": "Put the composed \"rule 3 out-of-stock refund + rule 4 over-$500 limit = escalate\" condition into the escalate and refund action descriptions in state-field terms, add \"total does not matter\" guards to reply and reship, and leave decision_instructions unchanged.",
+ "target": "system_prompt"
+}

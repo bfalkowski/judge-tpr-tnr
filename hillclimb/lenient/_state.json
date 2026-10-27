@@ -1,5 +1,5 @@
 {
- "current_round": 1,
+ "current_round": 2,
  "reps": 2,
  "approve_each_round": false,
  "goal": {
@@ -309,9 +309,20 @@
    "reason": "test did not rise",
    "best_after": "baseline",
    "best_test_rise": 0.0
+  },
+  {
+   "round": "v2",
+   "change": "Put the composed \"rule 3 out-of-stock refund + rule 4 over-$500 limit = escalate\" condition into the escalate and refund action descriptions in state-field terms, add \"total does not matter\" guards to reply and reship, and leave decision_instructions unchanged.",
+   "train": 0.8375,
+   "test": 0.8625,
+   "rerun_test": null,
+   "decision": "revert",
+   "reason": "test did not rise",
+   "best_after": "baseline",
+   "best_test_rise": 0.0
   }
  ],
- "flat_streak": 1,
+ "flat_streak": 2,
  "categorized": false,
  "stopped": null,
  "baseline_check": {
