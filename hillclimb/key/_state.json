@@ -331,11 +331,22 @@
    "reason": "train and test both rose",
    "best_after": "v3",
    "best_test_rise": 0.09583333333333333
+  },
+  {
+   "round": "v4",
+   "change": "No change: v3 passes all 240 train rows (120 cases x 2 reps), so no behavior is costing pass and no fix can clear the 6.5-point noise floor.",
+   "train": null,
+   "test": null,
+   "rerun_test": null,
+   "decision": "none",
+   "reason": "the analyzer proposed no change",
+   "best_after": "v3",
+   "best_test_rise": 0.0
   }
  ],
  "flat_streak": 0,
  "categorized": true,
- "stopped": null,
+ "stopped": "the analyzer proposed no change",
  "baseline_check": {
   "train": 0.8083333333333333,
   "test": 0.7916666666666666,
