@@ -7,8 +7,13 @@
   "direction": "higher",
   "hold": []
  },
- "best": null,
- "current": null,
+ "best": {
+  "round": 0,
+  "name": "baseline",
+  "test_score": 0.7708333333333334,
+  "train_score": 0.7791666666666667
+ },
+ "current": "baseline",
  "train_ids": [
   "Y007",
   "Y011",
@@ -296,5 +301,11 @@
  "history": [],
  "flat_streak": 0,
  "categorized": false,
- "stopped": null
+ "stopped": null,
+ "baseline_check": {
+  "train": 0.7791666666666667,
+  "test": 0.7708333333333334,
+  "gap": 0.008333333333333304,
+  "within_noise": true
+ }
 }
