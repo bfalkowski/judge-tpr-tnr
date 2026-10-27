@@ -1,0 +1,4 @@
+{
+ "description": "Make escalate selectable outside the numbered rules: the escalate description now covers explicit requests for a supervisor/manager/escalation and tickets that contradict the order record, and the instructions say to check those conditions before applying the rules.",
+ "target": "system_prompt"
+}

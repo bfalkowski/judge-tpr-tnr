@@ -12,3 +12,9 @@ Each entry is recorded when it is made, with what was known at the time.
    sandbox: the harness's saved copy of its own command output (a table it computed from the sandbox's traces and
    results), which the harness wrote elsewhere because it was too large to show inline. It holds only data derived
    from the sandbox, so the proposal is applied as written.
+
+3. **2026-10-27, after key's categorization round: the next analyzers see the categorization.** The skill says to
+   dispatch per bucket after a categorization rather than run another content round blind. In this study the only
+   way to act on a bucket is through the next analyzer, so from here on, in every arm, a content round after a
+   categorization gets its summary (`categorization.md` in the sandbox). Its suggestion to move date arithmetic into
+   code is outside the scope and is not acted on by the outer session.

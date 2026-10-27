@@ -1,0 +1,9 @@
+{
+ "decision_instructions": "Which action does the support policy call for on this ticket?",
+ "criteria": {
+  "0": "refund: refund the order. Only when the order total is $500 or less (a total of exactly $500 is still refunded).",
+  "1": "reship: send a replacement. The order total does not matter for a reship.",
+  "2": "escalate: hand the ticket to a supervisor. Also the action whenever the policy would otherwise refund an order whose total is over $500. That includes a missing order that is out of stock (stock 0) and is either status Lost, whatever its ship date, or shipped more than 14 days before today with no delivery date.",
+  "3": "reply: reply to the customer and take no other action. The order total does not matter for a reply."
+ }
+}

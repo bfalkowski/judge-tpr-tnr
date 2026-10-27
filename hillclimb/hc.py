@@ -360,6 +360,11 @@ def cmd_sandbox(a):
                                           for h in st["history"]]
     if len(hist) == 2:
         hist.append("- none yet")
+    if st.get("categorization") and not a.categorize:
+        c = st["categorization"]
+        shutil.copy(flow(arm, f"categorize_after_{c['after']}", "change.md"), os.path.join(sb, "categorization.md"))
+        hist += ["", f"A categorization round ran after {c['after']}. Its summary is in categorization.md "
+                     "(read it; it is part of this round's input)."]
     hist += ["", f"The current version is {cur}. The traces and results here are the current version's."]
     open(os.path.join(sb, "history.md"), "w").write("\n".join(hist) + "\n")
     nf = st["noise_floor"]
