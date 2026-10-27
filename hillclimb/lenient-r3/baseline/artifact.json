@@ -1,0 +1,9 @@
+{
+ "decision_instructions": "Which action does the support policy call for on this ticket?",
+ "criteria": {
+  "0": "refund: refund the order",
+  "1": "reship: send a replacement",
+  "2": "escalate: hand the ticket to a supervisor",
+  "3": "reply: reply to the customer and take no other action"
+ }
+}
