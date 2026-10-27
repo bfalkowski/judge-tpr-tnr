@@ -1,5 +1,5 @@
 {
- "current_round": 1,
+ "current_round": 2,
  "reps": 2,
  "approve_each_round": false,
  "goal": {
@@ -8,12 +8,12 @@
   "hold": []
  },
  "best": {
-  "round": 1,
-  "name": "v1",
-  "test_score": 0.8166666666666667,
-  "train_score": 0.8791666666666667
+  "round": 2,
+  "name": "v2",
+  "test_score": 0.8791666666666667,
+  "train_score": 0.9291666666666667
  },
- "current": "v1",
+ "current": "v2",
  "train_ids": [
   "Y007",
   "Y011",
@@ -309,9 +309,20 @@
    "reason": "train and test both rose",
    "best_after": "v1",
    "best_test_rise": 0.025000000000000022
+  },
+  {
+   "round": "v2",
+   "change": "Make the record decide the branch: compare shipped_on/delivered_on to 14- and 30-day cutoff dates, gate each rule on the record status, and say that the customer's account and demands do not change status or action. Mirror this in all four action descriptions.",
+   "train": 0.9291666666666667,
+   "test": 0.8791666666666667,
+   "rerun_test": null,
+   "decision": "keep",
+   "reason": "train and test both rose",
+   "best_after": "v2",
+   "best_test_rise": 0.0625
   }
  ],
- "flat_streak": 1,
+ "flat_streak": 2,
  "categorized": false,
  "stopped": null,
  "baseline_check": {
