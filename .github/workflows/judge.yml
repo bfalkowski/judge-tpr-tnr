@@ -10,7 +10,7 @@ on:
         default: v2
       split:
         type: choice
-        options: [dev, train, test, prod]
+        options: [dev, train, test, prod, all]
         default: dev
       repeats:
         default: "2"
