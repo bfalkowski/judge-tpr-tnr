@@ -77,8 +77,8 @@ choice to the user or to judgment, this study fixes it in advance:
   told to read nothing outside the sandbox and to list the files it read. The prompt is `hillclimb/prompts/analyzer.md`.
 - **De-fluff:** the analyzer does the de-fluff pass itself. The outer session applies the proposed artifact verbatim,
   so nothing it knows about the answer key can enter a change.
-- **Keep or revert** (`hillclimb/decide.py`), on the arm's grader, comparing the candidate with the current version:
-  keep when train and test both rise; revert when train rises and test does not, or when train falls; when test rises
+- **Keep or revert** (`decide()` in `hillclimb/hc.py`), on the arm's grader, comparing the candidate with the current version:
+  keep when train and test both rise; revert when test does not rise; when test rises
   and train does not, run the candidate once more and keep it only if test rises again. The current version is always
   the best kept version so far.
 - **Stall:** after two consecutive rounds in which the best test score does not rise by at least the noise floor, one
@@ -90,9 +90,9 @@ choice to the user or to judgment, this study fixes it in advance:
   reported (Section "Measures"), but the loop proceeds in every arm whatever they show. This is what lets the study see
   what each check would have caught.
 
-The outer session (Claude, running this study) makes keep, revert and stop decisions only from `decide.py`'s output,
+The outer session (Claude, running this study) makes keep, revert and stop decisions only from `hc.py decide`'s output,
 which reads the arm's grader scores on climb_train and climb_test. Answer-key scores and everything on holdout are
-written by `hillclimb/score.py` to `hillclimb/_sealed/` and are not opened until every arm has stopped.
+written by `hc.py ingest` to `hillclimb/_sealed/` and are not opened until every arm has stopped.
 
 ## Measures
 
