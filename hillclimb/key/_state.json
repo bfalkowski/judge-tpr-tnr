@@ -1,5 +1,5 @@
 {
- "current_round": 0,
+ "current_round": 1,
  "reps": 2,
  "approve_each_round": false,
  "goal": {
@@ -8,12 +8,12 @@
   "hold": []
  },
  "best": {
-  "round": 0,
-  "name": "baseline",
-  "test_score": 0.7916666666666666,
-  "train_score": 0.8083333333333333
+  "round": 1,
+  "name": "v1",
+  "test_score": 0.8166666666666667,
+  "train_score": 0.8791666666666667
  },
- "current": "baseline",
+ "current": "v1",
  "train_ids": [
   "Y007",
   "Y011",
@@ -298,8 +298,20 @@
   "hillclimb/hc.py",
   "hillclimb/arms.json"
  ],
- "history": [],
- "flat_streak": 0,
+ "history": [
+  {
+   "round": "v1",
+   "change": "Make the $500 refund cap (policy rule 4) an explicit second step that applies to every refund, including the out-of-stock refund on never-arrived/Lost orders, and say in the refund/escalate descriptions that refund is only for totals of $500 or less.",
+   "train": 0.8791666666666667,
+   "test": 0.8166666666666667,
+   "rerun_test": null,
+   "decision": "keep",
+   "reason": "train and test both rose",
+   "best_after": "v1",
+   "best_test_rise": 0.025000000000000022
+  }
+ ],
+ "flat_streak": 1,
  "categorized": false,
  "stopped": null,
  "baseline_check": {
