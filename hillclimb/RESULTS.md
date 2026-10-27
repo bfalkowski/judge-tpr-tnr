@@ -122,6 +122,79 @@ TPR and TNR on the baseline's train decisions without the damage_open tickets: k
 - true 1->0, grader 1->0: 9
 - true 1->0, grader 1->1: 2
 
+## How much of each change the grader saw (climb_train and climb_test rows, against the version it was compared with)
+
+J_fix is the grader's net credit per truly fixed row; J_break its net charge per truly broken row. A grader with one TPR and TNR for every row would have both equal to TPR + TNR - 1.
+
+| Arm | Round | Against | Decision | Fixed | Credited | J_fix | Broken | Charged | J_break | True change (rows) | Grader change (rows) |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| key | v1 | baseline | keep | 38 | 38 | 1.00 | 15 | 15 | 1.00 | +23 | +23 |
+| key | v2 | v1 | keep | 62 | 62 | 1.00 | 35 | 35 | 1.00 | +27 | +27 |
+| key | v3 | v2 | keep | 42 | 42 | 1.00 | 2 | 2 | 1.00 | +40 | +40 |
+| c3 | v1 | baseline | keep | 32 | 31 | 0.97 | 12 | 6 | 0.50 | +20 | +25 |
+| c3 | v2 | v1 | revert | 20 | 15 | 0.75 | 46 | 19 | 0.41 | -26 | -1 |
+| c3 | v3 | v1 | keep | 30 | 17 | 0.57 | 20 | 2 | 0.10 | +10 | +15 |
+| p2 | v1 | baseline | revert | 10 | -2 | -0.20 | 68 | 18 | 0.26 | -58 | -26 |
+| p2 | v2 | baseline | revert | 5 | 1 | 0.20 | 37 | 6 | 0.16 | -32 | -8 |
+| lenient | v1 | baseline | revert | 36 | 0 | 0.00 | 23 | 15 | 0.65 | +13 | -15 |
+| lenient | v2 | baseline | revert | 36 | 0 | 0.00 | 10 | 7 | 0.70 | +26 | -7 |
+
+## Labelling only the changed rows (retrospective)
+
+If a person had labelled k random rows whose action changed (climb_train and climb_test), how often the labelled net change has the same sign as the true net change (5,000 draws; a labelled net of 0 counts as a miss).
+
+| Arm | Round | Changed rows (of all) | True net change | k = 10 | k = 20 | k = 30 |
+|---|---|---|---|---|---|---|
+| key | v1 | 63 of 480 | +23 | 90% | 98% | 100% |
+| key | v2 | 97 of 480 | +27 | 74% | 88% | 95% |
+| key | v3 | 44 of 480 | +40 | 100% | 100% | 100% |
+| c3 | v1 | 54 of 480 | +20 | 90% | 99% | 100% |
+| c3 | v2 | 69 of 480 | -26 | 88% | 98% | 100% |
+| c3 | v3 | 50 of 480 | +10 | 64% | 82% | 93% |
+| p2 | v1 | 94 of 480 | -58 | 99% | 100% | 100% |
+| p2 | v2 | 57 of 480 | -32 | 100% | 100% | 100% |
+| lenient | v1 | 69 of 480 | +13 | 70% | 83% | 91% |
+| lenient | v2 | 56 of 480 | +26 | 96% | 100% | 100% |
+
+## True change on holdout by kind of ticket, each round against the version it was compared with (points)
+
+- key v1: damage_early -0.3, damage_open -0.6, never_came_delivered -0.3, other +0.6, over_limit_out_of_stock +2.5; total +1.9
+- key v2: damage_early +0.6, damage_open +1.2, never_came_delivered +1.9, other +8.1, over_limit_out_of_stock +0.0; total +11.8
+- key v3: damage_early +0.0, damage_open +0.0, never_came_delivered +0.0, other +6.9, over_limit_out_of_stock +0.0; total +6.9
+- c3 v1: damage_early -0.3, damage_open -0.6, never_came_delivered +0.3, other +0.3, over_limit_out_of_stock +2.5; total +2.2
+- c3 v2: damage_early -0.3, damage_open -2.5, never_came_delivered +0.6, other -0.9, over_limit_out_of_stock +0.0; total -3.1
+- c3 v3: damage_early +0.0, damage_open -1.9, never_came_delivered +1.2, other +3.4, over_limit_out_of_stock +0.0; total +2.7
+- p2 v1: damage_early -0.9, damage_open -3.1, never_came_delivered -2.8, other -1.9, over_limit_out_of_stock +0.6; total -8.1
+- p2 v2: damage_early -0.9, damage_open -3.1, never_came_delivered -1.6, other +0.9, over_limit_out_of_stock +0.3; total -4.4
+- lenient v1: damage_early -0.3, damage_open -1.2, never_came_delivered -0.9, other -0.0, over_limit_out_of_stock +2.5; total +0.1
+- lenient v2: damage_early +0.3, damage_open -0.6, never_came_delivered -0.6, other +3.4, over_limit_out_of_stock +2.5; total +5.0
+
+c3's TNR on test and holdout mistakes, baseline against winner: per row 109 of 116 against 76 of 90 (Fisher p = 0.035, but the two reps of a ticket are not independent); one rep per ticket 53 of 57 against 38 of 45 (p = 0.207).
+
+## Noise
+
+Re-running the same version (the baseline's two runs, validation split):
+
+- key: 2 of 120 tickets graded differently between runs; 95% half-width for comparing two 2-run versions 1.6 points
+- c3: 1 of 120 tickets graded differently between runs; 95% half-width for comparing two 2-run versions 1.2 points
+- p2: 1 of 120 tickets graded differently between runs; 95% half-width for comparing two 2-run versions 1.2 points
+- lenient: 0 of 120 tickets graded differently between runs; 95% half-width for comparing two 2-run versions 0.0 points
+
+Each round's change on the validation split (climb_test), with 95% paired intervals over tickets:
+
+| Arm | Round | Against | Decision | Grader change [95% CI] | True change [95% CI] |
+|---|---|---|---|---|---|
+| key | v1 | baseline | keep | +2.5 [-2.1, +7.1] | +2.5 [-2.1, +7.1] |
+| key | v2 | v1 | keep | +6.2 [-1.7, +14.6] | +6.2 [-1.7, +14.6] |
+| key | v3 | v2 | keep | +9.6 [+4.6, +15.0] | +9.6 [+4.6, +15.0] |
+| c3 | v1 | baseline | keep | +2.9 [+0.0, +6.7] | +2.1 [-1.3, +5.8] |
+| c3 | v2 | v1 | revert | -2.5 [-7.9, +2.9] | -6.2 [-11.7, -0.8] |
+| c3 | v3 | v1 | keep | +1.7 [-3.7, +7.1] | +2.1 [-4.2, +7.9] |
+| p2 | v1 | baseline | revert | -7.1 [-12.1, -2.9] | -10.0 [-16.7, -4.2] |
+| p2 | v2 | baseline | revert | -2.9 [-5.8, -0.4] | -5.0 [-9.6, -1.2] |
+| lenient | v1 | baseline | revert | -4.6 [-8.3, -1.3] | -0.8 [-6.2, +4.2] |
+| lenient | v2 | baseline | revert | -2.9 [-6.2, -0.4] | +2.5 [-2.1, +7.1] |
+
 ## Stall categorization
 
 - key (after v2): {'artifact_gap': 0, 'grader_disagreement': 0, 'harness': 0, 'structural': 12, 'variance': 5}. Grader-disagreement calls: 0, of which real judge errors: 0. Real false fails among the 17 train failures: 0.

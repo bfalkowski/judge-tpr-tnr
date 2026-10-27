@@ -297,8 +297,134 @@ def open_case_verdicts():
     return out
 
 
+def visibility_by_round(arm, splits=("climb_train", "climb_test")):
+    """For each round, against the version it was compared with: the rows the change truly fixed and broke, and how
+    much of each the grader saw. J_fix = net grader credit per fixed row; J_break = net grader charge per broken row.
+    With one TPR and TNR for every row both would equal TPR + TNR - 1 (Youden's J)."""
+    st = hc.state(arm)
+    cur, out = "baseline", []
+    for h in [h for h in st["history"] if h["decision"] != "none"]:
+        a = {(x["ticket_id"], x["rep"]): x for x in sealed(arm, cur)}
+        fx, bk, oth = [], [], []
+        for x in sealed(arm, h["round"]):
+            if x["split"] not in splits:
+                continue
+            o = a[(x["ticket_id"], x["rep"])]
+            d = x["grader"] - o["grader"]
+            (fx if (o["true"], x["true"]) == (0, 1) else bk if (o["true"], x["true"]) == (1, 0) else oth).append(d)
+        out.append({"round": h["round"], "against": cur, "decision": h["decision"], "fixed": len(fx), "fix_credit": sum(fx),
+                    "broken": len(bk), "break_charge": -sum(bk), "other": sum(oth),
+                    "j_fix": sum(fx) / len(fx) if fx else None, "j_break": -sum(bk) / len(bk) if bk else None,
+                    "true_change_rows": len(fx) - len(bk), "grader_change_rows": sum(fx) + sum(bk) + sum(oth)})
+        if h["decision"] == "keep":
+            cur = h["round"]
+    return out
+
+
+def label_the_diff(arm, ks=(10, 20, 30), draws=5000, splits=("climb_train", "climb_test")):
+    """Retrospective: if a person had labelled k random rows whose action changed in a round, how often would the
+    labelled net change (fixes minus breaks) have the same sign as the true net change over every changed row?"""
+    st = hc.state(arm)
+    cur, out = "baseline", []
+    for h in [h for h in st["history"] if h["decision"] != "none"]:
+        a = {(x["ticket_id"], x["rep"]): x for x in sealed(arm, cur)}
+        P = [(a[(x["ticket_id"], x["rep"])], x) for x in sealed(arm, h["round"])
+             if x["split"] in splits and a[(x["ticket_id"], x["rep"])]["action"] != x["action"]]
+        true = sum(n["true"] - o["true"] for o, n in P)
+        rng, agree = random.Random(0), {}
+        for k in ks:
+            ok = 0
+            for _ in range(draws):
+                est = sum(n["true"] - o["true"] for o, n in rng.sample(P, min(k, len(P))))
+                ok += est != 0 and (est > 0) == (true > 0)
+            agree[k] = ok / draws
+        out.append({"round": h["round"], "changed_rows": len(P), "rows_total": sum(1 for x in sealed(arm, h["round"]) if x["split"] in splits),
+                    "true_net": true, "agree": agree})
+        if h["decision"] == "keep":
+            cur = h["round"]
+    return out
+
+
+def kind(t):
+    """category(), plus the second case the policy text leaves open: "never came" on an order the record shows Delivered."""
+    c = category(t)
+    if c is None and t["issue"] in ("not_arrived", "where_is_it") and t["order"]["status"] == "Delivered":
+        return "never_came_delivered"
+    return c or "other"
+
+
+def holdout_change_by_kind(arm):
+    """Each round's true change on holdout against the version it was compared with, in points, split by kind."""
+    T = hc.tickets()
+    st = hc.state(arm)
+    cur, out = "baseline", {}
+    for h in [h for h in st["history"] if h["decision"] != "none"]:
+        a = {(x["ticket_id"], x["rep"]): x for x in sealed(arm, cur)}
+        rows = [x for x in sealed(arm, h["round"]) if x["split"] == "holdout"]
+        d = defaultdict(float)
+        for x in rows:
+            d[kind(T[x["ticket_id"]])] += (x["true"] - a[(x["ticket_id"], x["rep"])]["true"]) / len(rows)
+        out[h["round"]] = {k: round(100 * v, 1) for k, v in sorted(d.items())}
+        if h["decision"] == "keep":
+            cur = h["round"]
+    return out
+
+
+def tnr_drop_c3():
+    """c3's TNR on test and holdout mistakes, baseline against winner, counted per row and with one rep per ticket."""
+    def fisher(a, b, c, d):
+        import math
+        n, r1, c1 = a + b + c + d, a + b, a + c
+        pr = lambda x: math.comb(r1, x) * math.comb(n - r1, c1 - x) / math.comb(n, c1)
+        p0 = pr(a)
+        return sum(pr(x) for x in range(max(0, c1 - (n - r1)), min(r1, c1) + 1) if pr(x) <= p0 + 1e-12)
+    st = hc.state("c3")
+    out = {}
+    for label, reps in (("rows", (0, 1)), ("rep0", (0,))):
+        b = [r for r in sealed("c3", "baseline") if r["split"] in ("climb_test", "holdout") and not r["true"] and r["rep"] in reps]
+        w = [r for r in sealed("c3", st["best"]["name"]) if r["split"] in ("climb_test", "holdout") and not r["true"] and r["rep"] in reps]
+        bt, wt = sum(1 - r["grader"] for r in b), sum(1 - r["grader"] for r in w)
+        out[label] = {"baseline": [bt, len(b)], "winner": [wt, len(w)], "p": fisher(bt, len(b) - bt, wt, len(w) - wt)}
+    return out
+
+
+def rerun_noise(arm, name="baseline", split="climb_test"):
+    """Noise from re-running the same version: tickets whose grade differs between the two runs, and the 95%
+    half-width this implies for comparing two versions that each average two runs (Var(D_t) = Var(rep1 - rep0) / 2)."""
+    by = defaultdict(dict)
+    for r in sealed(arm, name):
+        if r["split"] == split:
+            by[r["ticket_id"]][r["rep"]] = r["grader"]
+    d = [v[1] - v[0] for v in by.values()]
+    return {"tickets_differing": sum(1 for x in d if x), "tickets": len(d),
+            "half_width": 1.96 * (sum(x * x for x in d) / 2) ** 0.5 / len(d)}
+
+
+def round_intervals(arm, split="climb_test"):
+    """Each round's change on the validation split against the version it was compared with, for the grader and the
+    answer key, with 95% paired intervals that resample tickets."""
+    st = hc.state(arm)
+    cur, out = "baseline", []
+    for h in [h for h in st["history"] if h["decision"] != "none"]:
+        a, b = sealed(arm, cur), sealed(arm, h["round"])
+        row = {"round": h["round"], "against": cur, "decision": h["decision"]}
+        for f in ("grader", "true"):
+            row[f] = by_split(b, f, [split]) - by_split(a, f, [split])
+            row[f + "_ci"] = boot_diff(a, b, f, [split])
+        out.append(row)
+        if h["decision"] == "keep":
+            cur = h["round"]
+    return out
+
+
 def main():
     res = {"arms": {}, "pre_loop": {}, "categorization": {}}
+    res["rerun_noise"] = {arm: rerun_noise(arm) for arm in ARMS}
+    res["round_intervals"] = {arm: round_intervals(arm) for arm in ARMS}
+    res["holdout_change_by_kind"] = {arm: holdout_change_by_kind(arm) for arm in ARMS}
+    res["tnr_drop_c3"] = tnr_drop_c3()
+    res["visibility"] = {arm: visibility_by_round(arm) for arm in ARMS}
+    res["label_the_diff"] = {arm: label_the_diff(arm) for arm in ARMS}
     res["rates_without_open_case"] = {arm: rates_without_open(arm) for arm in ARMS}
     res["open_case_verdicts"] = open_case_verdicts()
     res["agreement_check_power"] = {arm: agreement_check_power(arm) for arm in ARMS}
@@ -385,6 +511,41 @@ def report(res):
     L += ["", "## lenient v2 against baseline: rows whose action changed (climb_test and holdout)", ""]
     for k, v in res["lenient_v2_visibility"].items():
         L.append(f"- {k}: {v}")
+    L += ["", "## How much of each change the grader saw (climb_train and climb_test rows, against the version it was compared with)", "",
+          "J_fix is the grader's net credit per truly fixed row; J_break its net charge per truly broken row. A grader with one TPR and TNR for every row would have both equal to TPR + TNR - 1.", "",
+          "| Arm | Round | Against | Decision | Fixed | Credited | J_fix | Broken | Charged | J_break | True change (rows) | Grader change (rows) |",
+          "|---|---|---|---|---|---|---|---|---|---|---|---|"]
+    f2 = lambda v: "n/a" if v is None else f"{v:.2f}"
+    for arm, vs in res["visibility"].items():
+        for v in vs:
+            L.append(f"| {arm} | {v['round']} | {v['against']} | {v['decision']} | {v['fixed']} | {v['fix_credit']} | {f2(v['j_fix'])} | "
+                     f"{v['broken']} | {v['break_charge']} | {f2(v['j_break'])} | {v['true_change_rows']:+d} | {v['grader_change_rows']:+d} |")
+    L += ["", "## Labelling only the changed rows (retrospective)", "",
+          "If a person had labelled k random rows whose action changed (climb_train and climb_test), how often the labelled net change has the same sign as the true net change (5,000 draws; a labelled net of 0 counts as a miss).", "",
+          "| Arm | Round | Changed rows (of all) | True net change | k = 10 | k = 20 | k = 30 |", "|---|---|---|---|---|---|---|"]
+    for arm, vs in res["label_the_diff"].items():
+        for v in vs:
+            L.append(f"| {arm} | {v['round']} | {v['changed_rows']} of {v['rows_total']} | {v['true_net']:+d} | "
+                     + " | ".join(f"{100 * v['agree'][k]:.0f}%" for k in (10, 20, 30)) + " |")
+    L += ["", "## True change on holdout by kind of ticket, each round against the version it was compared with (points)", ""]
+    for arm, vs in res["holdout_change_by_kind"].items():
+        for rd, d in vs.items():
+            L.append(f"- {arm} {rd}: " + ", ".join(f"{k} {v:+.1f}" for k, v in d.items()) + f"; total {sum(d.values()):+.1f}")
+    t = res["tnr_drop_c3"]
+    L += ["", "c3's TNR on test and holdout mistakes, baseline against winner: per row "
+          f"{t['rows']['baseline'][0]} of {t['rows']['baseline'][1]} against {t['rows']['winner'][0]} of {t['rows']['winner'][1]} "
+          f"(Fisher p = {t['rows']['p']:.3f}, but the two reps of a ticket are not independent); one rep per ticket "
+          f"{t['rep0']['baseline'][0]} of {t['rep0']['baseline'][1]} against {t['rep0']['winner'][0]} of {t['rep0']['winner'][1]} (p = {t['rep0']['p']:.3f})."]
+    L += ["", "## Noise", "", "Re-running the same version (the baseline's two runs, validation split):", ""]
+    for arm, n in res["rerun_noise"].items():
+        L.append(f"- {arm}: {n['tickets_differing']} of {n['tickets']} tickets graded differently between runs; "
+                 f"95% half-width for comparing two 2-run versions {100 * n['half_width']:.1f} points")
+    L += ["", "Each round's change on the validation split (climb_test), with 95% paired intervals over tickets:", "",
+          "| Arm | Round | Against | Decision | Grader change [95% CI] | True change [95% CI] |", "|---|---|---|---|---|---|"]
+    for arm, vs in res["round_intervals"].items():
+        for v in vs:
+            L.append(f"| {arm} | {v['round']} | {v['against']} | {v['decision']} | {100 * v['grader']:+.1f} {pci(v['grader_ci'])} | "
+                     f"{100 * v['true']:+.1f} {pci(v['true_ci'])} |")
     L += ["", "## Stall categorization", ""]
     for arm, c in res["categorization"].items():
         if c:

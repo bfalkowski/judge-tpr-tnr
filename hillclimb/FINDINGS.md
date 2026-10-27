@@ -59,8 +59,9 @@ and it passes reply on 1. In round 3 the analyzer wrote c3's reading into the ag
 every ticket on it, including damaged or wrong-item reports and tickets that only ask for a status update: reship if
 stock is above 0, otherwise refund." Answer-key mistakes on those tickets in test and holdout went from 2 at baseline to
 14 at the winner, and c3 passed all 14. At the winner, every false pass c3 made was in that category. c3's TNR on the
-agent's test and holdout decisions went from 0.940 at baseline to 0.844 at the winner (109 of 116 against 38 of 45;
-p = 0.07, so suggestive, not conclusive).
+agent's test and holdout decisions went from 0.940 at baseline to 0.844 at the winner (109 of 116 against 76 of 90).
+The two reps of a ticket are not independent; with one rep per ticket it is 53 of 57 against 38 of 45 (p = 0.2), so
+this is suggestive, not conclusive.
 
 Whichever reading is right, the loop decided a question the policy leaves open, and nothing in the loop's numbers shows
 that it did. Re-checking the judge on the winner's decisions would have shown where its remaining errors are.
@@ -75,9 +76,9 @@ decided the open cases (damage on an undelivered order, or "never came" on an or
 differently from the answer key.
 
 Both lowered p2's own score and were reverted, so nothing harmful shipped, but the loop spent two rounds and ended at
-baseline. Under the answer key, round 1 would have cost 8.1 points on holdout: 2.8 on cases the numbered rules decide and
-5.9 on the open cases. Round 2 would have cost 4.4, all on the open cases, so that loss depends on the answer key's
-reading.
+baseline. Under the answer key, round 1 would have cost 8.1 points on holdout: 5.9 on the open cases and 2.2 on cases the
+numbered rules decide. Round 2 would have cost 4.4, all of it from the open cases, so that loss depends on the answer
+key's reading.
 
 After those two rounds the skill's stall step asked the right question. Its categorization put 34 of p2's 57 train
 failures in the grader-disagreement bucket. All 34 were real judge errors, out of 46 real false fails. The analyzer
