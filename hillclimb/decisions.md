@@ -27,3 +27,9 @@ Each entry is recorded when it is made, with what was known at the time.
    the arm.** The design's stop rule assumes every round has a change to run. The analyzer prompt allows it to report
    that no change can clear the noise floor. When it does, the arm stops there, rather than running more analyzers
    that will find nothing on a train split with few or no failures. This applies to every arm.
+
+6. **Recorded after the runs, from the independent check: the analyzers saw the current version's traces, which
+   departs from the skill's text after a revert.** The skill hands the analyzer "the previous round's train-split trace
+   files". After a reverted round, that is the reverted version. `hc.py sandbox` gave the current (best kept) version's
+   traces instead, with a one-line history of each earlier proposal. DESIGN.md described this choice, but it was not
+   flagged as a departure from the skill when it was made. It matters for the lenient arm (FINDINGS.md, finding 4).
