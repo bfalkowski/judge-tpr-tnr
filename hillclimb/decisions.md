@@ -18,3 +18,7 @@ Each entry is recorded when it is made, with what was known at the time.
    way to act on a bucket is through the next analyzer, so from here on, in every arm, a content round after a
    categorization gets its summary (`categorization.md` in the sandbox). Its suggestion to move date arithmetic into
    code is outside the scope and is not acted on by the outer session.
+
+4. **2026-10-27, lenient categorization: helper files outside the sandbox, accepted.** The analyzer wrote a script and
+   its output to a scratch folder of its own outside the sandbox and read them back. They are derived from the
+   sandbox only. From here on, analyzers are told to keep scratch files in the sandbox's out/ folder.
