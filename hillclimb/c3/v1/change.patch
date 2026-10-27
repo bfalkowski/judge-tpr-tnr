@@ -1,0 +1,15 @@
+--- a/hillclimb/c3/baseline/artifact.json
++++ b/hillclimb/c3/v1/artifact.json
+@@ -1,9 +1,9 @@
+ {
+- "decision_instructions": "Which action does the support policy call for on this ticket?",
++ "decision_instructions": "Which action does the support policy call for on this ticket? If the matching rule gives refund, compare the order total with the policy's refund limit: a refund over the limit becomes escalate, whichever rule produced it (damaged or wrong item, or never arrived and out of stock). The limit applies only to refunds. It never turns reship or reply into escalate.",
+  "criteria": {
+-  "0": "refund: refund the order",
++  "0": "refund: refund the order. Not when the order total is over the policy's refund limit; that refund is escalated instead",
+   "1": "reship: send a replacement",
+-  "2": "escalate: hand the ticket to a supervisor",
++  "2": "escalate: hand the ticket to a supervisor. This is also the action when a policy rule gives a refund but the order total is over the policy's refund limit, including never-arrived orders that are out of stock",
+   "3": "reply: reply to the customer and take no other action"
+  }
+ }
