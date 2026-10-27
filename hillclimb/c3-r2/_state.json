@@ -1,5 +1,5 @@
 {
- "current_round": 1,
+ "current_round": 2,
  "reps": 2,
  "approve_each_round": false,
  "goal": {
@@ -8,12 +8,12 @@
   "hold": []
  },
  "best": {
-  "round": 1,
-  "name": "v1",
-  "test_score": 0.7916666666666666,
-  "train_score": 0.8541666666666666
+  "round": 2,
+  "name": "v2",
+  "test_score": 0.8666666666666667,
+  "train_score": 0.9291666666666667
  },
- "current": "v1",
+ "current": "v2",
  "train_ids": [
   "Y007",
   "Y011",
@@ -309,9 +309,20 @@
    "reason": "train and test both rose",
    "best_after": "v1",
    "best_test_rise": 0.02083333333333326
+  },
+  {
+   "round": "v2",
+   "change": "Make the order record (status, shipped_on, delivered_on, stock), not the ticket's framing, pick the policy rule: add a status-first decision table to the instructions and state in the reship and reply descriptions which record states they cover, keeping the v1 refund-limit check as the last step.",
+   "train": 0.9291666666666667,
+   "test": 0.8666666666666667,
+   "rerun_test": null,
+   "decision": "keep",
+   "reason": "train and test both rose",
+   "best_after": "v2",
+   "best_test_rise": 0.07500000000000007
   }
  ],
- "flat_streak": 1,
+ "flat_streak": 0,
  "categorized": false,
  "stopped": null,
  "baseline_check": {

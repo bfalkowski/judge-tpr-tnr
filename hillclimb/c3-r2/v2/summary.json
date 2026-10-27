@@ -1,0 +1,4 @@
+{
+ "description": "Make the order record (status, shipped_on, delivered_on, stock), not the ticket's framing, pick the policy rule: add a status-first decision table to the instructions and state in the reship and reply descriptions which record states they cover, keeping the v1 refund-limit check as the last step.",
+ "target": "system_prompt"
+}
