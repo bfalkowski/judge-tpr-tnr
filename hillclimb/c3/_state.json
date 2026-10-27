@@ -1,5 +1,5 @@
 {
- "current_round": 1,
+ "current_round": 2,
  "reps": 2,
  "approve_each_round": false,
  "goal": {
@@ -309,9 +309,20 @@
    "reason": "train and test both rose",
    "best_after": "v1",
    "best_test_rise": 0.029166666666666674
+  },
+  {
+   "round": "v2",
+   "change": "Make rule selection record-first: compute today-minus-14 and today-minus-30 cutoff dates, pick the policy branch from the order's status and those cutoffs (not from what the ticket claims or asks for), and restate each action's description in those same terms.",
+   "train": 0.875,
+   "test": 0.775,
+   "rerun_test": null,
+   "decision": "revert",
+   "reason": "train rose, test did not",
+   "best_after": "v1",
+   "best_test_rise": 0.0
   }
  ],
- "flat_streak": 1,
+ "flat_streak": 2,
  "categorized": false,
  "stopped": null,
  "baseline_check": {

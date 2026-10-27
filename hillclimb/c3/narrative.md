@@ -2,5 +2,6 @@
 |---|---|---|---|---|
 | 0 | baseline | 0.771 | 0.779 | |
 | 1 | Make the $500 refund cap a step that applies to every refund, includin | 0.800 | 0.854 | keep |
+| 2 | Make rule selection record-first: compute today-minus-14 and today-min | 0.775 | 0.875 | revert |
 
 Best so far: v1 (test 0.800). Grader: the frozen judge c3 (Claude Haiku 4.5), threshold 0.5; test TPR 0.927, TNR 0.919
