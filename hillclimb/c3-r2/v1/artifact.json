@@ -1,0 +1,9 @@
+{
+ "decision_instructions": "Which action does the support policy call for on this ticket? First find the action the matching policy rule gives. If that action is refund, check the order total against the refund limit in rule 4: if the total is over the limit, the answer is escalate, not refund. This check applies to every rule that can end in refund, including the out-of-stock fallback for an order that never arrived or is Lost. The limit applies only to refunds: it never turns a reship or a reply into escalate, and a total equal to the limit is not over it.",
+ "criteria": {
+  "0": "refund: refund the order (only when the order total is not over the refund limit in rule 4; over the limit, choose escalate)",
+  "1": "reship: send a replacement",
+  "2": "escalate: hand the ticket to a supervisor (this includes any order the policy would refund whose total is over the refund limit in rule 4)",
+  "3": "reply: reply to the customer and take no other action"
+ }
+}
