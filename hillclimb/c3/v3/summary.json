@@ -1,0 +1,4 @@
+{
+ "description": "Pick the order's delivery state (not yet due / never arrived / delivered) from the record's status and delivered_on only, state that the policy's \"Lost\" means the status field, map each state to its rule (including damage reports on undelivered orders and \"never came\" on Delivered orders), and restate reship and reply in those record terms.",
+ "target": "system_prompt"
+}

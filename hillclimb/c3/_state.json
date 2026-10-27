@@ -1,5 +1,5 @@
 {
- "current_round": 2,
+ "current_round": 3,
  "reps": 2,
  "approve_each_round": false,
  "goal": {
@@ -8,12 +8,12 @@
   "hold": []
  },
  "best": {
-  "round": 1,
-  "name": "v1",
-  "test_score": 0.8,
-  "train_score": 0.8541666666666666
+  "round": 3,
+  "name": "v3",
+  "test_score": 0.8166666666666667,
+  "train_score": 0.9
  },
- "current": "v1",
+ "current": "v3",
  "train_ids": [
   "Y007",
   "Y011",
@@ -320,11 +320,22 @@
    "reason": "train rose, test did not",
    "best_after": "v1",
    "best_test_rise": 0.0
+  },
+  {
+   "round": "v3",
+   "change": "Pick the order's delivery state (not yet due / never arrived / delivered) from the record's status and delivered_on only, state that the policy's \"Lost\" means the status field, map each state to its rule (including damage reports on undelivered orders and \"never came\" on Delivered orders), and restate reship and reply in those record terms.",
+   "train": 0.9,
+   "test": 0.8166666666666667,
+   "rerun_test": null,
+   "decision": "keep",
+   "reason": "train and test both rose",
+   "best_after": "v3",
+   "best_test_rise": 0.016666666666666607
   }
  ],
- "flat_streak": 2,
+ "flat_streak": 3,
  "categorized": true,
- "stopped": null,
+ "stopped": "three rounds without a rise of 0.065 in the best test score",
  "baseline_check": {
   "train": 0.7791666666666667,
   "test": 0.7708333333333334,
