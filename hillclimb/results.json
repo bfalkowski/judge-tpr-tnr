@@ -476,6 +476,10 @@
  "pre_loop": {
   "key": {
    "spotcheck_lowest10_grader_errors": 0,
+   "spotcheck_by_judge_score": 0,
+   "spotcheck_random_ties_mean": 0.0,
+   "spotcheck_random_ties_flag_rate": 0.0,
+   "spotcheck_cases_tied_at_zero": 22,
    "spotcheck_flags": false,
    "agreement_40": 1.0,
    "agreement_flags": false,
@@ -496,6 +500,10 @@
   },
   "c3": {
    "spotcheck_lowest10_grader_errors": 3,
+   "spotcheck_by_judge_score": 3,
+   "spotcheck_random_ties_mean": 2.0101,
+   "spotcheck_random_ties_flag_rate": 0.6906,
+   "spotcheck_cases_tied_at_zero": 25,
    "spotcheck_flags": true,
    "agreement_40": 1.0,
    "agreement_flags": false,
@@ -516,6 +524,10 @@
   },
   "p2": {
    "spotcheck_lowest10_grader_errors": 7,
+   "spotcheck_by_judge_score": 7,
+   "spotcheck_random_ties_mean": 8.2312,
+   "spotcheck_random_ties_flag_rate": 1.0,
+   "spotcheck_cases_tied_at_zero": 28,
    "spotcheck_flags": true,
    "agreement_40": 0.625,
    "agreement_flags": true,
@@ -536,6 +548,10 @@
   },
   "lenient": {
    "spotcheck_lowest10_grader_errors": 3,
+   "spotcheck_by_judge_score": 0,
+   "spotcheck_random_ties_mean": 2.2134,
+   "spotcheck_random_ties_flag_rate": 0.7896,
+   "spotcheck_cases_tied_at_zero": 18,
    "spotcheck_flags": true,
    "agreement_40": 0.825,
    "agreement_flags": true,
@@ -613,6 +629,67 @@
    }
   }
  },
+ "rates_without_open_case": {
+  "key": {
+   "tp": 186,
+   "fn": 0,
+   "fp": 0,
+   "tn": 44,
+   "n": 230,
+   "tpr": 1.0,
+   "tnr": 1.0,
+   "youden": 1.0
+  },
+  "c3": {
+   "tp": 184,
+   "fn": 2,
+   "fp": 1,
+   "tn": 43,
+   "n": 230,
+   "tpr": 0.989247311827957,
+   "tnr": 0.9772727272727273,
+   "youden": 0.9665200391006843
+  },
+  "p2": {
+   "tp": 146,
+   "fn": 40,
+   "fp": 35,
+   "tn": 9,
+   "n": 230,
+   "tpr": 0.7849462365591398,
+   "tnr": 0.20454545454545456,
+   "youden": -0.01050830889540566
+  },
+  "lenient": {
+   "tp": 179,
+   "fn": 7,
+   "fp": 16,
+   "tn": 28,
+   "n": 230,
+   "tpr": 0.9623655913978495,
+   "tnr": 0.6363636363636364,
+   "youden": 0.5987292277614857
+  }
+ },
+ "open_case_verdicts": {
+  "tickets": 13,
+  "key": {
+   "reply_passed": 13,
+   "rule3_action_passed": 0
+  },
+  "c3": {
+   "reply_passed": 1,
+   "rule3_action_passed": 13
+  },
+  "p2": {
+   "reply_passed": 1,
+   "rule3_action_passed": 1
+  },
+  "lenient": {
+   "reply_passed": 10,
+   "rule3_action_passed": 0
+  }
+ },
  "agreement_check_power": {
   "key": {
    "p_pass": 1.0,
@@ -655,27 +732,50 @@
     "wrong_total": 54
    }
   },
-  "damage_on_undelivered": {
-   "tickets": 19,
+  "damage_open": {
+   "tickets": 13,
    "key": {
-    "correct_passed": 19,
+    "correct_passed": 13,
     "wrong_passed": 0,
-    "wrong_total": 57
+    "wrong_total": 39
    },
    "c3": {
-    "correct_passed": 7,
+    "correct_passed": 1,
     "wrong_passed": 13,
-    "wrong_total": 57
+    "wrong_total": 39
    },
    "p2": {
     "correct_passed": 1,
     "wrong_passed": 1,
-    "wrong_total": 57
+    "wrong_total": 39
    },
    "lenient": {
-    "correct_passed": 16,
+    "correct_passed": 10,
     "wrong_passed": 0,
-    "wrong_total": 57
+    "wrong_total": 39
+   }
+  },
+  "damage_early": {
+   "tickets": 6,
+   "key": {
+    "correct_passed": 6,
+    "wrong_passed": 0,
+    "wrong_total": 18
+   },
+   "c3": {
+    "correct_passed": 6,
+    "wrong_passed": 0,
+    "wrong_total": 18
+   },
+   "p2": {
+    "correct_passed": 0,
+    "wrong_passed": 0,
+    "wrong_total": 18
+   },
+   "lenient": {
+    "correct_passed": 6,
+    "wrong_passed": 0,
+    "wrong_total": 18
    }
   }
  },
@@ -690,8 +790,12 @@
      "mistakes": 16,
      "passed": 0
     },
-    "damage_on_undelivered": {
-     "mistakes": 3,
+    "damage_open": {
+     "mistakes": 2,
+     "passed": 0
+    },
+    "damage_early": {
+     "mistakes": 1,
      "passed": 0
     }
    },
@@ -700,8 +804,12 @@
      "mistakes": 98,
      "passed": 0
     },
-    "damage_on_undelivered": {
-     "mistakes": 6,
+    "damage_open": {
+     "mistakes": 4,
+     "passed": 0
+    },
+    "damage_early": {
+     "mistakes": 2,
      "passed": 0
     }
    },
@@ -728,9 +836,13 @@
      "mistakes": 16,
      "passed": 2
     },
-    "damage_on_undelivered": {
-     "mistakes": 3,
+    "damage_open": {
+     "mistakes": 2,
      "passed": 2
+    },
+    "damage_early": {
+     "mistakes": 1,
+     "passed": 0
     }
    },
    "v1": {
@@ -738,9 +850,13 @@
      "mistakes": 98,
      "passed": 4
     },
-    "damage_on_undelivered": {
-     "mistakes": 6,
+    "damage_open": {
+     "mistakes": 4,
      "passed": 4
+    },
+    "damage_early": {
+     "mistakes": 2,
+     "passed": 0
     }
    },
    "v2": {
@@ -748,9 +864,13 @@
      "mistakes": 110,
      "passed": 5
     },
-    "damage_on_undelivered": {
-     "mistakes": 19,
+    "damage_open": {
+     "mistakes": 16,
      "passed": 16
+    },
+    "damage_early": {
+     "mistakes": 3,
+     "passed": 0
     }
    },
    "v3": {
@@ -758,9 +878,13 @@
      "mistakes": 74,
      "passed": 0
     },
-    "damage_on_undelivered": {
-     "mistakes": 16,
+    "damage_open": {
+     "mistakes": 14,
      "passed": 14
+    },
+    "damage_early": {
+     "mistakes": 2,
+     "passed": 0
     }
    }
   },
@@ -774,9 +898,13 @@
      "mistakes": 16,
      "passed": 14
     },
-    "damage_on_undelivered": {
-     "mistakes": 3,
+    "damage_open": {
+     "mistakes": 2,
      "passed": 2
+    },
+    "damage_early": {
+     "mistakes": 1,
+     "passed": 0
     }
    },
    "v1": {
@@ -784,13 +912,17 @@
      "mistakes": 130,
      "passed": 65
     },
-    "damage_on_undelivered": {
-     "mistakes": 22,
+    "damage_open": {
+     "mistakes": 16,
      "passed": 0
     },
     "over_limit_out_of_stock": {
      "mistakes": 14,
      "passed": 10
+    },
+    "damage_early": {
+     "mistakes": 6,
+     "passed": 0
     }
    },
    "v2": {
@@ -798,13 +930,17 @@
      "mistakes": 105,
      "passed": 72
     },
-    "damage_on_undelivered": {
-     "mistakes": 22,
+    "damage_open": {
+     "mistakes": 16,
      "passed": 0
     },
     "over_limit_out_of_stock": {
      "mistakes": 15,
      "passed": 11
+    },
+    "damage_early": {
+     "mistakes": 6,
+     "passed": 0
     }
    }
   },
@@ -818,8 +954,12 @@
      "mistakes": 16,
      "passed": 2
     },
-    "damage_on_undelivered": {
-     "mistakes": 3,
+    "damage_open": {
+     "mistakes": 2,
+     "passed": 0
+    },
+    "damage_early": {
+     "mistakes": 1,
      "passed": 0
     }
    },
@@ -828,8 +968,12 @@
      "mistakes": 110,
      "passed": 56
     },
-    "damage_on_undelivered": {
-     "mistakes": 8,
+    "damage_open": {
+     "mistakes": 6,
+     "passed": 0
+    },
+    "damage_early": {
+     "mistakes": 2,
      "passed": 0
     }
    },
@@ -838,7 +982,7 @@
      "mistakes": 90,
      "passed": 50
     },
-    "damage_on_undelivered": {
+    "damage_open": {
      "mistakes": 4,
      "passed": 0
     }

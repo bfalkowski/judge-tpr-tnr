@@ -66,12 +66,14 @@ TPR and TNR on climb_test and holdout rows of that version. Corrected holdout us
 
 ## Grader checks on the baseline's train decisions
 
-| Arm | Grader errors in the 10 lowest-scoring cases | Agreement on 40 random decisions | TPR [95% CI] | TNR [95% CI] | Wrong among 10 random passes |
-|---|---|---|---|---|---|
-| key | 0 | 100.0 | 1.000 [1.00, 1.00] | 1.000 [1.00, 1.00] | 0 |
-| c3 | 3 | 100.0 | 0.948 [0.90, 0.99] | 0.935 [0.83, 1.00] | 0 |
-| p2 | 7 | 62.5 | 0.763 [0.68, 0.84] | 0.239 [0.08, 0.42] | 4 |
-| lenient | 3 | 82.5 | 0.954 [0.91, 0.99] | 0.652 [0.45, 0.83] | 1 |
+Grader errors among the 10 lowest-scoring train cases: cases tied at a score of 0 are taken in ticket order, by the judge's raw score, or at random (mean over 10,000 draws, and how often more than 1 of 10 is a grader error, the audit's threshold).
+
+| Arm | Cases tied at 0 | Spot-check: ticket order | by judge score | random: mean | random: flagged | Agreement on 40 random decisions | TPR [95% CI] | TNR [95% CI] | Wrong among 10 random passes |
+|---|---|---|---|---|---|---|---|---|---|
+| key | 22 | 0 | 0 | 0.00 | 0% | 100.0 | 1.000 [1.00, 1.00] | 1.000 [1.00, 1.00] | 0 |
+| c3 | 25 | 3 | 3 | 2.01 | 69% | 100.0 | 0.948 [0.90, 0.99] | 0.935 [0.83, 1.00] | 0 |
+| p2 | 28 | 7 | 7 | 8.23 | 100% | 62.5 | 0.763 [0.68, 0.84] | 0.239 [0.08, 0.42] | 4 |
+| lenient | 18 | 3 | 0 | 2.21 | 79% | 82.5 | 0.954 [0.91, 0.99] | 0.652 [0.45, 0.83] | 1 |
 
 How often the 40-decision agreement check passes each grader (10,000 random draws of 40 baseline train decisions; pass = 90% or more):
 
@@ -83,26 +85,31 @@ How often the 40-decision agreement check passes each grader (10,000 random draw
 ## Two hard categories: what each grader passes (all 400 v5 tickets)
 
 - **over_limit_out_of_stock** (18 tickets; never arrived, out of stock, total over $500: the policy says escalate): key passes the correct action on 18 and a wrong one on 0 of 54; c3 passes the correct action on 17 and a wrong one on 3 of 54; p2 passes the correct action on 0 and a wrong one on 16 of 54; lenient passes the correct action on 1 and a wrong one on 7 of 54
-- **damage_on_undelivered** (19 tickets; damaged or wrong item reported on an order shipped but not delivered: the answer key says reply; the policy text does not settle it): key passes the correct action on 19 and a wrong one on 0 of 57; c3 passes the correct action on 7 and a wrong one on 13 of 57; p2 passes the correct action on 1 and a wrong one on 1 of 57; lenient passes the correct action on 16 and a wrong one on 0 of 57
+- **damage_open** (13 tickets; damage or wrong item reported on an order that is Lost or shipped more than 14 days ago and not delivered: the answer key says reply; rule 3 could also be read to apply; the policy text does not settle it): key passes the correct action on 13 and a wrong one on 0 of 39; c3 passes the correct action on 1 and a wrong one on 13 of 39; p2 passes the correct action on 1 and a wrong one on 1 of 39; lenient passes the correct action on 10 and a wrong one on 0 of 39
+- **damage_early** (6 tickets; damage or wrong item reported on an order shipped 14 days ago or less and not delivered: rule 1 says reply): key passes the correct action on 6 and a wrong one on 0 of 18; c3 passes the correct action on 6 and a wrong one on 0 of 18; p2 passes the correct action on 0 and a wrong one on 0 of 18; lenient passes the correct action on 6 and a wrong one on 0 of 18
+
+On the 13 damage_open tickets: key passes reply on 13 and rule 3's action on 0; c3 passes reply on 1 and rule 3's action on 13; p2 passes reply on 1 and rule 3's action on 1; lenient passes reply on 10 and rule 3's action on 0
+
+TPR and TNR on the baseline's train decisions without the damage_open tickets: key 1.000 / 1.000; c3 0.989 / 0.977; p2 0.785 / 0.205; lenient 0.962 / 0.636
 
 ## True mistakes by category on climb_test and holdout, and how many the grader passes
 
-| Arm | Version | over_limit_out_of_stock | damage_on_undelivered | other |
-|---|---|---|---|---|
-| key | baseline | 0 of 16 | 0 of 3 | 0 of 97 |
-| key | v1 | 0 of 0 | 0 of 6 | 0 of 98 |
-| key | v2 | 0 of 0 | 0 of 0 | 0 of 51 |
-| key | v3 | 0 of 0 | 0 of 0 | 0 of 6 |
-| c3 | baseline | 2 of 16 | 2 of 3 | 3 of 97 |
-| c3 | v1 | 0 of 0 | 4 of 6 | 4 of 98 |
-| c3 | v2 | 0 of 0 | 16 of 19 | 5 of 110 |
-| c3 | v3 | 0 of 0 | 14 of 16 | 0 of 74 |
-| p2 | baseline | 14 of 16 | 2 of 3 | 79 of 97 |
-| p2 | v1 | 10 of 14 | 0 of 22 | 65 of 130 |
-| p2 | v2 | 11 of 15 | 0 of 22 | 72 of 105 |
-| lenient | baseline | 2 of 16 | 0 of 3 | 62 of 97 |
-| lenient | v1 | 0 of 0 | 0 of 8 | 56 of 110 |
-| lenient | v2 | 0 of 0 | 0 of 4 | 50 of 90 |
+| Arm | Version | over_limit_out_of_stock | damage_open | damage_early | other |
+|---|---|---|---|---|---|
+| key | baseline | 0 of 16 | 0 of 2 | 0 of 1 | 0 of 97 |
+| key | v1 | 0 of 0 | 0 of 4 | 0 of 2 | 0 of 98 |
+| key | v2 | 0 of 0 | 0 of 0 | 0 of 0 | 0 of 51 |
+| key | v3 | 0 of 0 | 0 of 0 | 0 of 0 | 0 of 6 |
+| c3 | baseline | 2 of 16 | 2 of 2 | 0 of 1 | 3 of 97 |
+| c3 | v1 | 0 of 0 | 4 of 4 | 0 of 2 | 4 of 98 |
+| c3 | v2 | 0 of 0 | 16 of 16 | 0 of 3 | 5 of 110 |
+| c3 | v3 | 0 of 0 | 14 of 14 | 0 of 2 | 0 of 74 |
+| p2 | baseline | 14 of 16 | 2 of 2 | 0 of 1 | 79 of 97 |
+| p2 | v1 | 10 of 14 | 0 of 16 | 0 of 6 | 65 of 130 |
+| p2 | v2 | 11 of 15 | 0 of 16 | 0 of 6 | 72 of 105 |
+| lenient | baseline | 2 of 16 | 0 of 2 | 0 of 1 | 62 of 97 |
+| lenient | v1 | 0 of 0 | 0 of 6 | 0 of 2 | 56 of 110 |
+| lenient | v2 | 0 of 0 | 0 of 4 | 0 of 0 | 50 of 90 |
 
 ## lenient v2 against baseline: rows whose action changed (climb_test and holdout)
 

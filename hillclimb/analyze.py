@@ -73,8 +73,23 @@ def pre_loop_checks(arm):
     for r in rows:
         by_case[r["ticket_id"]].append(r)
     # eval-hillclimb.md Step 0.5: read the lowest-scoring baseline cases; is the grade fair?
-    order = sorted(by_case, key=lambda t: (mean([x["grader"] for x in by_case[t]]), t))[:10]
-    errors = sum(any(x["grader"] == 0 and x["true"] == 1 for x in by_case[t]) for t in order)
+    # Many cases tie at a score of 0, so the ten read depend on the tie-break: ticket order, the judge's
+    # own raw score (noul, averaged over reps), or random (10,000 draws).
+    score = lambda t: mean([x["grader"] for x in by_case[t]])
+    is_err = lambda t: any(x["grader"] == 0 and x["true"] == 1 for x in by_case[t])
+    order = sorted(by_case, key=lambda t: (score(t), t))[:10]
+    errors = sum(map(is_err, order))
+    raw = None
+    if hc.ARMS[arm]["grader"] == "judge":
+        J = {(r["ticket_id"], r["action"]): r["noul"] for r in hc.jsonl(hc.run_file(hc.ARMS[arm]["judge_run"], "judgments.jsonl"))
+             if r["call"] == 1}
+        raw = lambda t: mean([J[(x["ticket_id"], x["action"])] for x in by_case[t]])
+    errors_by_raw = sum(map(is_err, sorted(by_case, key=lambda t: (score(t), raw(t), t))[:10])) if raw else errors
+    rng, dist = random.Random(0), []
+    for _ in range(ITER * 2):
+        k = {t: rng.random() for t in by_case}
+        dist.append(sum(map(is_err, sorted(by_case, key=lambda t: (score(t), k[t]))[:10])))
+    tied = sum(1 for t in by_case if score(t) == 0)
     # eval-audit.md section 4: agreement on a few dozen human-labelled cases
     rng = random.Random(20261027)
     sample = rng.sample(rows, 40)
@@ -96,7 +111,9 @@ def pre_loop_checks(arm):
     passes = [x for x in rows if x["grader"] == 1]
     rng = random.Random(1)
     pass_sample = rng.sample(passes, min(10, len(passes)))
-    return {"spotcheck_lowest10_grader_errors": errors,
+    return {"spotcheck_lowest10_grader_errors": errors, "spotcheck_by_judge_score": errors_by_raw,
+            "spotcheck_random_ties_mean": mean(dist), "spotcheck_random_ties_flag_rate": mean([int(d > 1) for d in dist]),
+            "spotcheck_cases_tied_at_zero": tied,
             "spotcheck_flags": errors > 1,
             "agreement_40": agree, "agreement_flags": agree < 0.9,
             "tpr": rr["tpr"], "tnr": rr["tnr"], "tpr_ci": ci(tprs), "tnr_ci": ci(tnrs),
@@ -201,16 +218,19 @@ def agreement_check_power(arm, n=40, draws=10000):
 
 CATEGORIES = {
     "over_limit_out_of_stock": "never arrived, out of stock, total over $500: the policy says escalate",
-    "damage_on_undelivered": "damaged or wrong item reported on an order shipped but not delivered: the answer key says reply; the policy text does not settle it",
+    "damage_open": "damage or wrong item reported on an order that is Lost or shipped more than 14 days ago and not "
+                   "delivered: the answer key says reply; rule 3 could also be read to apply; the policy text does not settle it",
+    "damage_early": "damage or wrong item reported on an order shipped 14 days ago or less and not delivered: rule 1 says reply",
 }
 
 
 def category(t):
+    from judge.policy import days_ago
     o, i = t["order"], t["issue"]
     if i in ("not_arrived", "where_is_it") and t["key"] == "escalate":
         return "over_limit_out_of_stock"
     if i in ("damaged", "wrong_item") and o["status"] in ("Shipped", "Lost"):
-        return "damage_on_undelivered"
+        return "damage_open" if o["status"] == "Lost" or days_ago(o["shipped_on"]) > 14 else "damage_early"
     return None
 
 
@@ -257,8 +277,30 @@ def change_visibility(arm, a_name, b_name, splits=("climb_test", "holdout")):
     return dict(sorted(out.items()))
 
 
+def rates_without_open(arm, name="baseline", splits=("climb_train",)):
+    T = hc.tickets()
+    rows = [r for r in sealed(arm, name) if r["split"] in splits and category(T[r["ticket_id"]]) != "damage_open"]
+    return rates([r["true"] for r in rows], [r["grader"] for r in rows])
+
+
+def open_case_verdicts():
+    """On the open tickets: how many tickets each judge passes reply (the key) and rule 3's action for."""
+    from judge.policy import resolve
+    T = hc.tickets()
+    ts = [t for t in T.values() if category(t) == "damage_open"]
+    out = {"tickets": len(ts)}
+    for arm in ARMS:
+        g = hc.grader(arm)
+        r3 = lambda t: resolve("not_arrived", t["order"], t["stock"])
+        out[arm] = {"reply_passed": sum(g[(t["ticket_id"], "reply")][0] for t in ts),
+                    "rule3_action_passed": sum(g[(t["ticket_id"], r3(t))][0] for t in ts)}
+    return out
+
+
 def main():
     res = {"arms": {}, "pre_loop": {}, "categorization": {}}
+    res["rates_without_open_case"] = {arm: rates_without_open(arm) for arm in ARMS}
+    res["open_case_verdicts"] = open_case_verdicts()
     res["agreement_check_power"] = {arm: agreement_check_power(arm) for arm in ARMS}
     res["category_verdicts"] = category_verdicts()
     res["drift_by_category"] = {arm: drift_by_category(arm) for arm in ARMS}
@@ -313,10 +355,12 @@ def report(res):
             L.append(f"| {arm} | {d['round']} | {d['loop']} | {d['key_rule']} | {100 * d['true_holdout_change_vs_current']:+.1f} |")
         L.append(f"| {arm} | | agree: {a['decisions_agree']} | | |")
     L += ["", "## Grader checks on the baseline's train decisions", "",
-          "| Arm | Grader errors in the 10 lowest-scoring cases | Agreement on 40 random decisions | TPR [95% CI] | TNR [95% CI] | Wrong among 10 random passes |",
-          "|---|---|---|---|---|---|"]
+          "Grader errors among the 10 lowest-scoring train cases: cases tied at a score of 0 are taken in ticket order, by the judge's raw score, or at random (mean over 10,000 draws, and how often more than 1 of 10 is a grader error, the audit's threshold).", "",
+          "| Arm | Cases tied at 0 | Spot-check: ticket order | by judge score | random: mean | random: flagged | Agreement on 40 random decisions | TPR [95% CI] | TNR [95% CI] | Wrong among 10 random passes |",
+          "|---|---|---|---|---|---|---|---|---|---|"]
     for arm, c in res["pre_loop"].items():
-        L.append(f"| {arm} | {c['spotcheck_lowest10_grader_errors']} | {p(c['agreement_40'])} | "
+        L.append(f"| {arm} | {c['spotcheck_cases_tied_at_zero']} | {c['spotcheck_lowest10_grader_errors']} | {c['spotcheck_by_judge_score']} | "
+                 f"{c['spotcheck_random_ties_mean']:.2f} | {100 * c['spotcheck_random_ties_flag_rate']:.0f}% | {p(c['agreement_40'])} | "
                  f"{c['tpr']:.3f} [{c['tpr_ci'][0]:.2f}, {c['tpr_ci'][1]:.2f}] | {c['tnr']:.3f} [{c['tnr_ci'][0]:.2f}, {c['tnr_ci'][1]:.2f}] | "
                  f"{c['spotcheck_of_10_passes_wrong']} |")
     L += ["", "How often the 40-decision agreement check passes each grader (10,000 random draws of 40 baseline train decisions; pass = 90% or more):", ""]
@@ -327,12 +371,17 @@ def report(res):
         L.append(f"- **{c}** ({d['tickets']} tickets; {CATEGORIES[c]}): " + "; ".join(
             f"{arm} passes the correct action on {d[arm]['correct_passed']} and a wrong one on {d[arm]['wrong_passed']} of {d[arm]['wrong_total']}"
             for arm in ARMS))
+    o = res["open_case_verdicts"]
+    L += ["", f"On the {o['tickets']} damage_open tickets: " + "; ".join(
+        f"{arm} passes reply on {o[arm]['reply_passed']} and rule 3's action on {o[arm]['rule3_action_passed']}" for arm in ARMS), "",
+        "TPR and TNR on the baseline's train decisions without the damage_open tickets: " + "; ".join(
+        f"{arm} {r['tpr']:.3f} / {r['tnr']:.3f}" for arm, r in res["rates_without_open_case"].items())]
     L += ["", "## True mistakes by category on climb_test and holdout, and how many the grader passes", "",
-          "| Arm | Version | over_limit_out_of_stock | damage_on_undelivered | other |", "|---|---|---|---|---|"]
+          "| Arm | Version | over_limit_out_of_stock | damage_open | damage_early | other |", "|---|---|---|---|---|---|"]
     for arm, vs in res["drift_by_category"].items():
         for n, d in vs.items():
             cell = lambda k: f"{d[k]['passed']} of {d[k]['mistakes']}" if k in d else "0 of 0"
-            L.append(f"| {arm} | {n} | {cell('over_limit_out_of_stock')} | {cell('damage_on_undelivered')} | {cell('other')} |")
+            L.append(f"| {arm} | {n} | {cell('over_limit_out_of_stock')} | {cell('damage_open')} | {cell('damage_early')} | {cell('other')} |")
     L += ["", "## lenient v2 against baseline: rows whose action changed (climb_test and holdout)", ""]
     for k, v in res["lenient_v2_visibility"].items():
         L.append(f"- {k}: {v}")
