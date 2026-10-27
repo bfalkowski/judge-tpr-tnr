@@ -1,0 +1,17 @@
+{"counts": {"artifact_gap": 0, "grader_disagreement": 4, "harness": 0, "structural": 6, "variance": 4},
+ "failures": [
+  {"case": "Y007", "rep": 0, "bucket": "structural", "reason": "Delivered 28 days ago, damaged, $79: artifact says refund and that a supervisor request never changes the action, yet Jev escalates (0.55); failing in every round (0.5/0.5/0) despite content aimed at it"},
+  {"case": "Y007", "rep": 1, "bucket": "structural", "reason": "Same as rep 0: escalate (0.48) on a $79 damaged item inside the 30-day window because the ticket demands escalation, against the explicit rule"},
+  {"case": "Y039", "rep": 0, "bucket": "structural", "reason": "Delivered exactly 30 days ago, damaged, $159: artifact says 30 or less refunds and demands do not change the action; Jev escalates (0.53); has never passed both reps in any round"},
+  {"case": "Y039", "rep": 1, "bucket": "structural", "reason": "Same as rep 0: escalate (0.35) on a day-30 damaged item with an escalation demand in the ticket"},
+  {"case": "Y114", "rep": 0, "bucket": "variance", "reason": "Shipped 13 days ago: reship (0.35) here, reply (0.48) and pass in rep 1 with the same artifact"},
+  {"case": "Y144", "rep": 1, "bucket": "variance", "reason": "Shipped 16 days ago, damage reported: reply (0.41) here, reship (0.36) and pass in rep 0 with the same artifact"},
+  {"case": "Y194", "rep": 0, "bucket": "grader_disagreement", "reason": "Delivered 33 days ago, ticket only complains about the wait: no policy rule calls for escalate (rule 2 needs damage or wrong item), reply looks right, but the judge applies the 30-day escalation anyway"},
+  {"case": "Y194", "rep": 1, "bucket": "grader_disagreement", "reason": "Same as rep 0: reply (0.65) consistent with the artifact; judge's own reasoning concedes no damage was reported but still demands escalate"},
+  {"case": "Y273", "rep": 0, "bucket": "structural", "reason": "Shipped 12 days ago, $899: artifact says reply and that the $500 limit never touches reply; Jev escalates (0.35); passed at baseline, failing since v1 despite v1 and v2 text aimed at exactly this"},
+  {"case": "Y273", "rep": 1, "bucket": "structural", "reason": "Same as rep 0: escalate (0.36) on a reply-step order because the total is over $500"},
+  {"case": "Y282", "rep": 0, "bucket": "variance", "reason": "Shipped 14 days ago (boundary): reship (0.40) here, reply (0.36) and pass in rep 1 with the same artifact"},
+  {"case": "Y331", "rep": 1, "bucket": "variance", "reason": "Wrong item delivered 27 days ago, $69: escalate (0.36) here, refund (0.41) and pass in rep 0 with the same artifact"},
+  {"case": "Y338", "rep": 0, "bucket": "grader_disagreement", "reason": "Delivered 32 days ago, ticket says it never arrived: rule 3 needs Lost or undelivered and rule 2 needs damage, so reply (0.88) fits the policy; judge escalates under the damage rule's 30-day window"},
+  {"case": "Y338", "rep": 1, "bucket": "grader_disagreement", "reason": "Same as rep 0: confident reply (0.88) matching the artifact; failing in all three rounds because the judge's reading, not the agent, is what differs from the policy"}
+ ]}
