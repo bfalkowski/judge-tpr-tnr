@@ -1,0 +1,245 @@
+{
+ "counts": {
+  "artifact_gap": 12,
+  "grader_disagreement": 7,
+  "harness": 0,
+  "structural": 19,
+  "variance": 1
+ },
+ "failures": [
+  {
+   "case": "Y007",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Damaged, delivered 28 days ago, $79: rule 2 says refund and the agent refunded, yet the grader failed it while passing escalate in rep 0; other declined escalation demands (Y212, Y225, Y303) pass."
+  },
+  {
+   "case": "Y013",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Lost, stock 0, $501: rule 3 falls back to refund and rule 4 turns that into escalate; agent refunded at 0.91, and the case failed in v1 and v2, which targeted exactly this."
+  },
+  {
+   "case": "Y013",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Same as rep 0: refunded at 0.97 instead of escalating; rule-3 fallback plus rule-4 limit never composed in any round."
+  },
+  {
+   "case": "Y027",
+   "rep": 0,
+   "bucket": "artifact_gap",
+   "reason": "Wrong-item claim on an order the record shows Shipped 35 days ago and never delivered ($501, stock 0); no rule covers a damage claim on an undelivered order and the agent guessed reply at 0.51."
+  },
+  {
+   "case": "Y027",
+   "rep": 1,
+   "bucket": "artifact_gap",
+   "reason": "Same conflict as rep 0; agent guessed reply at 0.52; failed in every round."
+  },
+  {
+   "case": "Y039",
+   "rep": 0,
+   "bucket": "artifact_gap",
+   "reason": "Cracked, delivered exactly 30 days ago, $159: rule 2 '30 days or less' means refund, but the state has no day count and the agent escalated at 0.45, pulled by the customer's escalation demand."
+  },
+  {
+   "case": "Y039",
+   "rep": 1,
+   "bucket": "artifact_gap",
+   "reason": "Same boundary case as rep 0; escalated at 0.57 instead of refunding."
+  },
+  {
+   "case": "Y050",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Lost 33 days, $899, stock 0: should escalate (rule 3 refund over the rule 4 limit); agent refunded at 0.99; failed in all three rounds."
+  },
+  {
+   "case": "Y050",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Same as rep 0: refunded at 0.99; content in v1 and v2 aimed at this did not move it."
+  },
+  {
+   "case": "Y054",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Shipped 16 days, undelivered, $899, stock 0: should escalate; agent refunded at 0.67; failed in v1 and v2."
+  },
+  {
+   "case": "Y054",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Same as rep 0: refunded at 0.76 instead of escalating."
+  },
+  {
+   "case": "Y061",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Changed mind on a delivered order: rule 5 says reply with return instructions and the agent replied at 0.95; rule 5 has no time or amount limit, yet the grader fails it every round (same template Y085 passes)."
+  },
+  {
+   "case": "Y061",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Same as rep 0: correct reply at 0.96 marked fail."
+  },
+  {
+   "case": "Y083",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Lost, $899, stock 0, customer even asks for escalation: should escalate; agent refunded at 0.87; failed in v1 and v2."
+  },
+  {
+   "case": "Y083",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Same as rep 0: refunded at 0.87."
+  },
+  {
+   "case": "Y084",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Cracked, delivered 28 days ago, $500 (not over $500): rule 2 says refund and the agent refunded; grader failed it though it passes refunds on the same facts (Y017, Y315 at $500; Y356 'ship me another one')."
+  },
+  {
+   "case": "Y084",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Same as rep 0: correct refund at 0.39 marked fail."
+  },
+  {
+   "case": "Y119",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Shipped 24 days, undelivered, $899, stock 0: should escalate; agent refunded at 0.29. The rep-1 pass is a reply the policy does not support and both reps failed in v1 and v2, so not real variance."
+  },
+  {
+   "case": "Y124",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Lost 15 days, $899, stock 0: should escalate; agent refunded at 0.99; failed in all rounds."
+  },
+  {
+   "case": "Y124",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Same as rep 0: refunded at 0.99."
+  },
+  {
+   "case": "Y133",
+   "rep": 0,
+   "bucket": "artifact_gap",
+   "reason": "'Someone else's item' claimed on an order recorded as Shipped 30 days ago and never delivered ($499, stock 3); no rule covers the conflict and the agent guessed reship at 0.32."
+  },
+  {
+   "case": "Y133",
+   "rep": 1,
+   "bucket": "artifact_gap",
+   "reason": "Same conflict as rep 0; guessed reship at 0.45."
+  },
+  {
+   "case": "Y169",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Changed mind, delivered 51 days ago, $649: rule 5 says reply with return instructions and the agent replied at 0.97; the grader appears to apply a time or amount limit rule 5 does not have."
+  },
+  {
+   "case": "Y169",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Same as rep 0: correct reply at 0.96 marked fail."
+  },
+  {
+   "case": "Y192",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Lost 15 days, $501, stock 0: should escalate; agent refunded at 0.87; failed in all rounds."
+  },
+  {
+   "case": "Y192",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Same as rep 0: refunded at 0.96."
+  },
+  {
+   "case": "Y194",
+   "rep": 0,
+   "bucket": "artifact_gap",
+   "reason": "Customer says still waiting but the record shows Delivered 33 days ago; no rule covers a non-arrival claim on a delivered order and the agent guessed reship at 0.31 with stock 0."
+  },
+  {
+   "case": "Y194",
+   "rep": 1,
+   "bucket": "artifact_gap",
+   "reason": "Same conflict as rep 0; guessed reship at 0.43 with stock 0."
+  },
+  {
+   "case": "Y282",
+   "rep": 0,
+   "bucket": "artifact_gap",
+   "reason": "Shipped exactly 14 days ago, undelivered: rule 1 '14 days or less' means reply, but no day count is in the state and the agent guessed reship at 0.60."
+  },
+  {
+   "case": "Y282",
+   "rep": 1,
+   "bucket": "artifact_gap",
+   "reason": "Same 14-day boundary as rep 0; guessed reship at 0.45."
+  },
+  {
+   "case": "Y338",
+   "rep": 0,
+   "bucket": "artifact_gap",
+   "reason": "'Hasn't arrived' but the record shows Delivered 32 days ago; no rule covers this conflict and the agent guessed reship at 0.24."
+  },
+  {
+   "case": "Y338",
+   "rep": 1,
+   "bucket": "artifact_gap",
+   "reason": "Same conflict as rep 0; guessed reship at 0.31."
+  },
+  {
+   "case": "Y343",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Shipped 34 days, undelivered, $899, stock 0: should escalate; agent refunded at 0.87; failed in all rounds."
+  },
+  {
+   "case": "Y343",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Same as rep 0: refunded at 0.84."
+  },
+  {
+   "case": "Y344",
+   "rep": 1,
+   "bucket": "variance",
+   "reason": "'Where is it' on an order Delivered 28 days ago: rep 0 replied (0.49, pass), rep 1 reshipped (0.31, fail) with the same artifact; also 0.5/0/1 across rounds."
+  },
+  {
+   "case": "Y346",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Lost 14 days, $501, stock 0: should escalate; agent refunded at 0.97; failed in all rounds."
+  },
+  {
+   "case": "Y346",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Same as rep 0: refunded at 0.95."
+  },
+  {
+   "case": "Y385",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Lost, $899, stock 0: should escalate; agent refunded at 0.99. It passed in v1/v2, but the near-identical Y083 did not, so content does not reliably carry rule 4 onto the rule-3 fallback."
+  },
+  {
+   "case": "Y385",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Same as rep 0: refunded at 0.99."
+  }
+ ]
+}
