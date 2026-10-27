@@ -1,0 +1,16 @@
+{
+ "run_id": "gh40568360163-climb-p2-v2",
+ "dataset": "v5",
+ "config": "clean",
+ "reps": 2,
+ "artifact_fingerprint": "dd5965e5beb406e9",
+ "artifact_path": "hillclimb/p2/v2/artifact.json",
+ "model": "jev-latest",
+ "backend": "api",
+ "n_tickets": 400,
+ "started_at": "2026-10-27T19:21:41Z",
+ "finished_at": "2026-10-27T19:22:54Z",
+ "errored": 0,
+ "stopped_at_spend_cap": false,
+ "spend_usd": 0.028384
+}
