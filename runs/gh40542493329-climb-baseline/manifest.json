@@ -1,0 +1,16 @@
+{
+ "run_id": "gh40542493329-climb-baseline",
+ "dataset": "v5",
+ "config": "clean",
+ "reps": 2,
+ "artifact_fingerprint": "bf1e3a6e6241759a",
+ "artifact_path": "hillclimb/baseline_agent.json",
+ "model": "jev-latest",
+ "backend": "api",
+ "n_tickets": 400,
+ "started_at": "2026-10-27T16:36:17Z",
+ "finished_at": "2026-10-27T16:38:09Z",
+ "errored": 0,
+ "stopped_at_spend_cap": false,
+ "spend_usd": 0.023613
+}
