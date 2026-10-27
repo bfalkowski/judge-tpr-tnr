@@ -1,5 +1,5 @@
 {
- "current_round": 1,
+ "current_round": 2,
  "reps": 2,
  "approve_each_round": false,
  "goal": {
@@ -8,12 +8,12 @@
   "hold": []
  },
  "best": {
-  "round": 1,
-  "name": "v1",
-  "test_score": 0.7875,
-  "train_score": 0.8541666666666666
+  "round": 2,
+  "name": "v2",
+  "test_score": 0.8291666666666667,
+  "train_score": 0.9416666666666667
  },
- "current": "v1",
+ "current": "v2",
  "train_ids": [
   "Y007",
   "Y011",
@@ -309,9 +309,20 @@
    "reason": "train and test both rose",
    "best_after": "v1",
    "best_test_rise": 0.016666666666666607
+  },
+  {
+   "round": "v2",
+   "change": "Replace the decision instructions with a status-first decision table (Processing / Lost / Shipped up to 14 days / Shipped over 14 days / Delivered) driven by the order record and an explicit day-count method, saying the ticket's story and requests never override the record, and tighten the four action descriptions to the same status and day gates.",
+   "train": 0.9416666666666667,
+   "test": 0.8291666666666667,
+   "rerun_test": null,
+   "decision": "keep",
+   "reason": "train and test both rose",
+   "best_after": "v2",
+   "best_test_rise": 0.04166666666666674
   }
  ],
- "flat_streak": 1,
+ "flat_streak": 2,
  "categorized": false,
  "stopped": null,
  "baseline_check": {
