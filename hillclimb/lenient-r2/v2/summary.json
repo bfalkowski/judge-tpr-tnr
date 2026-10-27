@@ -1,0 +1,4 @@
+{
+ "description": "Keep the instructions as they are and put the $500 refund limit into the refund and escalate action descriptions: refund is only allowed on orders of $500 or less, and escalate takes over every refund above $500, including rule 3's out-of-stock refund.",
+ "target": "system_prompt"
+}

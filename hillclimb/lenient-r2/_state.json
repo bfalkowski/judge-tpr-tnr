@@ -1,5 +1,5 @@
 {
- "current_round": 1,
+ "current_round": 2,
  "reps": 2,
  "approve_each_round": false,
  "goal": {
@@ -309,9 +309,20 @@
    "reason": "test did not rise",
    "best_after": "baseline",
    "best_test_rise": 0.0
+  },
+  {
+   "round": "v2",
+   "change": "Keep the instructions as they are and put the $500 refund limit into the refund and escalate action descriptions: refund is only allowed on orders of $500 or less, and escalate takes over every refund above $500, including rule 3's out-of-stock refund.",
+   "train": 0.8291666666666667,
+   "test": 0.8666666666666667,
+   "rerun_test": null,
+   "decision": "revert",
+   "reason": "test did not rise",
+   "best_after": "baseline",
+   "best_test_rise": 0.0
   }
  ],
- "flat_streak": 1,
+ "flat_streak": 2,
  "categorized": false,
  "stopped": null,
  "baseline_check": {
