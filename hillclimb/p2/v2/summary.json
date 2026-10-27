@@ -1,0 +1,4 @@
+{
+ "description": "Add the missing rule for tickets that contradict the order record about receipt (damaged/wrong item in hand but record not Delivered, or \"never came\" but record Delivered, status not Processing): choose refund, stated in the instructions and in the refund description.",
+ "target": "system_prompt"
+}
