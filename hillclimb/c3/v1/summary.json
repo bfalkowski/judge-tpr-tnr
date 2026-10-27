@@ -1,0 +1,4 @@
+{
+ "description": "Make the $500 refund cap a step that applies to every refund, including never-arrived/out-of-stock refunds, in both decision_instructions and the refund/escalate descriptions.",
+ "target": "system_prompt"
+}
