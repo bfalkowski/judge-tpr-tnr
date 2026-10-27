@@ -1,0 +1,858 @@
+{
+ "arms": {
+  "key": {
+   "arm": "key",
+   "grader": "the answer key (judge/policy.py), as a programmatic check",
+   "winner_name": "v3",
+   "stopped": "the analyzer proposed no change",
+   "rounds": 3,
+   "categorization": {
+    "after": "v2",
+    "counts": {
+     "artifact_gap": 0,
+     "grader_disagreement": 0,
+     "harness": 0,
+     "structural": 12,
+     "variance": 5
+    }
+   },
+   "baseline": {
+    "grader_train": 0.8083333333333333,
+    "grader_test": 0.7916666666666666,
+    "grader_holdout": 0.79375,
+    "true_train": 0.8083333333333333,
+    "true_test": 0.7916666666666666,
+    "true_holdout": 0.79375
+   },
+   "winner": {
+    "grader_train": 1.0,
+    "grader_test": 0.975,
+    "grader_holdout": 1.0,
+    "true_train": 1.0,
+    "true_test": 0.975,
+    "true_holdout": 1.0
+   },
+   "reported_test_delta": 0.18333333333333335,
+   "reported_test_delta_ci": [
+    0.11666666666666659,
+    0.25416666666666665
+   ],
+   "true_test_delta": 0.18333333333333335,
+   "true_test_delta_ci": [
+    0.11666666666666659,
+    0.25416666666666665
+   ],
+   "true_holdout_delta": 0.20625000000000004,
+   "true_holdout_delta_ci": [
+    0.14687499999999998,
+    0.26875000000000004
+   ],
+   "grader_holdout_delta": 0.20625000000000004,
+   "versions": [
+    {
+     "name": "baseline",
+     "decision": null,
+     "change": null,
+     "tpr": 1.0,
+     "tnr": 1.0,
+     "mistakes": 116,
+     "mistakes_passed": 0,
+     "grader_test": 0.7916666666666666,
+     "true_test": 0.7916666666666666,
+     "grader_holdout": 0.79375,
+     "true_holdout": 0.79375,
+     "corrected_holdout": 0.79375
+    },
+    {
+     "name": "v1",
+     "decision": "keep",
+     "change": "Make the $500 refund cap (policy rule 4) an explicit second step that applies to every refund, including the out-of-stock refund on never-arrived/Lost orders, and say in the refund/escalate descriptions that refund is only for totals of $500 or less.",
+     "tpr": 1.0,
+     "tnr": 1.0,
+     "mistakes": 104,
+     "mistakes_passed": 0,
+     "grader_test": 0.8166666666666667,
+     "true_test": 0.8166666666666667,
+     "grader_holdout": 0.8125,
+     "true_holdout": 0.8125,
+     "corrected_holdout": 0.8125
+    },
+    {
+     "name": "v2",
+     "decision": "keep",
+     "change": "Make the record decide the branch: compare shipped_on/delivered_on to 14- and 30-day cutoff dates, gate each rule on the record status, and say that the customer's account and demands do not change status or action. Mirror this in all four action descriptions.",
+     "tpr": 1.0,
+     "tnr": 1.0,
+     "mistakes": 51,
+     "mistakes_passed": 0,
+     "grader_test": 0.8791666666666667,
+     "true_test": 0.8791666666666667,
+     "grader_holdout": 0.93125,
+     "true_holdout": 0.93125,
+     "corrected_holdout": 0.9312499999999999
+    },
+    {
+     "name": "v3",
+     "decision": "keep",
+     "change": "Replace every \"N days ago\" condition in the instructions and all four action descriptions with a field-named comparison of shipped_on/delivered_on against the cutoff date, and spell out how to compare two dates (year, then month, then day), so Jev reads the branch off the date instead of estimating elapsed days.",
+     "tpr": 1.0,
+     "tnr": 1.0,
+     "mistakes": 6,
+     "mistakes_passed": 0,
+     "grader_test": 0.975,
+     "true_test": 0.975,
+     "grader_holdout": 1.0,
+     "true_holdout": 1.0,
+     "corrected_holdout": 1.0
+    }
+   ],
+   "decisions": [
+    {
+     "round": "v1",
+     "loop": "keep",
+     "key_rule": "keep",
+     "true_holdout_change_vs_current": 0.018750000000000044
+    },
+    {
+     "round": "v2",
+     "loop": "keep",
+     "key_rule": "keep",
+     "true_holdout_change_vs_current": 0.11875000000000002
+    },
+    {
+     "round": "v3",
+     "loop": "keep",
+     "key_rule": "keep",
+     "true_holdout_change_vs_current": 0.06874999999999998
+    }
+   ],
+   "decisions_agree": "3 of 3"
+  },
+  "c3": {
+   "arm": "c3",
+   "grader": "the frozen judge c3 (Claude Haiku 4.5), threshold 0.5; test TPR 0.927, TNR 0.919",
+   "winner_name": "v3",
+   "stopped": "three rounds without a rise of 0.065 in the best test score",
+   "rounds": 3,
+   "categorization": {
+    "after": "v2",
+    "counts": {
+     "artifact_gap": 16,
+     "grader_disagreement": 6,
+     "harness": 0,
+     "structural": 12,
+     "variance": 1
+    }
+   },
+   "baseline": {
+    "grader_train": 0.7791666666666667,
+    "grader_test": 0.7708333333333334,
+    "grader_holdout": 0.765625,
+    "true_train": 0.8083333333333333,
+    "true_test": 0.7916666666666666,
+    "true_holdout": 0.79375
+   },
+   "winner": {
+    "grader_train": 0.9,
+    "grader_test": 0.8166666666666667,
+    "grader_holdout": 0.83125,
+    "true_train": 0.8916666666666667,
+    "true_test": 0.8333333333333334,
+    "true_holdout": 0.84375
+   },
+   "reported_test_delta": 0.04583333333333328,
+   "reported_test_delta_ci": [
+    -0.012500000000000067,
+    0.10833333333333328
+   ],
+   "true_test_delta": 0.04166666666666674,
+   "true_test_delta_ci": [
+    -0.02083333333333337,
+    0.10416666666666674
+   ],
+   "true_holdout_delta": 0.050000000000000044,
+   "true_holdout_delta_ci": [
+    -0.009375000000000022,
+    0.109375
+   ],
+   "grader_holdout_delta": 0.06562500000000004,
+   "versions": [
+    {
+     "name": "baseline",
+     "decision": null,
+     "change": null,
+     "tpr": 0.9527027027027027,
+     "tnr": 0.9396551724137931,
+     "mistakes": 116,
+     "mistakes_passed": 7,
+     "grader_test": 0.7708333333333334,
+     "true_test": 0.7916666666666666,
+     "grader_holdout": 0.765625,
+     "true_holdout": 0.79375,
+     "corrected_holdout": 0.7930014590205534
+    },
+    {
+     "name": "v1",
+     "decision": "keep",
+     "change": "Make the $500 refund cap a step that applies to every refund, including never-arrived/out-of-stock refunds, in both decision_instructions and the refund/escalate descriptions.",
+     "tpr": 0.9539473684210527,
+     "tnr": 0.9230769230769231,
+     "mistakes": 104,
+     "mistakes_passed": 8,
+     "grader_test": 0.8,
+     "true_test": 0.8125,
+     "grader_holdout": 0.784375,
+     "true_holdout": 0.815625,
+     "corrected_holdout": 0.8142302080690181
+    },
+    {
+     "name": "v2",
+     "decision": "revert",
+     "change": "Make rule selection record-first: compute today-minus-14 and today-minus-30 cutoff dates, pick the policy branch from the order's status and those cutoffs (not from what the ticket claims or asks for), and restate each action's description in those same terms.",
+     "tpr": 0.9698375870069605,
+     "tnr": 0.8372093023255814,
+     "mistakes": 129,
+     "mistakes_passed": 21,
+     "grader_test": 0.775,
+     "true_test": 0.75,
+     "grader_holdout": 0.790625,
+     "true_holdout": 0.784375,
+     "corrected_holdout": 0.8213064577518399
+    },
+    {
+     "name": "v3",
+     "decision": "keep",
+     "change": "Pick the order's delivery state (not yet due / never arrived / delivered) from the record's status and delivered_on only, state that the policy's \"Lost\" means the status field, map each state to its rule (including damage reports on undelivered orders and \"never came\" on Delivered orders), and restate reship and reply in those record terms.",
+     "tpr": 0.9531914893617022,
+     "tnr": 0.8444444444444444,
+     "mistakes": 90,
+     "mistakes_passed": 14,
+     "grader_test": 0.8166666666666667,
+     "true_test": 0.8333333333333334,
+     "grader_holdout": 0.83125,
+     "true_holdout": 0.84375,
+     "corrected_holdout": 0.8673020806901802
+    }
+   ],
+   "decisions": [
+    {
+     "round": "v1",
+     "loop": "keep",
+     "key_rule": "keep",
+     "true_holdout_change_vs_current": 0.02187500000000009
+    },
+    {
+     "round": "v2",
+     "loop": "revert",
+     "key_rule": "revert",
+     "true_holdout_change_vs_current": -0.03125
+    },
+    {
+     "round": "v3",
+     "loop": "keep",
+     "key_rule": "keep",
+     "true_holdout_change_vs_current": 0.028124999999999956
+    }
+   ],
+   "decisions_agree": "3 of 3"
+  },
+  "p2": {
+   "arm": "p2",
+   "grader": "paper 2's judge p2 (Jev), threshold 0.5; test TPR 0.792, TNR 0.532",
+   "winner_name": "baseline",
+   "stopped": "the analyzer proposed no change",
+   "rounds": 2,
+   "categorization": {
+    "after": "v2",
+    "counts": {
+     "artifact_gap": 0,
+     "grader_disagreement": 34,
+     "harness": 0,
+     "structural": 22,
+     "variance": 1
+    }
+   },
+   "baseline": {
+    "grader_train": 0.7625,
+    "grader_test": 0.8375,
+    "grader_holdout": 0.81875,
+    "true_train": 0.8083333333333333,
+    "true_test": 0.7916666666666666,
+    "true_holdout": 0.79375
+   },
+   "winner": {
+    "grader_train": 0.7625,
+    "grader_test": 0.8375,
+    "grader_holdout": 0.81875,
+    "true_train": 0.8083333333333333,
+    "true_test": 0.7916666666666666,
+    "true_holdout": 0.79375
+   },
+   "reported_test_delta": 0.0,
+   "reported_test_delta_ci": [
+    0.0,
+    0.0
+   ],
+   "true_test_delta": 0.0,
+   "true_test_delta_ci": [
+    0.0,
+    0.0
+   ],
+   "true_holdout_delta": 0.0,
+   "true_holdout_delta_ci": [
+    0.0,
+    0.0
+   ],
+   "grader_holdout_delta": 0.0,
+   "versions": [
+    {
+     "name": "baseline",
+     "decision": null,
+     "change": null,
+     "tpr": 0.8288288288288288,
+     "tnr": 0.1810344827586207,
+     "mistakes": 116,
+     "mistakes_passed": 95,
+     "grader_test": 0.8375,
+     "true_test": 0.7916666666666666,
+     "grader_holdout": 0.81875,
+     "true_holdout": 0.79375,
+     "corrected_holdout": 1.0
+    },
+    {
+     "name": "v1",
+     "decision": "revert",
+     "change": "Make escalate selectable outside the numbered rules: the escalate description now covers explicit requests for a supervisor/manager/escalation and tickets that contradict the order record, and the instructions say to check those conditions before applying the rules.",
+     "tpr": 0.8959390862944162,
+     "tnr": 0.5481927710843374,
+     "mistakes": 166,
+     "mistakes_passed": 75,
+     "grader_test": 0.7666666666666667,
+     "true_test": 0.6916666666666667,
+     "grader_holdout": 0.7625,
+     "true_holdout": 0.7125,
+     "corrected_holdout": 0.808333333333325
+    },
+    {
+     "name": "v2",
+     "decision": "revert",
+     "change": "Add the missing rule for tickets that contradict the order record about receipt (damaged/wrong item in hand but record not Delivered, or \"never came\" but record Delivered, status not Processing): choose refund, stated in the instructions and in the refund description.",
+     "tpr": 0.8803827751196173,
+     "tnr": 0.4154929577464789,
+     "mistakes": 142,
+     "mistakes_passed": 83,
+     "grader_test": 0.8083333333333333,
+     "true_test": 0.7416666666666667,
+     "grader_holdout": 0.803125,
+     "true_holdout": 0.75,
+     "corrected_holdout": 1.0
+    }
+   ],
+   "decisions": [
+    {
+     "round": "v1",
+     "loop": "revert",
+     "key_rule": "revert",
+     "true_holdout_change_vs_current": -0.08124999999999993
+    },
+    {
+     "round": "v2",
+     "loop": "revert",
+     "key_rule": "revert",
+     "true_holdout_change_vs_current": -0.043749999999999956
+    }
+   ],
+   "decisions_agree": "2 of 2"
+  },
+  "lenient": {
+   "arm": "lenient",
+   "grader": "the step 2 judge j2 (Jev), threshold 0.3; test TPR 1.000, TNR 0.645",
+   "winner_name": "baseline",
+   "stopped": "the analyzer proposed no change",
+   "rounds": 2,
+   "categorization": {
+    "after": "v2",
+    "counts": {
+     "artifact_gap": 12,
+     "grader_disagreement": 7,
+     "harness": 0,
+     "structural": 19,
+     "variance": 1
+    }
+   },
+   "baseline": {
+    "grader_train": 0.8375,
+    "grader_test": 0.8916666666666667,
+    "grader_holdout": 0.8875,
+    "true_train": 0.8083333333333333,
+    "true_test": 0.7916666666666666,
+    "true_holdout": 0.79375
+   },
+   "winner": {
+    "grader_train": 0.8375,
+    "grader_test": 0.8916666666666667,
+    "grader_holdout": 0.8875,
+    "true_train": 0.8083333333333333,
+    "true_test": 0.7916666666666666,
+    "true_holdout": 0.79375
+   },
+   "reported_test_delta": 0.0,
+   "reported_test_delta_ci": [
+    0.0,
+    0.0
+   ],
+   "true_test_delta": 0.0,
+   "true_test_delta_ci": [
+    0.0,
+    0.0
+   ],
+   "true_holdout_delta": 0.0,
+   "true_holdout_delta_ci": [
+    0.0,
+    0.0
+   ],
+   "grader_holdout_delta": 0.0,
+   "versions": [
+    {
+     "name": "baseline",
+     "decision": null,
+     "change": null,
+     "tpr": 0.9774774774774775,
+     "tnr": 0.4482758620689655,
+     "mistakes": 116,
+     "mistakes_passed": 64,
+     "grader_test": 0.8916666666666667,
+     "true_test": 0.7916666666666666,
+     "grader_holdout": 0.8875,
+     "true_holdout": 0.79375,
+     "corrected_holdout": 0.8908712541620422
+    },
+    {
+     "name": "v1",
+     "decision": "revert",
+     "change": "Make the refund limit (policy rule 4) gate every refund, including the rule-3 out-of-stock fallback: the instructions now say to look for an overriding rule after reaching an outcome, the refund action says it is only for totals within the limit, and the escalate action names over-limit refunds as a trigger but not over-limit reships or replies.",
+     "tpr": 0.9479638009049773,
+     "tnr": 0.5254237288135594,
+     "mistakes": 118,
+     "mistakes_passed": 56,
+     "grader_test": 0.8458333333333333,
+     "true_test": 0.7833333333333333,
+     "grader_holdout": 0.85,
+     "true_holdout": 0.79375,
+     "corrected_holdout": 0.8289678135405104
+    },
+    {
+     "name": "v2",
+     "decision": "revert",
+     "change": "Put the composed \"rule 3 out-of-stock refund + rule 4 over-$500 limit = escalate\" condition into the escalate and refund action descriptions in state-field terms, add \"total does not matter\" guards to reply and reship, and leave decision_instructions unchanged.",
+     "tpr": 0.944206008583691,
+     "tnr": 0.46808510638297873,
+     "mistakes": 94,
+     "mistakes_passed": 50,
+     "grader_test": 0.8625,
+     "true_test": 0.8166666666666667,
+     "grader_holdout": 0.884375,
+     "true_holdout": 0.84375,
+     "corrected_holdout": 0.8857126341102481
+    }
+   ],
+   "decisions": [
+    {
+     "round": "v1",
+     "loop": "revert",
+     "key_rule": "revert",
+     "true_holdout_change_vs_current": 0.0
+    },
+    {
+     "round": "v2",
+     "loop": "revert",
+     "key_rule": "keep",
+     "true_holdout_change_vs_current": 0.050000000000000044
+    }
+   ],
+   "decisions_agree": "1 of 2"
+  }
+ },
+ "pre_loop": {
+  "key": {
+   "spotcheck_lowest10_grader_errors": 0,
+   "spotcheck_flags": false,
+   "agreement_40": 1.0,
+   "agreement_flags": false,
+   "tpr": 1.0,
+   "tnr": 1.0,
+   "tpr_ci": [
+    1.0,
+    1.0
+   ],
+   "tnr_ci": [
+    1.0,
+    1.0
+   ],
+   "n_true_pass": 194,
+   "n_true_fail": 46,
+   "tpr_tnr_flags": false,
+   "spotcheck_of_10_passes_wrong": 0
+  },
+  "c3": {
+   "spotcheck_lowest10_grader_errors": 3,
+   "spotcheck_flags": true,
+   "agreement_40": 1.0,
+   "agreement_flags": false,
+   "tpr": 0.9484536082474226,
+   "tnr": 0.9347826086956522,
+   "tpr_ci": [
+    0.900990099009901,
+    0.9894736842105263
+   ],
+   "tnr_ci": [
+    0.8292682926829268,
+    1.0
+   ],
+   "n_true_pass": 194,
+   "n_true_fail": 46,
+   "tpr_tnr_flags": false,
+   "spotcheck_of_10_passes_wrong": 0
+  },
+  "p2": {
+   "spotcheck_lowest10_grader_errors": 7,
+   "spotcheck_flags": true,
+   "agreement_40": 0.625,
+   "agreement_flags": true,
+   "tpr": 0.7628865979381443,
+   "tnr": 0.2391304347826087,
+   "tpr_ci": [
+    0.6772486772486772,
+    0.8415841584158416
+   ],
+   "tnr_ci": [
+    0.08,
+    0.425
+   ],
+   "n_true_pass": 194,
+   "n_true_fail": 46,
+   "tpr_tnr_flags": true,
+   "spotcheck_of_10_passes_wrong": 4
+  },
+  "lenient": {
+   "spotcheck_lowest10_grader_errors": 3,
+   "spotcheck_flags": true,
+   "agreement_40": 0.825,
+   "agreement_flags": true,
+   "tpr": 0.9536082474226805,
+   "tnr": 0.6521739130434783,
+   "tpr_ci": [
+    0.9095744680851063,
+    0.9896373056994818
+   ],
+   "tnr_ci": [
+    0.4473684210526316,
+    0.8333333333333334
+   ],
+   "n_true_pass": 194,
+   "n_true_fail": 46,
+   "tpr_tnr_flags": true,
+   "spotcheck_of_10_passes_wrong": 1
+  }
+ },
+ "categorization": {
+  "key": {
+   "version": "v2",
+   "grader_disagreement_calls": 0,
+   "of_which_real_judge_errors": 0,
+   "train_failures": 17,
+   "real_false_fails_among_them": 0,
+   "counts": {
+    "artifact_gap": 0,
+    "grader_disagreement": 0,
+    "harness": 0,
+    "structural": 12,
+    "variance": 5
+   }
+  },
+  "c3": {
+   "version": "v1",
+   "grader_disagreement_calls": 6,
+   "of_which_real_judge_errors": 2,
+   "train_failures": 35,
+   "real_false_fails_among_them": 8,
+   "counts": {
+    "artifact_gap": 16,
+    "grader_disagreement": 6,
+    "harness": 0,
+    "structural": 12,
+    "variance": 1
+   }
+  },
+  "p2": {
+   "version": "baseline",
+   "grader_disagreement_calls": 34,
+   "of_which_real_judge_errors": 34,
+   "train_failures": 57,
+   "real_false_fails_among_them": 46,
+   "counts": {
+    "artifact_gap": 0,
+    "grader_disagreement": 34,
+    "harness": 0,
+    "structural": 22,
+    "variance": 1
+   }
+  },
+  "lenient": {
+   "version": "baseline",
+   "grader_disagreement_calls": 7,
+   "of_which_real_judge_errors": 7,
+   "train_failures": 39,
+   "real_false_fails_among_them": 9,
+   "counts": {
+    "artifact_gap": 12,
+    "grader_disagreement": 7,
+    "harness": 0,
+    "structural": 19,
+    "variance": 1
+   }
+  }
+ },
+ "agreement_check_power": {
+  "key": {
+   "p_pass": 1.0,
+   "mean_true_failures_in_sample": 7.6764
+  },
+  "c3": {
+   "p_pass": 0.9528,
+   "mean_true_failures_in_sample": 7.6764
+  },
+  "p2": {
+   "p_pass": 0.0006,
+   "mean_true_failures_in_sample": 7.6764
+  },
+  "lenient": {
+   "p_pass": 0.5984,
+   "mean_true_failures_in_sample": 7.6764
+  }
+ },
+ "category_verdicts": {
+  "over_limit_out_of_stock": {
+   "tickets": 18,
+   "key": {
+    "correct_passed": 18,
+    "wrong_passed": 0,
+    "wrong_total": 54
+   },
+   "c3": {
+    "correct_passed": 17,
+    "wrong_passed": 3,
+    "wrong_total": 54
+   },
+   "p2": {
+    "correct_passed": 0,
+    "wrong_passed": 16,
+    "wrong_total": 54
+   },
+   "lenient": {
+    "correct_passed": 1,
+    "wrong_passed": 7,
+    "wrong_total": 54
+   }
+  },
+  "damage_on_undelivered": {
+   "tickets": 19,
+   "key": {
+    "correct_passed": 19,
+    "wrong_passed": 0,
+    "wrong_total": 57
+   },
+   "c3": {
+    "correct_passed": 7,
+    "wrong_passed": 13,
+    "wrong_total": 57
+   },
+   "p2": {
+    "correct_passed": 1,
+    "wrong_passed": 1,
+    "wrong_total": 57
+   },
+   "lenient": {
+    "correct_passed": 16,
+    "wrong_passed": 0,
+    "wrong_total": 57
+   }
+  }
+ },
+ "drift_by_category": {
+  "key": {
+   "baseline": {
+    "other": {
+     "mistakes": 97,
+     "passed": 0
+    },
+    "over_limit_out_of_stock": {
+     "mistakes": 16,
+     "passed": 0
+    },
+    "damage_on_undelivered": {
+     "mistakes": 3,
+     "passed": 0
+    }
+   },
+   "v1": {
+    "other": {
+     "mistakes": 98,
+     "passed": 0
+    },
+    "damage_on_undelivered": {
+     "mistakes": 6,
+     "passed": 0
+    }
+   },
+   "v2": {
+    "other": {
+     "mistakes": 51,
+     "passed": 0
+    }
+   },
+   "v3": {
+    "other": {
+     "mistakes": 6,
+     "passed": 0
+    }
+   }
+  },
+  "c3": {
+   "baseline": {
+    "other": {
+     "mistakes": 97,
+     "passed": 3
+    },
+    "over_limit_out_of_stock": {
+     "mistakes": 16,
+     "passed": 2
+    },
+    "damage_on_undelivered": {
+     "mistakes": 3,
+     "passed": 2
+    }
+   },
+   "v1": {
+    "other": {
+     "mistakes": 98,
+     "passed": 4
+    },
+    "damage_on_undelivered": {
+     "mistakes": 6,
+     "passed": 4
+    }
+   },
+   "v2": {
+    "other": {
+     "mistakes": 110,
+     "passed": 5
+    },
+    "damage_on_undelivered": {
+     "mistakes": 19,
+     "passed": 16
+    }
+   },
+   "v3": {
+    "other": {
+     "mistakes": 74,
+     "passed": 0
+    },
+    "damage_on_undelivered": {
+     "mistakes": 16,
+     "passed": 14
+    }
+   }
+  },
+  "p2": {
+   "baseline": {
+    "other": {
+     "mistakes": 97,
+     "passed": 79
+    },
+    "over_limit_out_of_stock": {
+     "mistakes": 16,
+     "passed": 14
+    },
+    "damage_on_undelivered": {
+     "mistakes": 3,
+     "passed": 2
+    }
+   },
+   "v1": {
+    "other": {
+     "mistakes": 130,
+     "passed": 65
+    },
+    "damage_on_undelivered": {
+     "mistakes": 22,
+     "passed": 0
+    },
+    "over_limit_out_of_stock": {
+     "mistakes": 14,
+     "passed": 10
+    }
+   },
+   "v2": {
+    "other": {
+     "mistakes": 105,
+     "passed": 72
+    },
+    "damage_on_undelivered": {
+     "mistakes": 22,
+     "passed": 0
+    },
+    "over_limit_out_of_stock": {
+     "mistakes": 15,
+     "passed": 11
+    }
+   }
+  },
+  "lenient": {
+   "baseline": {
+    "other": {
+     "mistakes": 97,
+     "passed": 62
+    },
+    "over_limit_out_of_stock": {
+     "mistakes": 16,
+     "passed": 2
+    },
+    "damage_on_undelivered": {
+     "mistakes": 3,
+     "passed": 0
+    }
+   },
+   "v1": {
+    "other": {
+     "mistakes": 110,
+     "passed": 56
+    },
+    "damage_on_undelivered": {
+     "mistakes": 8,
+     "passed": 0
+    }
+   },
+   "v2": {
+    "other": {
+     "mistakes": 90,
+     "passed": 50
+    },
+    "damage_on_undelivered": {
+     "mistakes": 4,
+     "passed": 0
+    }
+   }
+  }
+ },
+ "lenient_v2_visibility": {
+  "true 0->0, grader 0->0": 11,
+  "true 0->0, grader 1->0": 2,
+  "true 0->1, grader 0->0": 14,
+  "true 0->1, grader 0->1": 5,
+  "true 0->1, grader 1->0": 2,
+  "true 0->1, grader 1->1": 12,
+  "true 1->0, grader 1->0": 9,
+  "true 1->0, grader 1->1": 2
+ }
+}

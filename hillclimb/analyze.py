@@ -114,7 +114,7 @@ def arm_summary(arm):
     st, names = rounds_of(arm)
     S = {n: sealed(arm, n) for n in names}
     base, best = S["baseline"], S[st["best"]["name"]]
-    out = {"arm": arm, "grader": hc.ARMS[arm]["description"], "winner": st["best"]["name"],
+    out = {"arm": arm, "grader": hc.ARMS[arm]["description"], "winner_name": st["best"]["name"],
            "stopped": st["stopped"], "rounds": len(names) - 1,
            "categorization": st.get("categorization")}
     for label, rows in (("baseline", base), ("winner", best)):
@@ -188,8 +188,81 @@ def categorization_check(arm):
             "train_failures": len(fails), "real_false_fails_among_them": false_fails, "counts": cat["counts"]}
 
 
+def agreement_check_power(arm, n=40, draws=10000):
+    """How often the eval-audit agreement check (n random decisions, >= 90% agreement) passes this grader."""
+    rows = [r for r in sealed(arm, "baseline") if r["split"] == "climb_train"]
+    rng, ok, fails = random.Random(0), 0, []
+    for _ in range(draws):
+        s = rng.sample(rows, n)
+        ok += mean([int(r["grader"] == r["true"]) for r in s]) >= 0.9
+        fails.append(sum(1 for r in s if not r["true"]))
+    return {"p_pass": ok / draws, "mean_true_failures_in_sample": mean(fails)}
+
+
+CATEGORIES = {
+    "over_limit_out_of_stock": "never arrived, out of stock, total over $500: the policy says escalate",
+    "damage_on_undelivered": "damaged or wrong item reported on an order shipped but not delivered: the answer key says reply; the policy text does not settle it",
+}
+
+
+def category(t):
+    o, i = t["order"], t["issue"]
+    if i in ("not_arrived", "where_is_it") and t["key"] == "escalate":
+        return "over_limit_out_of_stock"
+    if i in ("damaged", "wrong_item") and o["status"] in ("Shipped", "Lost"):
+        return "damage_on_undelivered"
+    return None
+
+
+def category_verdicts():
+    """For each hard category and judge: how many tickets' correct and wrong actions the judge passes (all v5 tickets)."""
+    T = hc.tickets()
+    out = {}
+    for c in CATEGORIES:
+        ts = [t for t in T.values() if category(t) == c]
+        out[c] = {"tickets": len(ts)}
+        for arm in ARMS:
+            g = hc.grader(arm)
+            out[c][arm] = {"correct_passed": sum(g[(t["ticket_id"], t["key"])][0] for t in ts),
+                           "wrong_passed": sum(g[(t["ticket_id"], a)][0] for t in ts
+                                               for a in ("refund", "reship", "escalate", "reply") if a != t["key"]),
+                           "wrong_total": 3 * len(ts)}
+    return out
+
+
+def drift_by_category(arm):
+    """True mistakes on climb_test and holdout by category, and how many the grader passes, for each version."""
+    T = hc.tickets()
+    _, names = rounds_of(arm)
+    out = {}
+    for n in names:
+        rows = [r for r in sealed(arm, n) if r["split"] in ("climb_test", "holdout") and not r["true"]]
+        d = defaultdict(lambda: {"mistakes": 0, "passed": 0})
+        for r in rows:
+            c = category(T[r["ticket_id"]]) or "other"
+            d[c]["mistakes"] += 1
+            d[c]["passed"] += r["grader"]
+        out[n] = dict(d)
+    return out
+
+
+def change_visibility(arm, a_name, b_name, splits=("climb_test", "holdout")):
+    """Rows whose action changed from version a to b, by true change and grader change."""
+    a = {(r["ticket_id"], r["rep"]): r for r in sealed(arm, a_name)}
+    out = defaultdict(int)
+    for r in sealed(arm, b_name):
+        o = a[(r["ticket_id"], r["rep"])]
+        if r["split"] in splits and o["action"] != r["action"]:
+            out[f"true {o['true']}->{r['true']}, grader {o['grader']}->{r['grader']}"] += 1
+    return dict(sorted(out.items()))
+
+
 def main():
     res = {"arms": {}, "pre_loop": {}, "categorization": {}}
+    res["agreement_check_power"] = {arm: agreement_check_power(arm) for arm in ARMS}
+    res["category_verdicts"] = category_verdicts()
+    res["drift_by_category"] = {arm: drift_by_category(arm) for arm in ARMS}
+    res["lenient_v2_visibility"] = change_visibility("lenient", "baseline", "v2")
     for arm in ARMS:
         res["arms"][arm] = arm_summary(arm)
         res["pre_loop"][arm] = pre_loop_checks(arm)
@@ -214,7 +287,7 @@ def report(res):
          "| Arm | Winner | Rounds | Grader test: baseline -> winner | Reported delta [95% CI] | True test delta [95% CI] | True holdout delta [95% CI] | Grader holdout delta |",
          "|---|---|---|---|---|---|---|---|"]
     for arm, a in res["arms"].items():
-        L.append(f"| {arm} | {a['winner']} | {a['rounds']} | {p(a['baseline']['grader_test'])} -> {p(a['winner']['grader_test'])} | "
+        L.append(f"| {arm} | {a['winner_name']} | {a['rounds']} | {p(a['baseline']['grader_test'])} -> {p(a['winner']['grader_test'])} | "
                  f"{100 * a['reported_test_delta']:+.1f} {pci(a['reported_test_delta_ci'])} | "
                  f"{100 * a['true_test_delta']:+.1f} {pci(a['true_test_delta_ci'])} | "
                  f"{100 * a['true_holdout_delta']:+.1f} {pci(a['true_holdout_delta_ci'])} | {100 * a['grader_holdout_delta']:+.1f} |")
@@ -246,6 +319,23 @@ def report(res):
         L.append(f"| {arm} | {c['spotcheck_lowest10_grader_errors']} | {p(c['agreement_40'])} | "
                  f"{c['tpr']:.3f} [{c['tpr_ci'][0]:.2f}, {c['tpr_ci'][1]:.2f}] | {c['tnr']:.3f} [{c['tnr_ci'][0]:.2f}, {c['tnr_ci'][1]:.2f}] | "
                  f"{c['spotcheck_of_10_passes_wrong']} |")
+    L += ["", "How often the 40-decision agreement check passes each grader (10,000 random draws of 40 baseline train decisions; pass = 90% or more):", ""]
+    for arm, c in res["agreement_check_power"].items():
+        L.append(f"- {arm}: passes {100 * c['p_pass']:.1f}% of the time; a draw holds {c['mean_true_failures_in_sample']:.1f} true failures on average")
+    L += ["", "## Two hard categories: what each grader passes (all 400 v5 tickets)", ""]
+    for c, d in res["category_verdicts"].items():
+        L.append(f"- **{c}** ({d['tickets']} tickets; {CATEGORIES[c]}): " + "; ".join(
+            f"{arm} passes the correct action on {d[arm]['correct_passed']} and a wrong one on {d[arm]['wrong_passed']} of {d[arm]['wrong_total']}"
+            for arm in ARMS))
+    L += ["", "## True mistakes by category on climb_test and holdout, and how many the grader passes", "",
+          "| Arm | Version | over_limit_out_of_stock | damage_on_undelivered | other |", "|---|---|---|---|---|"]
+    for arm, vs in res["drift_by_category"].items():
+        for n, d in vs.items():
+            cell = lambda k: f"{d[k]['passed']} of {d[k]['mistakes']}" if k in d else "0 of 0"
+            L.append(f"| {arm} | {n} | {cell('over_limit_out_of_stock')} | {cell('damage_on_undelivered')} | {cell('other')} |")
+    L += ["", "## lenient v2 against baseline: rows whose action changed (climb_test and holdout)", ""]
+    for k, v in res["lenient_v2_visibility"].items():
+        L.append(f"- {k}: {v}")
     L += ["", "## Stall categorization", ""]
     for arm, c in res["categorization"].items():
         if c:
