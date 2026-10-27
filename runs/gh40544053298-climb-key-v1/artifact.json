@@ -1,0 +1,9 @@
+{
+ "decision_instructions": "Which action does the support policy call for on this ticket? Decide in two steps. Step 1: find the numbered policy rule that fits the ticket and the order record, and the action that rule names. Step 2: policy rule 4 overrides every other rule. If the action from step 1 is refund and the order total is over $500, the answer is escalate. This holds no matter which rule produced the refund, including the out-of-stock refund for an order that never arrived or is Lost. A total of exactly $500 is not over $500. Rule 4 changes only refunds: a reship or a reply stays the answer whatever the order total is.",
+ "criteria": {
+  "0": "refund: refund the order. Use only when the policy calls for a refund and the order total is $500 or less.",
+  "1": "reship: send a replacement",
+  "2": "escalate: hand the ticket to a supervisor. Use when the policy says to escalate, and also whenever the policy would refund an order whose total is over $500, whether that refund comes from the damaged/wrong-item rule or from the never-arrived rule with the item out of stock.",
+  "3": "reply: reply to the customer and take no other action"
+ }
+}
