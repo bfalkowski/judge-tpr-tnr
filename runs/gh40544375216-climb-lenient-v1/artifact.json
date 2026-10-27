@@ -1,0 +1,9 @@
+{
+ "decision_instructions": "Which action does the support policy call for on this ticket? Find the policy rule that fits the ticket and the order record and follow it to its outcome, including its fallback (for example, a refund when the item is out of stock and cannot be reshipped). Then check whether another policy rule overrides that outcome before you choose. The policy's refund limit applies to every refund, whichever rule produced it.",
+ "criteria": {
+  "0": "refund: refund the order. Only when the order total is within the policy's refund limit (a total exactly at the limit is not over it). If the total is over the limit, choose escalate instead, including when the refund is the out-of-stock fallback for an order that never arrived.",
+  "1": "reship: send a replacement",
+  "2": "escalate: hand the ticket to a supervisor. Choose this when the policy says to escalate, or when the policy's outcome would be a refund and the order total is over the refund limit. A total over the limit is not a reason to escalate when the outcome is a reship or a reply.",
+  "3": "reply: reply to the customer and take no other action"
+ }
+}
