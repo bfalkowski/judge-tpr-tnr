@@ -388,8 +388,39 @@ def tnr_drop_c3():
     return out
 
 
+def rerun_noise(arm, name="baseline", split="climb_test"):
+    """Noise from re-running the same version: tickets whose grade differs between the two runs, and the 95%
+    half-width this implies for comparing two versions that each average two runs (Var(D_t) = Var(rep1 - rep0) / 2)."""
+    by = defaultdict(dict)
+    for r in sealed(arm, name):
+        if r["split"] == split:
+            by[r["ticket_id"]][r["rep"]] = r["grader"]
+    d = [v[1] - v[0] for v in by.values()]
+    return {"tickets_differing": sum(1 for x in d if x), "tickets": len(d),
+            "half_width": 1.96 * (sum(x * x for x in d) / 2) ** 0.5 / len(d)}
+
+
+def round_intervals(arm, split="climb_test"):
+    """Each round's change on the validation split against the version it was compared with, for the grader and the
+    answer key, with 95% paired intervals that resample tickets."""
+    st = hc.state(arm)
+    cur, out = "baseline", []
+    for h in [h for h in st["history"] if h["decision"] != "none"]:
+        a, b = sealed(arm, cur), sealed(arm, h["round"])
+        row = {"round": h["round"], "against": cur, "decision": h["decision"]}
+        for f in ("grader", "true"):
+            row[f] = by_split(b, f, [split]) - by_split(a, f, [split])
+            row[f + "_ci"] = boot_diff(a, b, f, [split])
+        out.append(row)
+        if h["decision"] == "keep":
+            cur = h["round"]
+    return out
+
+
 def main():
     res = {"arms": {}, "pre_loop": {}, "categorization": {}}
+    res["rerun_noise"] = {arm: rerun_noise(arm) for arm in ARMS}
+    res["round_intervals"] = {arm: round_intervals(arm) for arm in ARMS}
     res["holdout_change_by_kind"] = {arm: holdout_change_by_kind(arm) for arm in ARMS}
     res["tnr_drop_c3"] = tnr_drop_c3()
     res["visibility"] = {arm: visibility_by_round(arm) for arm in ARMS}
@@ -505,6 +536,16 @@ def report(res):
           f"{t['rows']['baseline'][0]} of {t['rows']['baseline'][1]} against {t['rows']['winner'][0]} of {t['rows']['winner'][1]} "
           f"(Fisher p = {t['rows']['p']:.3f}, but the two reps of a ticket are not independent); one rep per ticket "
           f"{t['rep0']['baseline'][0]} of {t['rep0']['baseline'][1]} against {t['rep0']['winner'][0]} of {t['rep0']['winner'][1]} (p = {t['rep0']['p']:.3f})."]
+    L += ["", "## Noise", "", "Re-running the same version (the baseline's two runs, validation split):", ""]
+    for arm, n in res["rerun_noise"].items():
+        L.append(f"- {arm}: {n['tickets_differing']} of {n['tickets']} tickets graded differently between runs; "
+                 f"95% half-width for comparing two 2-run versions {100 * n['half_width']:.1f} points")
+    L += ["", "Each round's change on the validation split (climb_test), with 95% paired intervals over tickets:", "",
+          "| Arm | Round | Against | Decision | Grader change [95% CI] | True change [95% CI] |", "|---|---|---|---|---|---|"]
+    for arm, vs in res["round_intervals"].items():
+        for v in vs:
+            L.append(f"| {arm} | {v['round']} | {v['against']} | {v['decision']} | {100 * v['grader']:+.1f} {pci(v['grader_ci'])} | "
+                     f"{100 * v['true']:+.1f} {pci(v['true_ci'])} |")
     L += ["", "## Stall categorization", ""]
     for arm, c in res["categorization"].items():
         if c:

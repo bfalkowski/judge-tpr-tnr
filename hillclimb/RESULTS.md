@@ -171,6 +171,30 @@ If a person had labelled k random rows whose action changed (climb_train and cli
 
 c3's TNR on test and holdout mistakes, baseline against winner: per row 109 of 116 against 76 of 90 (Fisher p = 0.035, but the two reps of a ticket are not independent); one rep per ticket 53 of 57 against 38 of 45 (p = 0.207).
 
+## Noise
+
+Re-running the same version (the baseline's two runs, validation split):
+
+- key: 2 of 120 tickets graded differently between runs; 95% half-width for comparing two 2-run versions 1.6 points
+- c3: 1 of 120 tickets graded differently between runs; 95% half-width for comparing two 2-run versions 1.2 points
+- p2: 1 of 120 tickets graded differently between runs; 95% half-width for comparing two 2-run versions 1.2 points
+- lenient: 0 of 120 tickets graded differently between runs; 95% half-width for comparing two 2-run versions 0.0 points
+
+Each round's change on the validation split (climb_test), with 95% paired intervals over tickets:
+
+| Arm | Round | Against | Decision | Grader change [95% CI] | True change [95% CI] |
+|---|---|---|---|---|---|
+| key | v1 | baseline | keep | +2.5 [-2.1, +7.1] | +2.5 [-2.1, +7.1] |
+| key | v2 | v1 | keep | +6.2 [-1.7, +14.6] | +6.2 [-1.7, +14.6] |
+| key | v3 | v2 | keep | +9.6 [+4.6, +15.0] | +9.6 [+4.6, +15.0] |
+| c3 | v1 | baseline | keep | +2.9 [+0.0, +6.7] | +2.1 [-1.3, +5.8] |
+| c3 | v2 | v1 | revert | -2.5 [-7.9, +2.9] | -6.2 [-11.7, -0.8] |
+| c3 | v3 | v1 | keep | +1.7 [-3.7, +7.1] | +2.1 [-4.2, +7.9] |
+| p2 | v1 | baseline | revert | -7.1 [-12.1, -2.9] | -10.0 [-16.7, -4.2] |
+| p2 | v2 | baseline | revert | -2.9 [-5.8, -0.4] | -5.0 [-9.6, -1.2] |
+| lenient | v1 | baseline | revert | -4.6 [-8.3, -1.3] | -0.8 [-6.2, +4.2] |
+| lenient | v2 | baseline | revert | -2.9 [-6.2, -0.4] | +2.5 [-2.1, +7.1] |
+
 ## Stall categorization
 
 - key (after v2): {'artifact_gap': 0, 'grader_disagreement': 0, 'harness': 0, 'structural': 12, 'variance': 5}. Grader-disagreement calls: 0, of which real judge errors: 0. Real false fails among the 17 train failures: 0.
