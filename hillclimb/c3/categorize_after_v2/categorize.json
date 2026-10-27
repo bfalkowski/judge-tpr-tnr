@@ -1,0 +1,221 @@
+{
+ "counts": {
+  "artifact_gap": 16,
+  "grader_disagreement": 6,
+  "harness": 0,
+  "structural": 12,
+  "variance": 1
+ },
+ "failures": [
+  {
+   "case": "Y017",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Wrong item, delivered 27d, total exactly $500.00: refund is correct (policy escalates only refunds OVER $500); grader calls $500 over the limit, contradicting its own Y084/Y315 passes on the same $500 total."
+  },
+  {
+   "case": "Y017",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Wrong item, delivered 27d, total exactly $500.00: refund is correct (policy escalates only refunds OVER $500); grader calls $500 over the limit, contradicting its own Y084/Y315 passes on the same $500 total."
+  },
+  {
+   "case": "Y030",
+   "rep": 0,
+   "bucket": "artifact_gap",
+   "reason": "Record says Delivered 28d ago (stock 0) but ticket asks where it is; artifact never says rule 3 needs status Lost or shipped >14d undelivered, so Jev guesses reship (conf 0.41/0.57); v2 record-first content fixed it."
+  },
+  {
+   "case": "Y030",
+   "rep": 1,
+   "bucket": "artifact_gap",
+   "reason": "Record says Delivered 28d ago (stock 0) but ticket asks where it is; artifact never says rule 3 needs status Lost or shipped >14d undelivered, so Jev guesses reship (conf 0.41/0.57); v2 record-first content fixed it."
+  },
+  {
+   "case": "Y039",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Damaged, delivered exactly 30d, $159: rule 2 gives refund; Jev escalates on the customer's demand; failed baseline, v1 and v2 even with v2 content saying to use cutoffs, not what the ticket asks for."
+  },
+  {
+   "case": "Y039",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Damaged, delivered exactly 30d, $159: rule 2 gives refund; Jev escalates on the customer's demand; failed baseline, v1 and v2 even with v2 content saying to use cutoffs, not what the ticket asks for."
+  },
+  {
+   "case": "Y063",
+   "rep": 0,
+   "bucket": "artifact_gap",
+   "reason": "Shipped 15d, undelivered, in stock: rule 3 gives reship; artifact has no 14-day cutoff, Jev treats it as rule 1 and replies; v2 cutoff content fixed it."
+  },
+  {
+   "case": "Y063",
+   "rep": 1,
+   "bucket": "artifact_gap",
+   "reason": "Shipped 15d, undelivered, in stock: rule 3 gives reship; artifact has no 14-day cutoff, Jev treats it as rule 1 and replies; v2 cutoff content fixed it."
+  },
+  {
+   "case": "Y089",
+   "rep": 0,
+   "bucket": "artifact_gap",
+   "reason": "Damage claim but record is Shipped 28d, undelivered: record puts it in rule 3 (reship); artifact never says the record, not the claim, picks the rule, so Jev replies; v2 record-first content fixed it."
+  },
+  {
+   "case": "Y089",
+   "rep": 1,
+   "bucket": "artifact_gap",
+   "reason": "Damage claim but record is Shipped 28d, undelivered: record puts it in rule 3 (reship); artifact never says the record, not the claim, picks the rule, so Jev replies; v2 record-first content fixed it."
+  },
+  {
+   "case": "Y114",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Shipped 13d, undelivered: rule 1 gives reply; Jev reships on the not-arrived wording (conf 0.37/0.43); failed baseline, v1 and v2 even with v2 cutoff content aimed at the 14-day gate."
+  },
+  {
+   "case": "Y114",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Shipped 13d, undelivered: rule 1 gives reply; Jev reships on the not-arrived wording (conf 0.37/0.43); failed baseline, v1 and v2 even with v2 cutoff content aimed at the 14-day gate."
+  },
+  {
+   "case": "Y138",
+   "rep": 0,
+   "bucket": "artifact_gap",
+   "reason": "Damaged, delivered 33d, $500: rule 2 gives escalate (>30d); artifact covers only the refund limit, not the 30-day window, and Jev refunds; v2 cutoff content fixed it."
+  },
+  {
+   "case": "Y138",
+   "rep": 1,
+   "bucket": "artifact_gap",
+   "reason": "Damaged, delivered 33d, $500: rule 2 gives escalate (>30d); artifact covers only the refund limit, not the 30-day window, and Jev refunds; v2 cutoff content fixed it."
+  },
+  {
+   "case": "Y144",
+   "rep": 0,
+   "bucket": "artifact_gap",
+   "reason": "Damage claim but record is Shipped 16d, undelivered, in stock: record puts it in rule 3 (reship); artifact never says the record picks the rule, so Jev replies; v2 record-first content fixed it."
+  },
+  {
+   "case": "Y144",
+   "rep": 1,
+   "bucket": "artifact_gap",
+   "reason": "Damage claim but record is Shipped 16d, undelivered, in stock: record puts it in rule 3 (reship); artifact never says the record picks the rule, so Jev replies; v2 record-first content fixed it."
+  },
+  {
+   "case": "Y179",
+   "rep": 1,
+   "bucket": "variance",
+   "reason": "Wrong item, delivered 32d: escalate is correct; rep0 escalated and passed, rep1 refunded (conf 0.35 vs 0.41) with the same artifact."
+  },
+  {
+   "case": "Y194",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Record Delivered 33d, customer says still waiting: no policy rule covers a delivered order claimed not received, but the grader demands escalate on an invented 30-day window (it wants reply for the same ticket shape at 28-29d on Y030/Y344 and passed reply at 33d on Y362); v2 record-first content fixed Y030/Y344 but not this, so no artifact satisfies both. Jev's reship with stock 0 is also wrong."
+  },
+  {
+   "case": "Y194",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Record Delivered 33d, customer says still waiting: no policy rule covers a delivered order claimed not received, but the grader demands escalate on an invented 30-day window (it wants reply for the same ticket shape at 28-29d on Y030/Y344 and passed reply at 33d on Y362); v2 record-first content fixed Y030/Y344 but not this, so no artifact satisfies both. Jev's reship with stock 0 is also wrong."
+  },
+  {
+   "case": "Y258",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Customer claims lost but record is Shipped 13d (not Lost): rule 1 gives reply; Jev reships at conf 0.91/0.93 on the claim; failed baseline, v1 and v2 even with v2 record-first content aimed at it."
+  },
+  {
+   "case": "Y258",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Customer claims lost but record is Shipped 13d (not Lost): rule 1 gives reply; Jev reships at conf 0.91/0.93 on the claim; failed baseline, v1 and v2 even with v2 record-first content aimed at it."
+  },
+  {
+   "case": "Y273",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Shipped 12d, $899, stock 0, check-on ticket: rule 1 gives reply; Jev escalates, over-applying v1's 'never-arrived out-of-stock refund over the limit' escalate text with no 14-day gate; baseline passed, v1 and v2 (which added the 14-day cutoff) both fail."
+  },
+  {
+   "case": "Y273",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Shipped 12d, $899, stock 0, check-on ticket: rule 1 gives reply; Jev escalates, over-applying v1's 'never-arrived out-of-stock refund over the limit' escalate text with no 14-day gate; baseline passed, v1 and v2 (which added the 14-day cutoff) both fail."
+  },
+  {
+   "case": "Y282",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Shipped exactly 14d, undelivered: rule 1 (14 days or less) gives reply; Jev reships; failed baseline, v1 and v2 even with v2 cutoff content aimed at the boundary."
+  },
+  {
+   "case": "Y282",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Shipped exactly 14d, undelivered: rule 1 (14 days or less) gives reply; Jev reships; failed baseline, v1 and v2 even with v2 cutoff content aimed at the boundary."
+  },
+  {
+   "case": "Y304",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Customer says lost in the mail but record is Shipped 12d: rule 1 gives reply; Jev reships at conf 0.89; failed baseline, v1 and v2 even with v2 record-first content aimed at it."
+  },
+  {
+   "case": "Y304",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Customer says lost in the mail but record is Shipped 12d: rule 1 gives reply; Jev reships at conf 0.89; failed baseline, v1 and v2 even with v2 record-first content aimed at it."
+  },
+  {
+   "case": "Y318",
+   "rep": 0,
+   "bucket": "artifact_gap",
+   "reason": "Damaged (burning smell), delivered 31d: rule 2 gives escalate; v1 artifact has no 30-day cutoff and Jev refunds the $499 order; v2 cutoff content only got it to 0.50, so it is close to structural."
+  },
+  {
+   "case": "Y318",
+   "rep": 1,
+   "bucket": "artifact_gap",
+   "reason": "Damaged (burning smell), delivered 31d: rule 2 gives escalate; v1 artifact has no 30-day cutoff and Jev refunds the $499 order; v2 cutoff content only got it to 0.50, so it is close to structural."
+  },
+  {
+   "case": "Y338",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Record Delivered 32d, customer says not arrived: grader cites 'escalation for items not arrived when delivered more than 30 days ago', which is not in the policy; same shape as Y030/Y344, which v2 fixed at 28-29d while this stayed at 0.50. Jev's reship is also unsupported (record shows Delivered)."
+  },
+  {
+   "case": "Y338",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Record Delivered 32d, customer says not arrived: grader cites 'escalation for items not arrived when delivered more than 30 days ago', which is not in the policy; same shape as Y030/Y344, which v2 fixed at 28-29d while this stayed at 0.50. Jev's reship is also unsupported (record shows Delivered)."
+  },
+  {
+   "case": "Y344",
+   "rep": 0,
+   "bucket": "artifact_gap",
+   "reason": "Record Delivered 29d, customer asks where it is: rule 3 needs Lost or undelivered, so reply is the policy-consistent answer the grader wants; artifact lacks the rule and Jev reships (conf 0.31/0.39); v2 record-first content fixed it."
+  },
+  {
+   "case": "Y344",
+   "rep": 1,
+   "bucket": "artifact_gap",
+   "reason": "Record Delivered 29d, customer asks where it is: rule 3 needs Lost or undelivered, so reply is the policy-consistent answer the grader wants; artifact lacks the rule and Jev reships (conf 0.31/0.39); v2 record-first content fixed it."
+  },
+  {
+   "case": "Y396",
+   "rep": 0,
+   "bucket": "artifact_gap",
+   "reason": "Damage claim plus escalate demand, but record is Shipped 23d, undelivered, in stock: rule 3 gives reship; artifact never says the record picks the rule, so Jev replies; v2 record-first content fixed it."
+  },
+  {
+   "case": "Y396",
+   "rep": 1,
+   "bucket": "artifact_gap",
+   "reason": "Damage claim plus escalate demand, but record is Shipped 23d, undelivered, in stock: rule 3 gives reship; artifact never says the record picks the rule, so Jev replies; v2 record-first content fixed it."
+  }
+ ]
+}
