@@ -1,0 +1,4 @@
+{
+ "description": "Make the $500 refund cap (rule 4) explicitly cover the out-of-stock refund for lost/undelivered orders (rule 3), in the instructions and in the refund/escalate action descriptions, while saying the cap does not touch reship or reply.",
+ "target": "system_prompt"
+}
