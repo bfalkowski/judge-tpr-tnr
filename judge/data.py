@@ -16,7 +16,7 @@ from judge.policy import ACTIONS, resolve
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 DATA = os.path.join(ROOT, "data")
-DATASETS = ["v2", "v3", "v4"]
+DATASETS = ["v2", "v3", "v4", "v5"]
 
 
 def load(version):

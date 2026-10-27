@@ -2,6 +2,7 @@
 
   python data/make_data_v3.py [--n 240] [--seed 20261010]
   python data/make_data_v3.py --version v4 --n 200 --seed 20261011   # the correction batch
+  python data/make_data_v3.py --version v5 --n 400 --seed 20261027   # the hill-climbing study (hillclimb/)
 
 v2 has 60 hand-written tickets, and the paper 2 agent makes only 28 distinct
 mistakes on them across every run on record. The judge-validation method
@@ -23,7 +24,7 @@ is built in two steps:
 The expected action comes from the reference policy (judge/policy.py), the
 same function paper 2 used. Writes data/<version>/tickets.jsonl and
 data/<version>/orders.json and updates data/CHECKSUMS.json. v3 uses ticket IDs
-W001.. and orders 3001..; v4 uses X001.. and orders 4001...
+W001.. and orders 3001..; v4 uses X001.. and orders 4001..; v5 uses Y001.. and orders 5001...
 """
 
 import argparse
@@ -39,7 +40,7 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 sys.path.insert(0, ROOT)
 from judge.policy import TODAY, resolve  # noqa: E402
 
-PREFIX = {"v3": ("W", 3001), "v4": ("X", 4001)}
+PREFIX = {"v3": ("W", 3001), "v4": ("X", 4001), "v5": ("Y", 5001)}
 
 # sku: (product, price, stock). Prices sit on both sides of the $500 limit.
 PRODUCTS = {

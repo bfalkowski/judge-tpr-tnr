@@ -1,0 +1,29 @@
+{
+ "repo": "https://github.com/anthropics/skills",
+ "commit": "dbd4588f9e1033efb41dad4bef2f7947c8993d44",
+ "copied_on": "2026-10-27",
+ "license": "Apache-2.0 (skills/claude-api/LICENSE.txt in this folder)",
+ "modified": false,
+ "files": {
+  "skills/claude-api/shared/evals/eval-hillclimb.md": {
+   "sha256": "315ae8540ebaeb9f1d7de5efa49625e6137ead255dc3a545b63393df89375588",
+   "git_blob": "7e16832bef17a195ee87da35a4fd4df1b6fc9264",
+   "last_changed_in": "dbd4588f9e1033efb41dad4bef2f7947c8993d44 2026-10-09"
+  },
+  "skills/claude-api/shared/evals/eval-audit.md": {
+   "sha256": "a013f8eb0452c51c5a31860df0fb47219dcdb4da507092fc98867225095026ba",
+   "git_blob": "bc277162f32f11c98639621d94c4a3b90ce6d33d",
+   "last_changed_in": "dbd4588f9e1033efb41dad4bef2f7947c8993d44 2026-10-09"
+  },
+  "skills/claude-api/shared/evals/build-eval.md": {
+   "sha256": "c8f6ae960867f6b3b35557aec75361553888ae7168f268365444bf6a4e09a5d7",
+   "git_blob": "ba875b712ba63135c60aaba4710bf84681ddf34b",
+   "last_changed_in": "dbd4588f9e1033efb41dad4bef2f7947c8993d44 2026-10-09"
+  },
+  "skills/claude-api/LICENSE.txt": {
+   "sha256": "bc6b3af2f331cbc7fb0da1344efb2cbe5877a31498b4d70dbc7000f3405a1362",
+   "git_blob": "4f881c52d1f72f4cfb720e339e2d35c3058d01a9",
+   "last_changed_in": "dbd4588f9e1033efb41dad4bef2f7947c8993d44 2026-10-09"
+  }
+ }
+}

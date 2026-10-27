@@ -10,6 +10,9 @@ Split plan (see README, "Why the test split is new tickets"):
   v2   train 15% / dev 85%. Every v2 ticket was already seen in phase 0 and in
        paper 2, so none of them can serve as unseen test data.
   v3   test 100%. New tickets, written and frozen before any judge sees them.
+  v5   climb_train 30% / climb_test 30% / holdout 40%, for hillclimb/: the
+       hill climber reads climb_train, scores climb_train and climb_test every
+       round, and never sees holdout.
 Within a dataset the split is stratified by the ticket's difficulty tag and
 uses largest-remainder rounding, with a fixed seed.
 """
@@ -24,7 +27,9 @@ from collections import defaultdict
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 from judge import data  # noqa: E402
 
-PLAN = {"v2": {"train": 0.15, "dev": 0.85}, "v3": {"test": 1.0}}
+PLAN = {"v2": {"train": 0.15, "dev": 0.85}, "v3": {"test": 1.0},
+        # the hill-climbing study (hillclimb/DESIGN.md): the agent is climbed, not the judge
+        "v5": {"climb_train": 0.30, "climb_test": 0.30, "holdout": 0.40}}
 SEED = 20261007
 
 

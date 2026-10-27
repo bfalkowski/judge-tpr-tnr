@@ -5,5 +5,7 @@
  "v3/orders.json": "49f147c62718b61b1141194c147528926050b1365a64d2d581ffdb452ae2de68",
  "v3/tickets.jsonl": "f61a336cd97770bbb5f549a1cb318aa35ed4e43d929389a473e04b57f0a8fd11",
  "v4/orders.json": "2290c5c708aedadd3d18f15a17db76a30738ffdc488c3a9b8f34668c3e673155",
- "v4/tickets.jsonl": "b1bce88d07a12df6f2835822619deaff909566e9c5f5e6cafbb8e12e3fccad4d"
+ "v4/tickets.jsonl": "b1bce88d07a12df6f2835822619deaff909566e9c5f5e6cafbb8e12e3fccad4d",
+ "v5/orders.json": "ff30a1e0bec1a1f5a46c9bf61402e6e1d034b672fbdc43d074295795cb363157",
+ "v5/tickets.jsonl": "f3019f3d14f8cedaf32ceece264172ab9313d499decd6530f5755a1e63045781"
 }
