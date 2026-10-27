@@ -1,0 +1,16 @@
+{
+ "run_id": "gh40551650478-climb-key-v3",
+ "dataset": "v5",
+ "config": "clean",
+ "reps": 2,
+ "artifact_fingerprint": "6cc4a424901499c9",
+ "artifact_path": "hillclimb/key/v3/artifact.json",
+ "model": "jev-latest",
+ "backend": "api",
+ "n_tickets": 400,
+ "started_at": "2026-10-27T17:33:19Z",
+ "finished_at": "2026-10-27T17:35:16Z",
+ "errored": 0,
+ "stopped_at_spend_cap": false,
+ "spend_usd": 0.058322
+}
