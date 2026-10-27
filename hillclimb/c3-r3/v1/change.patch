@@ -1,0 +1,15 @@
+--- a/hillclimb/c3-r3/baseline/artifact.json
++++ b/hillclimb/c3-r3/v1/artifact.json
+@@ -1,9 +1,9 @@
+ {
+- "decision_instructions": "Which action does the support policy call for on this ticket?",
++ "decision_instructions": "Which action does the support policy call for on this ticket? Rule 4 applies to every refund the policy gives, including the out-of-stock refund in rule 3 for a lost or undelivered order: if the matching rule says refund and the order total is over $500, choose escalate. The $500 limit changes only refunds; when the matching rule says reship or reply, choose that at any order total.",
+  "criteria": {
+-  "0": "refund: refund the order",
++  "0": "refund: refund the order, only when the order total is $500 or less",
+   "1": "reship: send a replacement",
+-  "2": "escalate: hand the ticket to a supervisor",
++  "2": "escalate: hand the ticket to a supervisor, including any case where the policy gives a refund and the order total is over $500",
+   "3": "reply: reply to the customer and take no other action"
+  }
+ }
