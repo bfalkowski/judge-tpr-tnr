@@ -1,0 +1,4 @@
+{
+ "description": "Replace every \"N days ago\" condition in the instructions and all four action descriptions with a field-named comparison of shipped_on/delivered_on against the cutoff date, and spell out how to compare two dates (year, then month, then day), so Jev reads the branch off the date instead of estimating elapsed days.",
+ "target": "system_prompt"
+}

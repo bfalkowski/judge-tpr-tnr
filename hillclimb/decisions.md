@@ -22,3 +22,8 @@ Each entry is recorded when it is made, with what was known at the time.
 4. **2026-10-27, lenient categorization: helper files outside the sandbox, accepted.** The analyzer wrote a script and
    its output to a scratch folder of its own outside the sandbox and read them back. They are derived from the
    sandbox only. From here on, analyzers are told to keep scratch files in the sandbox's out/ folder.
+
+5. **2026-10-27, after key v3 (train 1.000, test 0.975), before key v4's analyzer runs: a round with no proposal ends
+   the arm.** The design's stop rule assumes every round has a change to run. The analyzer prompt allows it to report
+   that no change can clear the noise floor. When it does, the arm stops there, rather than running more analyzers
+   that will find nothing on a train split with few or no failures. This applies to every arm.

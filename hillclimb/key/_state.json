@@ -1,5 +1,5 @@
 {
- "current_round": 2,
+ "current_round": 3,
  "reps": 2,
  "approve_each_round": false,
  "goal": {
@@ -8,12 +8,12 @@
   "hold": []
  },
  "best": {
-  "round": 2,
-  "name": "v2",
-  "test_score": 0.8791666666666667,
-  "train_score": 0.9291666666666667
+  "round": 3,
+  "name": "v3",
+  "test_score": 0.975,
+  "train_score": 1.0
  },
- "current": "v2",
+ "current": "v3",
  "train_ids": [
   "Y007",
   "Y011",
@@ -320,9 +320,20 @@
    "reason": "train and test both rose",
    "best_after": "v2",
    "best_test_rise": 0.0625
+  },
+  {
+   "round": "v3",
+   "change": "Replace every \"N days ago\" condition in the instructions and all four action descriptions with a field-named comparison of shipped_on/delivered_on against the cutoff date, and spell out how to compare two dates (year, then month, then day), so Jev reads the branch off the date instead of estimating elapsed days.",
+   "train": 1.0,
+   "test": 0.975,
+   "rerun_test": null,
+   "decision": "keep",
+   "reason": "train and test both rose",
+   "best_after": "v3",
+   "best_test_rise": 0.09583333333333333
   }
  ],
- "flat_streak": 2,
+ "flat_streak": 0,
  "categorized": true,
  "stopped": null,
  "baseline_check": {
