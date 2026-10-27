@@ -189,7 +189,8 @@ def test_labeled_split_is_by_ticket_and_train_is_v2_only():
 
 
 def test_vendored_skills_are_unmodified():
-    src = json.load(open(os.path.join(ROOT, "vendor", "evals-skills", "SOURCE.json")))
-    assert src["modified"] is False
-    for path, meta in src["files"].items():
-        assert sha(os.path.join("vendor", "evals-skills", path)) == meta["sha256"], path
+    for folder in ("evals-skills", "claude-api-evals"):
+        src = json.load(open(os.path.join(ROOT, "vendor", folder, "SOURCE.json")))
+        assert src["modified"] is False
+        for path, meta in src["files"].items():
+            assert sha(os.path.join("vendor", folder, path)) == meta["sha256"], path

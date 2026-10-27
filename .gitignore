@@ -6,3 +6,7 @@ __pycache__/
 .DS_Store
 .venv/
 p2/
+hillclimb/.cache/
+hillclimb/.sandboxes/
+hillclimb/*/*/traces/
+hillclimb/*/*/rerun/traces/

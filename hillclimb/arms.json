@@ -1,0 +1,13 @@
+{
+ "key": {"grader": "key",
+         "description": "the answer key (judge/policy.py), as a programmatic check"},
+ "c3": {"grader": "judge", "variant": "c3", "threshold": 0.5, "explain": true,
+        "judge_run": "gh40541791108-c3-v5-all",
+        "description": "the frozen judge c3 (Claude Haiku 4.5), threshold 0.5; test TPR 0.927, TNR 0.919"},
+ "p2": {"grader": "judge", "variant": "p2", "threshold": 0.5, "explain": false,
+        "judge_run": "gh40541805958-p2-v5-all",
+        "description": "paper 2's judge p2 (Jev), threshold 0.5; test TPR 0.792, TNR 0.532"},
+ "lenient": {"grader": "judge", "variant": "j2", "threshold": 0.3, "explain": false,
+             "judge_run": "gh40541820936-j2-v5-all",
+             "description": "the step 2 judge j2 (Jev), threshold 0.3; test TPR 1.000, TNR 0.645"}
+}
