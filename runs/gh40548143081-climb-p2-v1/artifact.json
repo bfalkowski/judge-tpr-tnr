@@ -1,0 +1,9 @@
+{
+ "decision_instructions": "Choose the action to take on this ticket. Check the escalate conditions in the action list first; if one holds, choose escalate. Otherwise choose the action that the support policy's matching numbered rule gives.",
+ "criteria": {
+  "0": "refund: refund the order",
+  "1": "reship: send a replacement",
+  "2": "escalate: hand the ticket to a supervisor. Besides the cases where a policy rule says to escalate, choose this when (a) the customer explicitly asks for a supervisor or a manager, or asks for the ticket to be escalated, whatever action the rules would otherwise give; or (b) the ticket contradicts the order record about whether the customer has the item: they report a damaged or wrong item but the order shows a ship date and no delivery date, or they say it has not arrived or ask where it is but the status is Delivered. A Processing order is not a contradiction, and neither is a not-arrived report on an order with no delivery date.",
+  "3": "reply: reply to the customer and take no other action"
+ }
+}
