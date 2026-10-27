@@ -1,5 +1,5 @@
 {
- "current_round": 1,
+ "current_round": 2,
  "reps": 2,
  "approve_each_round": false,
  "goal": {
@@ -309,9 +309,20 @@
    "reason": "test did not rise",
    "best_after": "baseline",
    "best_test_rise": 0.0
+  },
+  {
+   "round": "v2",
+   "change": "Rewrite the refund and escalate descriptions as complete condition lists, so an undelivered order that is Lost or shipped more than 14 days ago, has stock 0 and a total over $500 matches escalate, and refund only matches totals of $500 or less.",
+   "train": 0.8333333333333334,
+   "test": 0.8458333333333333,
+   "rerun_test": null,
+   "decision": "revert",
+   "reason": "test did not rise",
+   "best_after": "baseline",
+   "best_test_rise": 0.0
   }
  ],
- "flat_streak": 1,
+ "flat_streak": 2,
  "categorized": false,
  "stopped": null,
  "baseline_check": {
