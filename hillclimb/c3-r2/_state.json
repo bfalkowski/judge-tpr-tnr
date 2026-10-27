@@ -1,5 +1,5 @@
 {
- "current_round": 0,
+ "current_round": 1,
  "reps": 2,
  "approve_each_round": false,
  "goal": {
@@ -8,12 +8,12 @@
   "hold": []
  },
  "best": {
-  "round": 0,
-  "name": "baseline",
-  "test_score": 0.7708333333333334,
-  "train_score": 0.7791666666666667
+  "round": 1,
+  "name": "v1",
+  "test_score": 0.7916666666666666,
+  "train_score": 0.8541666666666666
  },
- "current": "baseline",
+ "current": "v1",
  "train_ids": [
   "Y007",
   "Y011",
@@ -298,8 +298,20 @@
   "hillclimb/hc.py",
   "hillclimb/arms.json"
  ],
- "history": [],
- "flat_streak": 0,
+ "history": [
+  {
+   "round": "v1",
+   "change": "Make the rule 4 refund-limit check an explicit last step for every refund outcome (including rule 3's out-of-stock fallback) in the instructions and in the refund and escalate action descriptions, and say that the limit never converts reship or reply.",
+   "train": 0.8541666666666666,
+   "test": 0.7916666666666666,
+   "rerun_test": null,
+   "decision": "keep",
+   "reason": "train and test both rose",
+   "best_after": "v1",
+   "best_test_rise": 0.02083333333333326
+  }
+ ],
+ "flat_streak": 1,
  "categorized": false,
  "stopped": null,
  "baseline_check": {

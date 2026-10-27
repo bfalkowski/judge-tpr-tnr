@@ -1,0 +1,4 @@
+{
+ "description": "Make the rule 4 refund-limit check an explicit last step for every refund outcome (including rule 3's out-of-stock fallback) in the instructions and in the refund and escalate action descriptions, and say that the limit never converts reship or reply.",
+ "target": "system_prompt"
+}
