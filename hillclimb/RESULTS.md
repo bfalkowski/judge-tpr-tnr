@@ -217,28 +217,28 @@ Truly broken rows on damage_open tickets and on the rest, and what the grader di
 
 ## Labelling only the changed rows (retrospective)
 
-If a person had labelled k random rows whose action changed (climb_train and climb_test), how often the labelled net change has the same sign as the true net change (5,000 draws; a labelled net of 0 counts as a miss).
+If a person had labelled k random rows whose action changed (climb_train and climb_test), the probability that the labelled net change has the same sign as the true net change (exact, from the hypergeometric distribution; a labelled net of 0 counts as a miss).
 
 | Arm | Round | Changed rows (of all) | True net change | k = 10 | k = 20 | k = 30 |
 |---|---|---|---|---|---|---|
 | key | v1 | 63 of 480 | +23 | 90% | 98% | 100% |
 | key | v2 | 97 of 480 | +27 | 74% | 88% | 95% |
 | key | v3 | 44 of 480 | +40 | 100% | 100% | 100% |
-| c3 | v1 | 54 of 480 | +20 | 90% | 99% | 100% |
+| c3 | v1 | 54 of 480 | +20 | 91% | 99% | 100% |
 | c3 | v2 | 69 of 480 | -26 | 88% | 98% | 100% |
-| c3 | v3 | 50 of 480 | +10 | 64% | 82% | 93% |
+| c3 | v3 | 50 of 480 | +10 | 65% | 81% | 93% |
 | p2 | v1 | 94 of 480 | -58 | 99% | 100% | 100% |
-| p2 | v2 | 57 of 480 | -32 | 100% | 100% | 100% |
+| p2 | v2 | 57 of 480 | -32 | 99% | 100% | 100% |
 | lenient | v1 | 69 of 480 | +13 | 70% | 83% | 91% |
 | lenient | v2 | 56 of 480 | +26 | 96% | 100% | 100% |
-| c3-r2 | v1 | 61 of 480 | +19 | 85% | 97% | 100% |
-| c3-r2 | v2 | 86 of 480 | +8 | 53% | 64% | 70% |
+| c3-r2 | v1 | 61 of 480 | +19 | 85% | 96% | 100% |
+| c3-r2 | v2 | 86 of 480 | +8 | 54% | 64% | 70% |
 | c3-r3 | v1 | 58 of 480 | +24 | 93% | 100% | 100% |
-| c3-r3 | v2 | 71 of 480 | +17 | 69% | 86% | 94% |
-| lenient-r2 | v1 | 64 of 480 | +12 | 71% | 84% | 92% |
+| c3-r3 | v2 | 71 of 480 | +17 | 69% | 85% | 94% |
+| lenient-r2 | v1 | 64 of 480 | +12 | 70% | 83% | 92% |
 | lenient-r2 | v2 | 59 of 480 | +29 | 97% | 100% | 100% |
-| lenient-r3 | v1 | 66 of 480 | +18 | 82% | 93% | 98% |
-| lenient-r3 | v2 | 76 of 480 | +34 | 94% | 100% | 100% |
+| lenient-r3 | v1 | 66 of 480 | +18 | 81% | 93% | 98% |
+| lenient-r3 | v2 | 76 of 480 | +34 | 95% | 100% | 100% |
 
 ## True change on holdout by kind of ticket, each round against the version it was compared with (points)
 

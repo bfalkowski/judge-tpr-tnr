@@ -32,7 +32,7 @@ rules. c3 kept changes in all three runs: true holdout gains +5.0, +6.9 and +7.8
 across the seven c3 rounds the judge credited all 43 broken damage_open decisions as fixes, and its TNR on test and
 holdout mistakes fell from 0.94 to 0.84, 0.74 and 0.84. The lenient arm reverted all six of its rounds; each applied the
 $500 fix (+2.5 holdout on those tickets every time), its J on fixes was −0.08 to 0.00, and every run ended with the
-analyzer concluding the fix had failed. The "label 20 changed decisions" check held at 82% or more in 17 of 18 rounds;
+analyzer concluding the fix had failed. The "label 20 changed decisions" check (exact probability) held at 81% or more in 17 of 18 rounds;
 the exception (c3-r2 v2, net +8 among 86 changed) was 64%.
 
 ## Setup in one paragraph

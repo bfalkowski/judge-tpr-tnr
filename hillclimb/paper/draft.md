@@ -110,7 +110,8 @@ decisions, 46 of which were wrong:
 
 A judge's input is fully set by the ticket, order, stock and action, so I ran each judge once on all four actions of
 every ticket before the climbs started. The loop looked up the verdict for whatever action the agent chose. Total API
-spend was $3.89: $2.93 for the calibrated judge's verdicts and $0.26 for the repeat runs. In the repo the three judges are `c3`, `j2` at threshold 0.3, and
+spend was $3.89, of which $2.93 was the calibrated judge's verdicts and $0.26 the repeat runs. In the repo the three
+judges are `c3`, `j2` at threshold 0.3, and
 `p2`.
 
 **Noise.** The guide's rule of thumb for a pass rate is 1/√(cases × runs), about 6.5 points here. That treats all 240
@@ -120,7 +121,7 @@ validation tickets got a different grade, depending on the grader, which is abou
 two versions. The larger term is which tickets happen to be in the set. Paired 95% intervals on each round's change,
 resampling tickets, had half-widths of about 3 to 8 points. I use the paired intervals below.
 
-## 3. Four climbs
+## 3. The climbs
 
 | Grader | Rounds | What the loop reported (validation) | True change, validation | True change, holdout |
 |---|---|---|---|---|
@@ -141,8 +142,8 @@ change, and in that run the reported gain matched the realized one. The repeat r
 | lenient | 2 | none of 2 | 0 | 0 | 0 |
 | lenient | 3 | none of 2 | 0 | 0 | 0 |
 
-All three calibrated climbs made real gains. But the gain the loop reported on validation was off by +0.4, +5.4 and −1.3
-points, and on holdout the judge's own scores overstated the gain in all three runs, by 1.6, 4.7 and 1.6 points. All
+All three calibrated climbs raised the true pass rate on holdout, though only run 3's interval clearly excludes zero.
+The gain the loop reported on validation was off by +0.4, +5.4 and −1.3 points, and on holdout the judge's own scores overstated the gain in all three runs, by 1.6, 4.7 and 1.6 points. All
 three lenient climbs reverted every round. The round-level results below show why even a good baseline judge can make the
 wrong call when a change touches outputs it grades differently.
 
@@ -207,7 +208,8 @@ points.
 Each run then ended the same way. The analyzer read the history, saw two rounds aimed at the $500 limit that the judge
 had scored as losses, and proposed nothing. Run 1's analyzer described the over-limit refunds as a behavior "that two
 artifact rounds already failed to move," and run 3's said the same behavior "has already resisted both in-scope levers."
-The fix had worked every time. The judge's blind spot became the analyzer's conclusion about the agent.
+On the over-$500 out-of-stock tickets the fix had worked every time. The judge's blind spot became the analyzer's
+conclusion about the agent.
 
 Two different gaps hid the fixes, and they need different repairs. Low TNR on the old mistakes means the judge already
 passed them, so fixing them earns nothing. Low TPR on the new correct answers means the judge fails them, so fixing them
@@ -278,7 +280,7 @@ measuring the judge's TPR and TNR before tuning further. That was the first step
 
 ## 7. Applying TPR and TNR to a hill climb
 
-The four climbs suggest a procedure. Some steps are demonstrated here. Others are hypotheses this study supports but
+The climbs suggest a procedure. Some steps are demonstrated here. Others are hypotheses this study supports but
 does not establish, and I mark them.
 
 **Before the climb: measure TPR, TNR and J.** *Demonstrated here.* Label decisions from the baseline, with at least
@@ -305,18 +307,18 @@ judge's own score, its ten lowest hold no grader errors at all.
 **Before the climb: measure the judge by kind of output.** *Demonstrated here.* A judge can be fine on average and have
 J near zero on one kind of output. On the baseline you often can't see that, because the app never produces the correct
 output there. Grade a correct output for each main branch of the spec. The lenient judge fails the correct escalation on
-17 of 18 tickets. That check would have found it in minutes, before the loop spent two rounds on a fix it could never
-credit.
+17 of 18 tickets. That check would have found it in minutes, before the loop spent two rounds in each of three runs on
+a fix it could never credit.
 
 **During the climb: label a sample of the changed outputs.** *Supported retrospectively, not yet tested in a loop.* A
 round changes few outputs. Here each round changed 44 to 97 of its 480 train and validation decisions, and every keep or
 revert depends only on those. Labelling a small random sample of them estimates the true change without trusting the
-judge. To check how small, I took each round's changed decisions, drew k of them at random without replacement, counted
-fixes minus breaks with the answer key, and asked whether the sign matched the count over all of them, repeating 5,000
-times per round. Across the 18 rounds of all the runs, at k = 20 the sign matched in at least 82% of draws in 17, and in
-98% or more in 10. The exception was the calibrated judge's second round in run 2, which fixed 45 decisions and broke 37.
-Its net of +8 among 86 changed decisions is hard to sign from a sample: 20 labels got it right in 64% of draws, and 30 in
-70%. At k = 30 every other round was 91% or higher. These are rounds of one task, so they show the idea can work, not
+judge. To check how small, I took each round's changed decisions and computed the chance that k of them, drawn at
+random without replacement and labelled with the answer key, give fixes minus breaks with the same sign as the count over
+all of them. Across the 18 rounds of all the runs, at k = 20 that chance was at least 81% in 17 rounds, and 98% or more in
+9. The exception was the calibrated judge's second round in run 2, which fixed 45 decisions and broke 37. Its net of +8
+among 86 changed decisions is hard to sign from a sample: 20 labels get it right 64% of the time, and 30 labels 70%. At
+k = 30 every other round was 91% or higher. These are rounds of one task, so they show the idea can work, not
 that 20 is enough in general. For this task, 20 decisions is a few minutes of review. The same labels show where J on fixes
 and J on breaks differ, which is how the lenient judge's reverts and the calibrated judge's round 2 would have been
 caught.

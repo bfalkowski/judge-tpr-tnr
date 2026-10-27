@@ -323,7 +323,7 @@ def visibility_by_round(arm, splits=("climb_train", "climb_test")):
     return out
 
 
-def label_the_diff(arm, ks=(10, 20, 30), draws=5000, splits=("climb_train", "climb_test")):
+def label_the_diff(arm, ks=(10, 20, 30), splits=("climb_train", "climb_test")):
     """Retrospective: if a person had labelled k random rows whose action changed in a round, how often would the
     labelled net change (fixes minus breaks) have the same sign as the true net change over every changed row?"""
     st = hc.state(arm)
@@ -333,13 +333,17 @@ def label_the_diff(arm, ks=(10, 20, 30), draws=5000, splits=("climb_train", "cli
         P = [(a[(x["ticket_id"], x["rep"])], x) for x in sealed(arm, h["round"])
              if x["split"] in splits and a[(x["ticket_id"], x["rep"])]["action"] != x["action"]]
         true = sum(n["true"] - o["true"] for o, n in P)
-        rng, agree = random.Random(0), {}
+        # Exact: drawing k rows without replacement from F fixes, B breaks and O other changed rows is multivariate
+        # hypergeometric; sum the probability of every (fixes, breaks) count whose sign matches the true net.
+        from math import comb
+        F = sum(1 for o, n in P if (o["true"], n["true"]) == (0, 1))
+        B = sum(1 for o, n in P if (o["true"], n["true"]) == (1, 0))
+        O, agree = len(P) - F - B, {}
         for k in ks:
-            ok = 0
-            for _ in range(draws):
-                est = sum(n["true"] - o["true"] for o, n in rng.sample(P, min(k, len(P))))
-                ok += est != 0 and (est > 0) == (true > 0)
-            agree[k] = ok / draws
+            k = min(k, len(P))
+            agree[k] = sum(comb(F, f) * comb(B, b) * comb(O, k - f - b)
+                           for f in range(0, min(F, k) + 1) for b in range(0, min(B, k - f) + 1)
+                           if k - f - b <= O and f != b and (f > b) == (true > 0)) / comb(len(P), k)
         out.append({"round": h["round"], "changed_rows": len(P), "rows_total": sum(1 for x in sealed(arm, h["round"]) if x["split"] in splits),
                     "true_net": true, "agree": agree})
         if h["decision"] == "keep":
@@ -589,7 +593,7 @@ def report(res):
             d, r = v["damage_open"], v["rest"]
             L.append(f"| {arm} | {v['round']} | {v['decision']} | {d['broken']} / {d['charged']} / {d['credited']} | {r['broken']} / {r['charged']} / {r['credited']} |")
     L += ["", "## Labelling only the changed rows (retrospective)", "",
-          "If a person had labelled k random rows whose action changed (climb_train and climb_test), how often the labelled net change has the same sign as the true net change (5,000 draws; a labelled net of 0 counts as a miss).", "",
+          "If a person had labelled k random rows whose action changed (climb_train and climb_test), the probability that the labelled net change has the same sign as the true net change (exact, from the hypergeometric distribution; a labelled net of 0 counts as a miss).", "",
           "| Arm | Round | Changed rows (of all) | True net change | k = 10 | k = 20 | k = 30 |", "|---|---|---|---|---|---|---|"]
     for arm, vs in res["label_the_diff"].items():
         for v in vs:
