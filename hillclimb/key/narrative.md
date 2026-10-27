@@ -5,3 +5,5 @@
 | 2 | Make the record decide the branch: compare shipped_on/delivered_on to  | 0.879 | 0.929 | keep |
 
 Best so far: v2 (test 0.879). Grader: the answer key (judge/policy.py), as a programmatic check
+
+Stall categorization: {"artifact_gap": 0, "grader_disagreement": 0, "harness": 0, "structural": 12, "variance": 5}

@@ -323,12 +323,22 @@
   }
  ],
  "flat_streak": 2,
- "categorized": false,
+ "categorized": true,
  "stopped": null,
  "baseline_check": {
   "train": 0.8083333333333333,
   "test": 0.7916666666666666,
   "gap": 0.01666666666666672,
   "within_noise": true
+ },
+ "categorization": {
+  "after": "v2",
+  "counts": {
+   "artifact_gap": 0,
+   "grader_disagreement": 0,
+   "harness": 0,
+   "structural": 12,
+   "variance": 5
+  }
  }
 }
