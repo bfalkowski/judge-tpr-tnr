@@ -5,3 +5,5 @@
 | 2 | Rewrite the refund and escalate descriptions as complete condition lis | 0.846 | 0.833 | revert |
 
 Best so far: baseline (test 0.892). Grader: the step 2 judge j2 (Jev), threshold 0.3; test TPR 1.000, TNR 0.645
+
+Stall categorization: {"artifact_gap": 9, "grader_disagreement": 7, "harness": 0, "structural": 23, "variance": 0}

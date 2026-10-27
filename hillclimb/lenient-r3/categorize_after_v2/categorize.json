@@ -1,0 +1,245 @@
+{
+ "counts": {
+  "artifact_gap": 9,
+  "grader_disagreement": 7,
+  "harness": 0,
+  "structural": 23,
+  "variance": 0
+ },
+ "failures": [
+  {
+   "case": "Y007",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Damaged, delivered 28 days ago, $79: rule 2 calls for refund and the agent refunded (0.36); grader failed it, while passing rep 0's escalate, which follows the customer's demand, not the policy"
+  },
+  {
+   "case": "Y013",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Lost, stock 0, $501: rule 3 fallback refund is over the rule 4 $500 limit, so policy calls for escalate; agent refunded (0.91); same miss in v1 and v2 despite content aimed at it"
+  },
+  {
+   "case": "Y013",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Lost, stock 0, $501: rule 3 fallback refund is over the rule 4 $500 limit, so policy calls for escalate; agent refunded (0.97); same miss in v1 and v2 despite content aimed at it"
+  },
+  {
+   "case": "Y027",
+   "rep": 0,
+   "bucket": "artifact_gap",
+   "reason": "Wrong-item claim but record shows Shipped 35 days ago, never delivered ($501, stock 0); no policy or artifact rule covers a damage/wrong-item claim with no delivery date, agent guesses reply (0.51)"
+  },
+  {
+   "case": "Y027",
+   "rep": 1,
+   "bucket": "artifact_gap",
+   "reason": "Wrong-item claim but record shows Shipped 35 days ago, never delivered ($501, stock 0); no policy or artifact rule covers a damage/wrong-item claim with no delivery date, agent guesses reply (0.52)"
+  },
+  {
+   "case": "Y039",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Damaged, delivered exactly 30 days ago, $159: rule 2 ('30 days ago or less') calls for refund; agent escalated (0.45), following the customer's demand or miscounting the boundary"
+  },
+  {
+   "case": "Y039",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Damaged, delivered exactly 30 days ago, $159: rule 2 ('30 days ago or less') calls for refund; agent escalated (0.57), following the customer's demand or miscounting the boundary"
+  },
+  {
+   "case": "Y050",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Lost, stock 0, $899: rule 3 fallback refund is over the rule 4 $500 limit, so policy calls for escalate; agent refunded (0.99); same miss in v1 and v2 despite content aimed at it"
+  },
+  {
+   "case": "Y050",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Lost, stock 0, $899: rule 3 fallback refund is over the rule 4 $500 limit, so policy calls for escalate; agent refunded (0.99); same miss in v1 and v2 despite content aimed at it"
+  },
+  {
+   "case": "Y054",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Shipped 16 days ago, not delivered, stock 0, $899: rule 3 fallback refund is over the rule 4 $500 limit, so policy calls for escalate; agent refunded (0.67); same miss in v1 and v2"
+  },
+  {
+   "case": "Y054",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Shipped 16 days ago, not delivered, stock 0, $899: rule 3 fallback refund is over the rule 4 $500 limit, so policy calls for escalate; agent refunded (0.76); same miss in v1 and v2"
+  },
+  {
+   "case": "Y061",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Change of mind on a delivered order: rule 5 calls for reply and the agent replied (0.95); grader failed it. Rule 4 limits refunds only and rule 5 has no time or amount limit"
+  },
+  {
+   "case": "Y061",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Change of mind on a delivered order: rule 5 calls for reply and the agent replied (0.96); grader failed it. Rule 4 limits refunds only and rule 5 has no time or amount limit"
+  },
+  {
+   "case": "Y083",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Lost (shipped 5 days ago), stock 0, $899: rule 3 fallback refund is over the rule 4 $500 limit, so policy calls for escalate; agent refunded (0.87), even though the customer also asked for escalation; same miss in v1 and v2"
+  },
+  {
+   "case": "Y083",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Lost (shipped 5 days ago), stock 0, $899: rule 3 fallback refund is over the rule 4 $500 limit, so policy calls for escalate; agent refunded (0.87), even though the customer also asked for escalation; same miss in v1 and v2"
+  },
+  {
+   "case": "Y084",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Damaged, delivered 28 days ago, total exactly $500 (not over the limit): rule 2 calls for refund and the agent refunded (0.39); grader failed it, apparently siding with the customer's 'send a new one'"
+  },
+  {
+   "case": "Y084",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Damaged, delivered 28 days ago, total exactly $500 (not over the limit): rule 2 calls for refund and the agent refunded (0.39); grader failed it, apparently siding with the customer's 'send a new one'"
+  },
+  {
+   "case": "Y119",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Shipped 24 days ago, not delivered, stock 0, $899: rule 3 fallback refund is over the rule 4 $500 limit, so policy calls for escalate; agent refunded (0.29). Rep 1 passed on reply (0.31), which the policy does not call for either; case scored 0 in v1 and v2"
+  },
+  {
+   "case": "Y124",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Lost, stock 0, $899: rule 3 fallback refund is over the rule 4 $500 limit, so policy calls for escalate; agent refunded (0.99); same miss in v1 and v2 despite content aimed at it"
+  },
+  {
+   "case": "Y124",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Lost, stock 0, $899: rule 3 fallback refund is over the rule 4 $500 limit, so policy calls for escalate; agent refunded (0.99); same miss in v1 and v2 despite content aimed at it"
+  },
+  {
+   "case": "Y133",
+   "rep": 0,
+   "bucket": "artifact_gap",
+   "reason": "Wrong-item claim but record shows Shipped 30 days ago, never delivered; no rule covers this, agent guesses reship (0.32), an action rule 2 never calls for"
+  },
+  {
+   "case": "Y133",
+   "rep": 1,
+   "bucket": "artifact_gap",
+   "reason": "Wrong-item claim but record shows Shipped 30 days ago, never delivered; no rule covers this, agent guesses reship (0.45), an action rule 2 never calls for"
+  },
+  {
+   "case": "Y169",
+   "rep": 0,
+   "bucket": "grader_disagreement",
+   "reason": "Change of mind on a delivered order ($649, delivered 51 days ago): rule 5 calls for reply and the agent replied (0.97); grader failed it"
+  },
+  {
+   "case": "Y169",
+   "rep": 1,
+   "bucket": "grader_disagreement",
+   "reason": "Change of mind on a delivered order ($649, delivered 51 days ago): rule 5 calls for reply and the agent replied (0.96); grader failed it"
+  },
+  {
+   "case": "Y192",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Lost, stock 0, $501: rule 3 fallback refund is over the rule 4 $500 limit, so policy calls for escalate; agent refunded (0.87); same miss in v1 and v2 despite content aimed at it"
+  },
+  {
+   "case": "Y192",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Lost, stock 0, $501: rule 3 fallback refund is over the rule 4 $500 limit, so policy calls for escalate; agent refunded (0.96); same miss in v1 and v2 despite content aimed at it"
+  },
+  {
+   "case": "Y194",
+   "rep": 0,
+   "bucket": "artifact_gap",
+   "reason": "Record says Delivered 33 days ago but the customer says it never came; no rule covers delivered-but-missing, agent guesses reship (0.31) with stock 0"
+  },
+  {
+   "case": "Y194",
+   "rep": 1,
+   "bucket": "artifact_gap",
+   "reason": "Record says Delivered 33 days ago but the customer says it never came; no rule covers delivered-but-missing, agent guesses reship (0.43) with stock 0"
+  },
+  {
+   "case": "Y282",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Shipped exactly 14 days ago, not delivered: rule 1 ('14 days ago or less') calls for reply; agent reshipped (0.60), missing the boundary"
+  },
+  {
+   "case": "Y282",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Shipped exactly 14 days ago, not delivered: rule 1 ('14 days ago or less') calls for reply; agent reshipped (0.45), missing the boundary"
+  },
+  {
+   "case": "Y338",
+   "rep": 0,
+   "bucket": "artifact_gap",
+   "reason": "Record says Delivered 32 days ago but the customer says it hasn't arrived; no rule covers delivered-but-missing, agent guesses reship (0.24)"
+  },
+  {
+   "case": "Y338",
+   "rep": 1,
+   "bucket": "artifact_gap",
+   "reason": "Record says Delivered 32 days ago but the customer says it hasn't arrived; no rule covers delivered-but-missing, agent guesses reship (0.31)"
+  },
+  {
+   "case": "Y343",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Shipped 34 days ago, not delivered, stock 0, $899: rule 3 fallback refund is over the rule 4 $500 limit, so policy calls for escalate; agent refunded (0.87); same miss in v1 and v2"
+  },
+  {
+   "case": "Y343",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Shipped 34 days ago, not delivered, stock 0, $899: rule 3 fallback refund is over the rule 4 $500 limit, so policy calls for escalate; agent refunded (0.84); same miss in v1 and v2"
+  },
+  {
+   "case": "Y344",
+   "rep": 1,
+   "bucket": "artifact_gap",
+   "reason": "Record says Delivered 28 days ago, customer asks where it is; no rule covers delivered-but-missing, agent flips between reply (rep 0, 0.49, passed) and reship (rep 1, 0.31, failed)"
+  },
+  {
+   "case": "Y346",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Lost, stock 0, $501: rule 3 fallback refund is over the rule 4 $500 limit, so policy calls for escalate; agent refunded (0.97); same miss in v1 and v2 despite content aimed at it"
+  },
+  {
+   "case": "Y346",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Lost, stock 0, $501: rule 3 fallback refund is over the rule 4 $500 limit, so policy calls for escalate; agent refunded (0.95); same miss in v1 and v2 despite content aimed at it"
+  },
+  {
+   "case": "Y385",
+   "rep": 0,
+   "bucket": "structural",
+   "reason": "Lost, stock 0, $899: rule 3 fallback refund is over the rule 4 $500 limit, so policy calls for escalate; agent refunded (0.99) despite the customer asking for a replacement; same rule 4 composition miss as the other over-limit cases"
+  },
+  {
+   "case": "Y385",
+   "rep": 1,
+   "bucket": "structural",
+   "reason": "Lost, stock 0, $899: rule 3 fallback refund is over the rule 4 $500 limit, so policy calls for escalate; agent refunded (0.99) despite the customer asking for a replacement; same rule 4 composition miss as the other over-limit cases"
+  }
+ ]
+}
