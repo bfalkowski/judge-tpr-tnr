@@ -33,3 +33,10 @@ Each entry is recorded when it is made, with what was known at the time.
    files". After a reverted round, that is the reverted version. `hc.py sandbox` gave the current (best kept) version's
    traces instead, with a one-line history of each earlier proposal. DESIGN.md described this choice, but it was not
    flagged as a departure from the skill when it was made. It matters for the lenient arm (FINDINGS.md, finding 4).
+
+7. **2026-10-27, after the external review and before any replicate run: two more climbs each for c3 and lenient.**
+   Arms `c3-r2`, `c3-r3`, `lenient-r2` and `lenient-r3` (arms.json) repeat the original c3 and lenient climbs exactly:
+   the same baseline agent run (gh40542493329), the same precomputed judge verdicts and threshold, the same analyzer
+   prompt and sandbox (the current version's train traces, decisions 3 and 4 included), and the same keep, stall and
+   stop rules, including decision 5. Only the analyzer's proposals can differ, so the replicates measure how much of
+   each finding depends on one trajectory. The p2 and key arms are not repeated. The original arms count as run 1.
