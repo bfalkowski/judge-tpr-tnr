@@ -1,8 +1,6 @@
 # Can You Trust Your Judge's Score? A Primer on TPR and TNR for LLM Judges
 
-Bryan Falkowski · October 2026
-
-*Updated October 28, 2026: added Section 9, Rules for using a judge, and short notes in Sections 3, 7 and 8. They come from a [study of hill climbing with LLM judges](https://github.com/bfalkowski/judge-tpr-tnr/blob/main/hillclimb/paper/overview.md).*
+Bryan Falkowski · October 2026 · Updated October 28, 2026
 
 An LLM judge reads an output and says PASS or FAIL. Teams use judges to answer questions like "what share of our replies are polite?" without reading every reply themselves. Before you trust the number a judge reports, you need to know how often it gets each kind of output right. That is what TPR and TNR measure.
 
@@ -164,15 +162,14 @@ The same applies whenever the replies change in other ways, such as new template
 
 ## 9. Rules for using a judge
 
-The sections above come down to seven rules. Rules 1 to 6 restate points made earlier in this primer. The note on kinds of output in rule 3, the condition in rule 5, and rule 7 were added in October 2026, after the hill-climbing study.
+The sections above come down to six rules.
 
 1. **Measure TPR and TNR separately.** One accuracy or agreement number hides which kind of mistake the judge makes. (Section 3)
 2. **Improve a weak judge before you correct it.** If J = TPR + TNR − 1 is close to zero, the correction cannot rescue the judge. (Section 6)
 3. **Carry TPR and TNR only to the same kinds of output.** They do not depend on the mix of good and bad outputs, so you can use them on new data. But they can differ by kind of output, so label examples of each kind that matters. (Sections 3 and 5)
-4. **Measure again when the outputs change.** A new model, new templates or new kinds of requests can move TPR and TNR. Label a fresh sample and check. (Section 8)
+4. **Measure again when the outputs change.** A new model, new templates or new kinds of requests can move TPR and TNR. Label a fresh sample and check. If the judge chooses the changes, as in a hill climb, also check a sample of the outputs that each change affects, and measure the judge again on the final version. (Section 8)
 5. **Compare versions with the same judge, when the change keeps the same kinds of output.** Then the judge's errors largely affect both versions the same way. (Section 7)
 6. **Correct the score with rates measured on outputs like the ones you are scoring.** The correction is only as good as those rates. (Sections 5 and 8)
-7. **When the judge chooses changes, check it three times:** before the optimization, on a sample of the outputs that each change affects, and on the final version. (Section 8)
 
 ## 10. Summary
 

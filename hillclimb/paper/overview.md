@@ -16,13 +16,12 @@ increase. My primer, [Can You Trust Your Judge's Score?](https://bfalkowski.gith
 how to measure a judge with TPR and TNR. It also shows how to correct the pass rate that the judge reports.
 
 This study implements the loop from the article, adapted to isolate grader errors. It uses three LLM judges of
-measured quality and an answer key, and it tests six rules from the primer in this loop. The primer stated these rules
-before the study, and its Section 9 now lists them. **All six rules stay correct.** But a hill climb breaks the
-conditions of some rules, and it needs more measurement than the primer described. The main finding is this: **a judge can be accurate on
+measured quality and an answer key, and it tests the six rules in Section 9 of the primer. **All six rules stay
+correct.** But a hill climb breaks the
+conditions of some rules, and it needs more measurement than one calibration before the climb. The main finding is this: **a judge can be accurate on
 the baseline and still make incorrect keep or revert choices**, because each choice depends on how the judge grades
 the small number of outputs that the change affects. The practical result is a check of the judge at three times:
-before the climb, on the decisions that each change affects, and after the climb. The primer now gives this check as
-its rule 7.
+before the climb, on the decisions that each change affects, and after the climb.
 
 ## 1. Where the study started
 
@@ -61,9 +60,8 @@ increased the pass rate on the holdout tickets from 79% to 100%.
 ## 3. The six rules and the results
 
 Each rule below stays correct. The rules have the same numbers as in Section 9 of the primer. The table gives each
-rule as the primer stated it before this study. The results show the conditions under which each rule holds in a hill
-climb, and what a climb needs in addition. After the study, the primer added the conditions to rules 3 and 5, and it
-added rule 7 for optimization loops.
+rule as the primer first stated it. The results show the conditions under which each rule holds in a hill climb, and
+what a climb needs in addition.
 
 | Rule from the primer | What the rule means in a hill climb | Result |
 |---|---|---|
@@ -193,7 +191,7 @@ Two examples show this. Each example occurred in all three runs.
   an unclear case, not a clear judge error. The climbs broke 43 decisions on these tickets by the answer key's reading,
   and the judge counted all 43 as fixes.
 
-**Added to the primer (rule 3):** measure the judge for each kind of output. Include correct outputs that the app does not
+**Extension to the primer (rule 3):** measure the judge for each kind of output. Include correct outputs that the app does not
 produce yet. On the baseline, the agent never gave the correct escalation, so the lenient judge's problem was not
 visible there.
 
@@ -211,7 +209,7 @@ samples of 10, 20 and 30.
 
 <!-- figure:labels -->
 
-**Added to the primer (rule 7):** in a hill climb, label a small sample of the changed outputs in each round. This is
+**Extension to the primer (rule 4):** in a hill climb, label a small sample of the changed outputs in each round. This is
 retrospective evidence from the completed climbs. It is not yet a tested procedure for a running loop.
 
 ### Rule 5 holds only if the change does not alter the kind of output
@@ -256,7 +254,7 @@ The primer already warns that the correction needs rates that are correct for th
 where the rates change because of the optimization itself. This is a form of Goodhart's law: when the judge's pass rate
 becomes the target, the loop can move the app toward the judge's blind spots.
 
-**Added to the primer (rule 7):** after an optimization, measure TPR and TNR again on the final version before you correct
+**Extension to the primer (rules 4 and 6):** after an optimization, measure TPR and TNR again on the final version before you correct
 or report its pass rate.
 
 ### Where the effects come from
@@ -314,8 +312,7 @@ again, with the same agent, tickets and judges. It will examine these questions:
 ## 9. The practical result: check the judge three times
 
 The article checks the grader before the first round and again when the score stalls. The results add a check on the
-decisions that each change affects, and a new measurement after the climb. Together, they give three principles. The
-primer now gives them as rule 7.
+decisions that each change affects, and a new measurement after the climb. Together, they give three principles.
 
 1. **Measure the judge before the optimization.** One agreement number is not sufficient. Measure both types of error,
    and measure them for each important kind of output. *This study shows this.*

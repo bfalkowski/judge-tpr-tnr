@@ -141,8 +141,7 @@
 <main class="container"><article>
   <h1>Can You Trust Your Judge's Score?</h1>
   <p class="subtitle">A Primer on TPR and TNR for LLM Judges</p>
-  <p class="byline">Bryan Falkowski · October 2026</p>
-  <p class="byline"><em>Updated October 28, 2026: added <a href="#rules">Section 9, Rules for using a judge</a>, and short notes in Sections 3, 7 and 8. They come from a <a href="https://github.com/bfalkowski/judge-tpr-tnr/blob/main/hillclimb/paper/overview.md">study of hill climbing with LLM judges</a>.</em></p>
+  <p class="byline">Bryan Falkowski · October 2026 · Updated October 28, 2026</p>
 
   <div class="abstract"><p>An LLM judge reads an output and says PASS or FAIL. Teams use judges to answer questions like "what share of our replies are polite?" without reading every reply themselves. Before you trust the number a judge reports, you need to know how often it gets each kind of output right. That is what TPR and TNR measure.</p>
 <p>This primer works through one small example from start to finish: label some outputs, measure a judge, improve it, use it, and report the result with a range. The counts are invented for teaching; every calculation is checked by <a href="https://github.com/bfalkowski/judge-tpr-tnr/blob/main/primer/numbers.py"><code>primer/numbers.py</code></a>.</p></div>
@@ -285,15 +284,14 @@ Reply: {{REPLY}}</pre>
   <p>The same applies whenever the replies change in other ways, such as new templates or new kinds of requests: re-check the judge on a fresh labeled sample. In practice that is the ongoing cost of using a judge.</p>
   <p><strong>Using the judge to choose changes</strong> is the strongest case of this. In a hill climb, each round makes one change to the app and keeps it only if the judge's score goes up. The replies change every round, and the judge's own verdicts decide which changes stay. A change that produces replies the judge wrongly passes can stay, and a real fix the judge does not recognize can be thrown away. Check a small labeled sample of the replies that each change affected, and measure the judge again on the final version before you report its score. The <a href="https://github.com/bfalkowski/judge-tpr-tnr/blob/main/hillclimb/paper/overview.md">hill-climbing study</a> shows what goes wrong without these checks.</p>
   <h2 id="rules"><span class="num">9.</span>Rules for using a judge</h2>
-  <p>The sections above come down to seven rules. Rules 1 to 6 restate points made earlier in this primer. The note on kinds of output in rule 3, the condition in rule 5, and rule 7 were added in October 2026, after the hill-climbing study.</p>
+  <p>The sections above come down to six rules.</p>
   <ol>
     <li><strong>Measure TPR and TNR separately.</strong> One accuracy or agreement number hides which kind of mistake the judge makes. (<a href="#tpr-tnr">Section 3</a>)</li>
     <li><strong>Improve a weak judge before you correct it.</strong> If J = TPR + TNR − 1 is close to zero, the correction cannot rescue the judge. (<a href="#range">Section 6</a>)</li>
     <li><strong>Carry TPR and TNR only to the same kinds of output.</strong> They do not depend on the mix of good and bad outputs, so you can use them on new data. But they can differ by kind of output, so label examples of each kind that matters. (<a href="#tpr-tnr">Sections 3</a> and <a href="#correction">5</a>)</li>
-    <li><strong>Measure again when the outputs change.</strong> A new model, new templates or new kinds of requests can move TPR and TNR. Label a fresh sample and check. (<a href="#models">Section 8</a>)</li>
+    <li><strong>Measure again when the outputs change.</strong> A new model, new templates or new kinds of requests can move TPR and TNR. Label a fresh sample and check. If the judge chooses the changes, as in a hill climb, also check a sample of the outputs that each change affects, and measure the judge again on the final version. (<a href="#models">Section 8</a>)</li>
     <li><strong>Compare versions with the same judge, when the change keeps the same kinds of output.</strong> Then the judge's errors largely affect both versions the same way. (<a href="#report">Section 7</a>)</li>
     <li><strong>Correct the score with rates measured on outputs like the ones you are scoring.</strong> The correction is only as good as those rates. (<a href="#correction">Sections 5</a> and <a href="#models">8</a>)</li>
-    <li><strong>When the judge chooses changes, check it three times:</strong> before the optimization, on a sample of the outputs that each change affects, and on the final version. (<a href="#models">Section 8</a>)</li>
   </ol>
   <h2 id="summary"><span class="num">10.</span>Summary</h2>
   <p>The judge said 284 of last month's 400 replies were polite (71%). If you had hand-labeled all 400, you would have found 296 (74%). Three ideas explain the gap.</p>

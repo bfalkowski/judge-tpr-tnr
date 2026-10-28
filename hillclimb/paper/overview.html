@@ -214,13 +214,12 @@ analyzer proposes one change. The loop keeps the change only if the pass rates o
 increase. My primer, <a href="https://bfalkowski.github.io/writing/judge-score.html">Can You Trust Your Judge's Score?</a>, shows
 how to measure a judge with TPR and TNR. It also shows how to correct the pass rate that the judge reports.</p>
 <p>This study implements the loop from the article, adapted to isolate grader errors. It uses three LLM judges of
-measured quality and an answer key, and it tests six rules from the primer in this loop. The primer stated these rules
-before the study, and its Section 9 now lists them. <strong>All six rules stay correct.</strong> But a hill climb breaks the
-conditions of some rules, and it needs more measurement than the primer described. The main finding is this: <strong>a judge can be accurate on
+measured quality and an answer key, and it tests the six rules in Section 9 of the primer. <strong>All six rules stay
+correct.</strong> But a hill climb breaks the
+conditions of some rules, and it needs more measurement than one calibration before the climb. The main finding is this: <strong>a judge can be accurate on
 the baseline and still make incorrect keep or revert choices</strong>, because each choice depends on how the judge grades
 the small number of outputs that the change affects. The practical result is a check of the judge at three times:
-before the climb, on the decisions that each change affects, and after the climb. The primer now gives this check as
-its rule 7.</p></div>
+before the climb, on the decisions that each change affects, and after the climb.</p></div>
 <h2 id="where-the-study-started"><span class="num">1.</span> Where the study started</h2>
 <p>Two documents started this study.</p>
 <ul>
@@ -252,9 +251,8 @@ LLM. The <em>answer key</em> is a grader that is code. The article also uses the
 increased the pass rate on the holdout tickets from 79% to 100%.</p>
 <h2 id="the-six-rules-and-the-results"><span class="num">3.</span> The six rules and the results</h2>
 <p>Each rule below stays correct. The rules have the same numbers as in Section 9 of the primer. The table gives each
-rule as the primer stated it before this study. The results show the conditions under which each rule holds in a hill
-climb, and what a climb needs in addition. After the study, the primer added the conditions to rules 3 and 5, and it
-added rule 7 for optimization loops.</p>
+rule as the primer first stated it. The results show the conditions under which each rule holds in a hill climb, and
+what a climb needs in addition.</p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -499,7 +497,7 @@ true change −32 decisions, the judge saw −8" tabindex="0"><circle class="hit
   an unclear case, not a clear judge error. The climbs broke 43 decisions on these tickets by the answer key's reading,
   and the judge counted all 43 as fixes.</li>
 </ul>
-<p><strong>Added to the primer (rule 3):</strong> measure the judge for each kind of output. Include correct outputs that the app does not
+<p><strong>Extension to the primer (rule 3):</strong> measure the judge for each kind of output. Include correct outputs that the app does not
 produce yet. On the baseline, the agent never gave the correct escalation, so the lenient judge's problem was not
 visible there.</p>
 <h3>Rule 4 holds, and a climb needs it in each round</h3>
@@ -620,7 +618,7 @@ true net change −58 in 94 changed decisions" tabindex="0"><circle class="hit" 
 true net change +40 in 44 changed decisions" tabindex="0"><circle class="hit" cx="660.0" cy="231.0" r="11"></circle><circle class="mark filled" cx="660.0" cy="231.0" r="5"></circle></g><g class="pt g-weak" data-tip="Weak, round 2
 100.0% with k = 30
 true net change −32 in 57 changed decisions" tabindex="0"><circle class="hit" cx="660.0" cy="231.0" r="11"></circle><circle class="mark filled" cx="660.0" cy="231.0" r="5"></circle></g></svg></div><figcaption><b>Fig 3</b> For each of the 18 rounds: the probability that k changed decisions, selected at random and labelled by a person, give the same direction as the true net change. These are exact probabilities. The one difficult round had a net change near zero.</figcaption><details class="data"><summary>Show the data</summary><div class="table-wrap"><table><thead><tr><th>Climb</th><th>Round</th><th>Changed decisions</th><th>True net change</th><th>k = 10</th><th>k = 20</th><th>k = 30</th></tr></thead><tbody><tr><td>Answer key</td><td>round 1</td><td class="n">63</td><td class="n">+23</td><td class="n">89.6%</td><td class="n">98.4%</td><td class="n">99.9%</td></tr><tr><td>Answer key</td><td>round 2</td><td class="n">97</td><td class="n">+27</td><td class="n">73.7%</td><td class="n">88.3%</td><td class="n">95.3%</td></tr><tr><td>Answer key</td><td>round 3</td><td class="n">44</td><td class="n">+40</td><td class="n">100.0%</td><td class="n">100.0%</td><td class="n">100.0%</td></tr><tr><td>Calibrated, run 1</td><td>round 1</td><td class="n">54</td><td class="n">+20</td><td class="n">90.8%</td><td class="n">99.0%</td><td class="n">100.0%</td></tr><tr><td>Calibrated, run 1</td><td>round 2</td><td class="n">69</td><td class="n">−26</td><td class="n">87.7%</td><td class="n">97.8%</td><td class="n">99.8%</td></tr><tr><td>Calibrated, run 1</td><td>round 3</td><td class="n">50</td><td class="n">+10</td><td class="n">64.5%</td><td class="n">81.2%</td><td class="n">93.1%</td></tr><tr><td>Calibrated, run 2</td><td>round 1</td><td class="n">61</td><td class="n">+19</td><td class="n">85.0%</td><td class="n">96.3%</td><td class="n">99.6%</td></tr><tr><td>Calibrated, run 2</td><td>round 2</td><td class="n">86</td><td class="n">+8</td><td class="n">54.0%</td><td class="n">63.7%</td><td class="n">70.2%</td></tr><tr><td>Calibrated, run 3</td><td>round 1</td><td class="n">58</td><td class="n">+24</td><td class="n">93.4%</td><td class="n">99.5%</td><td class="n">100.0%</td></tr><tr><td>Calibrated, run 3</td><td>round 2</td><td class="n">71</td><td class="n">+17</td><td class="n">69.3%</td><td class="n">84.8%</td><td class="n">93.7%</td></tr><tr><td>Lenient, run 1</td><td>round 1</td><td class="n">69</td><td class="n">+13</td><td class="n">70.0%</td><td class="n">82.9%</td><td class="n">91.5%</td></tr><tr><td>Lenient, run 1</td><td>round 2</td><td class="n">56</td><td class="n">+26</td><td class="n">96.2%</td><td class="n">99.9%</td><td class="n">100.0%</td></tr><tr><td>Lenient, run 2</td><td>round 1</td><td class="n">64</td><td class="n">+12</td><td class="n">70.1%</td><td class="n">83.3%</td><td class="n">92.2%</td></tr><tr><td>Lenient, run 2</td><td>round 2</td><td class="n">59</td><td class="n">+29</td><td class="n">97.1%</td><td class="n">99.9%</td><td class="n">100.0%</td></tr><tr><td>Lenient, run 3</td><td>round 1</td><td class="n">66</td><td class="n">+18</td><td class="n">80.5%</td><td class="n">93.2%</td><td class="n">98.4%</td></tr><tr><td>Lenient, run 3</td><td>round 2</td><td class="n">76</td><td class="n">+34</td><td class="n">94.7%</td><td class="n">99.6%</td><td class="n">100.0%</td></tr><tr><td>Weak</td><td>round 1</td><td class="n">94</td><td class="n">−58</td><td class="n">99.5%</td><td class="n">100.0%</td><td class="n">100.0%</td></tr><tr><td>Weak</td><td>round 2</td><td class="n">57</td><td class="n">−32</td><td class="n">99.5%</td><td class="n">100.0%</td><td class="n">100.0%</td></tr></tbody></table></div></details></figure>
-<p><strong>Added to the primer (rule 7):</strong> in a hill climb, label a small sample of the changed outputs in each round. This is
+<p><strong>Extension to the primer (rule 4):</strong> in a hill climb, label a small sample of the changed outputs in each round. This is
 retrospective evidence from the completed climbs. It is not yet a tested procedure for a running loop.</p>
 <h3>Rule 5 holds only if the change does not alter the kind of output</h3>
 <p>The primer says that a comparison of two versions with the same judge, on the same kind of data, is more reliable
@@ -680,7 +678,7 @@ nearer to the true values.</p>
 <p>The primer already warns that the correction needs rates that are correct for the new outputs. A hill climb is a case
 where the rates change because of the optimization itself. This is a form of Goodhart's law: when the judge's pass rate
 becomes the target, the loop can move the app toward the judge's blind spots.</p>
-<p><strong>Added to the primer (rule 7):</strong> after an optimization, measure TPR and TNR again on the final version before you correct
+<p><strong>Extension to the primer (rules 4 and 6):</strong> after an optimization, measure TPR and TNR again on the final version before you correct
 or report its pass rate.</p>
 <h3>Where the effects come from</h3>
 <p>The results show three sources of the effects. Each source has a different size.</p>
@@ -761,8 +759,7 @@ again, with the same agent, tickets and judges. It will examine these questions:
 </ul>
 <h2 id="the-practical-result-check-the-judge-three-times"><span class="num">9.</span> The practical result: check the judge three times</h2>
 <p>The article checks the grader before the first round and again when the score stalls. The results add a check on the
-decisions that each change affects, and a new measurement after the climb. Together, they give three principles. The
-primer now gives them as rule 7.</p>
+decisions that each change affects, and a new measurement after the climb. Together, they give three principles.</p>
 <ol>
 <li><strong>Measure the judge before the optimization.</strong> One agreement number is not sufficient. Measure both types of error,
    and measure them for each important kind of output. <em>This study shows this.</em></li>
