@@ -132,11 +132,11 @@ def fig_glance():
     vis = [v for a in LEN_RUNS for v in R["visibility"][a]]
     good_reverts = sum(1 for v in vis if v["decision"] == "revert" and v["true_change_rows"] > 0)
     tiles = [
-        (f"+{min(gains):.0f} to +{max(gains):.0f} points", "true gain on holdout in each of the three climbs with the calibrated judge"),
+        (f"{good_reverts} of {len(vis)}", "lenient rounds that the loop reverted, but each round fixed more decisions than it broke"),
+        (f"{oc} of {ob}", "decisions that the calibrated climbs broke on open tickets, which the judge showed as fixes"),
         (f"{pct(fp0)} → {100 * min(fpw):.0f}–{pct(max(fpw))}",
          "incorrect decisions that the calibrated judge passed, before and after each climb"),
-        (f"{oc} of {ob}", "decisions that the calibrated climbs broke on open tickets, which the judge showed as fixes"),
-        (f"{good_reverts} of {len(vis)}", "lenient rounds that the loop reverted, but each round fixed more decisions than it broke"),
+        (f"+{min(gains):.0f} to +{max(gains):.0f} points", "true gain on holdout in each of the three climbs with the calibrated judge"),
     ]
     return ('<section class="glance" aria-label="At a glance">' + "".join(
         f'<div class="tile"><div class="v">{esc(v)}</div><div class="l">{esc(l)}</div></div>' for v, l in tiles)

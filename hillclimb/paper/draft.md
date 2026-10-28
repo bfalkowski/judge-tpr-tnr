@@ -5,28 +5,29 @@ Bryan Falkowski · October 2026 · Code and data: [github.com/bfalkowski/judge-t
 *Fourth draft: the third draft, rewritten in ASD-STE100 Simplified Technical English. Every number comes from
 `hillclimb/analyze.py` and is in `hillclimb/RESULTS.md`.*
 
-**Abstract.** Hill climbing improves an app with one change at a time. If the pass rate on the eval increases, you
-keep the change. If not, you revert it. When an LLM judge grades the eval, the mistakes of the judge can cause
-incorrect keep or revert choices. This paper examines how.
+**Abstract.** A judge that is good enough to measure an app is not always good enough to control a hill climb. A
+hill climb keeps a change only if the judge's pass rate increases. Thus each keep or revert choice depends on how the
+judge grades the small number of outputs that the change affects. On these outputs, the accuracy of the judge can be
+very different from its average. I measure it with two values for each round: J on fixes and J on breaks.
 
-I ran the same loop on one support agent with four graders. One grader was the answer key. The other three were
-judges with a measured TPR and TNR. TPR is the rate at which a judge passes correct outputs. TNR is the rate at which it
-fails incorrect outputs. After the climbs, the answer key graded every decision.
+Two findings show this. Each finding occurred in all three runs.
 
-- **Answer key:** The pass rate on the holdout tickets increased from 79% to 100%. The loop did not use these tickets.
-- **Calibrated judge, three runs:** Each climb increased the true pass rate on holdout by 5 to 8 points. Each climb
-  also gave the agent the judge's answer for one type of ticket that the policy does not decide. Before the climbs,
-  the judge passed 6% of the agent's incorrect decisions. After them, it passed 16% to 26%.
-- **Lenient judge, three runs:** Each change fixed more decisions than it broke. But the judge gave no net increase
-  in passes for the fixed decisions. It also changed most of the broken decisions from pass to fail. Thus the loop
-  reverted every change.
-- **Weak judge:** Its verdicts gave almost no information. Thus the loop could not detect an improvement, and it kept
-  no change.
+- **The judge rejected a true improvement.** The lenient judge had J = 0.61 on the baseline. On the decisions that a
+  fix of the $500 refund limit corrected, its J was 0 or less. The loop reverted this fix in all six rounds, although
+  each round fixed more decisions than it broke. Then the analyzer concluded that the fix did not work.
+- **The climb moved the agent's mistakes to where the judge does not detect them.** The calibrated judge had J = 0.88.
+  Its climbs increased the true holdout pass rate by 5 to 8 points. But each climb also gave the agent the judge's
+  answer for one type of ticket that the policy does not decide. The judge counted all 43 breaks on these tickets as
+  fixes. Before the climbs, it passed 6% of the agent's incorrect decisions. After them, it passed 16% to 26%.
 
-A simple model says that, on average, a judge shows each change at J = TPR + TNR − 1 times its true size. This model
-is correct when TPR and TNR are the same for all outputs. In these climbs, they were not the same. Thus the quality of
-a judge on the baseline does not tell you how it grades the changes that a loop tries. Section 7 shows how to measure
-this before, during and after a climb.
+The usual checks of a judge did not reliably separate the lenient judge from the calibrated judge. Section 7 gives a
+procedure to detect these problems. Its main step is to label a small sample of the outputs that each change affects.
+I tested this step only on the completed climbs.
+
+I ran Anthropic's published hill-climbing loop on one support agent, with an answer key and three judges with a
+measured TPR and TNR. I ran the climbs with the calibrated and lenient judges three times each. The answer key graded
+every decision after the climbs. With the answer key as the grader, the loop increased the holdout pass rate from 79%
+to 100%.
 
 <!-- figure:glance -->
 
@@ -80,7 +81,8 @@ badly. I call the average J over the fixes of a change its "J on fixes." I call 
 
 This changes the question. The question is not only "Is the judge accurate?" It is also "Can the judge control an
 optimization correctly?" These are two different questions. The loop changes the outputs of the agent. This changes
-where the judge makes its mistakes, and that has an effect on the next round. The remainder of this paper shows this
+where the judge makes its mistakes, and that has an effect on the next round. The main finding of this paper is that a judge
+can be accurate on the baseline and still control the optimization incorrectly. The remainder of this paper shows this
 effect in the climbs of this study. It also shows how to measure it.
 
 ## 2. Setup
