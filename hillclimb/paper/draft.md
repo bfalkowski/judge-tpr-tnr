@@ -65,6 +65,7 @@ with a negative J gives higher pass rates to worse outputs. The model also gives
 clearly more than zero, the smallest true gain that the loop can detect is approximately the noise divided by J.
 
 <!-- figure:shrink -->
+![Fig 1: the change a judge shows against the true change, one line for each grader's J](figures/shrink.png)
 
 The uniform-error model is only the start. A change in a hill climb usually affects a small number of types of output.
 The judge's rates are different for each type. Thus each fixed output adds its own J. This J is the judge's TPR on the
@@ -123,6 +124,7 @@ climbs with the calibrated judge and the lenient judge two more times. These rep
 verdicts and rules. Only the analyzer's proposals, and thus the changes that the loop kept, could be different.
 
 <!-- figure:loop -->
+![Fig 2: the 400 tickets in three sets, and the four steps of one round of the loop](figures/loop.png)
 
 **The graders.** Each climb used one grader for all its rounds. I measured each judge on the 240 train decisions of
 the baseline. Of these decisions, 46 were incorrect.
@@ -180,6 +182,7 @@ good on the baseline can make an incorrect keep or revert choice. This can occur
 the judge grades differently.
 
 <!-- figure:outcomes -->
+![Fig 3: holdout gain of each climb, from its own judge and from the answer key](figures/outcomes.png)
 
 In the uniform-error model, the paired noise of 3 to 8 points sets the smallest true change that each judge can
 detect.
@@ -210,6 +213,7 @@ on breaks. In the last kept round of each run, J on breaks was between 0.10 and 
 fixes was between −0.08 and 0.00, and J on breaks was between 0.53 and 0.86. `RESULTS.md` has each round of each run.
 
 <!-- figure:jscatter -->
+![Fig 4: J on fixes against J on breaks for each round of each climb](figures/jscatter.png)
 
 No judge had one J. Each judge had a J on fixes and a different J on breaks. This difference decided the round. Two
 rounds show this most clearly on the validation set:
@@ -248,6 +252,7 @@ the loop's rule. Round 1 tried the same fix. In round 1 also, the number of pass
 decisions.
 
 <!-- figure:waffle -->
+![Fig 5: what the lenient judge did with each decision that round 2 fixed or broke](figures/waffle.png)
 
 The repeat runs gave the same result. In all six lenient rounds of the three runs, the change applied the $500 limit
 to the out-of-stock refund. Each time, the over-$500 out-of-stock tickets alone increased the holdout pass rate by 2.5
@@ -297,6 +302,7 @@ wrong item." In the seven calibrated rounds of the three runs, changes broke 43 
 to fail.
 
 <!-- figure:breaks -->
+![Fig 6: the decisions that each calibrated round broke, by what the judge did](figures/breaks.png)
 
 Two related effects occur here.
 
@@ -321,6 +327,7 @@ judge failed 53 of 57 incorrect decisions at baseline. At the three final versio
 But the decrease has the same direction and the same cause in each run.
 
 <!-- figure:drift -->
+![Fig 7: incorrect decisions on the open tickets, and the share that the judge passed, before and after each calibrated climb](figures/drift.png)
 
 This argument does not depend on which reading is correct. The loop decided an unclear part of the policy. It used
 the judge's reading, and it did not show this decision to a person. No number from the loop shows that it decided a
@@ -356,6 +363,7 @@ The climbs suggest a procedure. This study shows some of the steps. For other st
 proof. I identify each type of step.
 
 <!-- figure:procedure -->
+![Fig 8: the procedure, before, during and after a climb](figures/procedure.png)
 
 **Before the climb: measure TPR, TNR and J.** *Shown in this study.* Label decisions from the baseline. Include at
 least approximately 30 incorrect decisions. Measure TPR and TNR with intervals. If J is not clearly more than zero,
@@ -405,6 +413,7 @@ breaks are different. With these labels, you can detect the incorrect reverts of
 the calibrated judge showed only a small decrease in round 2 of run 1.
 
 <!-- figure:labels -->
+![Fig 9: probability that k labelled decisions give the correct direction, for each round](figures/labels.png)
 
 **During the climb: if a change breaks the specification, examine the judge.** *A hypothesis from a small number of
 examples.* The analyzer can propose a change that the specification does not allow. It can also decide a case that the

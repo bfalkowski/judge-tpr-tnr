@@ -523,7 +523,7 @@ def build_body():
         figs.append(place(m))
         return f"FIGURETOKEN{len(figs) - 1}"
 
-    rest = re.sub(r"<!-- figure:(\w+) -->", token, rest)
+    rest = re.sub(r"<!-- figure:(\w+) -->(?:\n!\[[^\]]*\]\(figures/[^)]*\))?", token, rest)
     body = conv(rest)
     for i, f in enumerate(figs):
         assert body.count(f"<p>FIGURETOKEN{i}</p>") == 1, i
