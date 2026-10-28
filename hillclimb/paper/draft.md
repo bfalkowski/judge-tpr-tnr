@@ -256,7 +256,7 @@ decisions on the open tickets, and the judge credited all 43 as fixes. It charge
 Two related things are happening here.
 
 The first is selection. The loop keeps changes the judge rewards, so it pulls the agent toward the judge's reading of
-anything the judge reads differently from the answer key. That is Goodhart's law (Goodhart 1975): once the judge's score
+anything the judge reads differently from the answer key. That is Goodhart's law (Wikipedia): once the judge's score
 is the target, the loop optimizes the judge's opinion along with the agent's quality.
 
 The second is a shift in where the judge's errors fall, and this one is the empirical finding. The climb changed which
@@ -396,6 +396,6 @@ separate Claude agent checked their numbers the same way. The judges, agent runs
 - Anthropic. `claude-api` skill, [`shared/evals/eval-hillclimb.md`](https://github.com/anthropics/skills/tree/main/skills/claude-api), commit `dbd4588`. 2026.
 - Falkowski. [Can You Trust Your Judge's Score? A Primer on TPR and TNR for LLM Judges](https://bfalkowski.github.io/writing/judge-score.html). 2026a.
 - Falkowski. [Is This Run Valid? Attributing Pipeline Failures Before Scoring LLM Evaluations](https://bfalkowski.github.io/writing/run-valid.html). 2026b.
-- Goodhart. Problems of monetary management: the U.K. experience. Papers in Monetary Economics, Reserve Bank of Australia, 1975.
 - Martin. [Automating eval design and hillclimbing with Claude](https://claude.dev/blog/automating-eval-design-and-hillclimbing/). claude.dev, September 2026.
+- Wikipedia. [Goodhart's law](https://en.wikipedia.org/wiki/Goodhart%27s_law).
 - Youden. Index for rating diagnostic tests. Cancer, 1950.

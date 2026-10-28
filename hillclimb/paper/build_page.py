@@ -97,6 +97,16 @@ def dot_sw(cls, hollow=False, shape="circle"):
     return f'<svg class="sw-svg {cls}" viewBox="0 0 14 14" aria-hidden="true">{m}</svg>'
 
 
+def callout(cx, cy, num):
+    """A numbered marker on a chart, keyed to a list under it (keeps long notes out of the plot)."""
+    return (f'<g class="callout"><circle cx="{cx:.1f}" cy="{cy:.1f}" r="8.5"/>'
+            f'<text x="{cx:.1f}" y="{cy + 3.8:.1f}" text-anchor="middle">{num}</text></g>')
+
+
+def callout_key(notes):
+    return '<ol class="callouts">' + "".join(f"<li>{esc(n)}</li>" for n in notes) + "</ol>"
+
+
 def box_sw(cls):
     return f'<span class="sw {cls}" aria-hidden="true"></span>'
 
@@ -138,10 +148,12 @@ def fig_shrink():
     x, y = Lin(-10, 10, L, W - Rm), Lin(-10, 10, H - B, T)
     g = []
     for v in (-10, -5, 0, 5, 10):
-        g.append(f'<line x1="{x(v):.1f}" x2="{x(v):.1f}" y1="{T}" y2="{H - B}" class="{"axis" if v == 0 else "grid"}"/>')
         g.append(f'<line x1="{L}" x2="{W - Rm}" y1="{y(v):.1f}" y2="{y(v):.1f}" class="{"axis" if v == 0 else "grid"}"/>')
-        g.append(text(x(v), H - B + 18, minus(f"{v:+d}" if v else "0"), "tick", "middle"))
+        g.append(f'<line x1="{x(v):.1f}" x2="{x(v):.1f}" y1="{H - B}" y2="{H - B + 5}" class="axis"/>')
+        g.append(text(x(v), H - B + 20, minus(f"{v:+d}" if v else "0"), "tick", "middle"))
         g.append(text(L - 8, y(v) + 4, minus(f"{v:+d}" if v else "0"), "tick", "end"))
+    g.append(f'<line x1="{x(0):.1f}" x2="{x(0):.1f}" y1="{T}" y2="{H - B}" class="axis"/>')
+    g.append(f'<line x1="{L}" x2="{W - Rm}" y1="{H - B}" y2="{H - B}" class="axis"/>')
     g.append(text((L + W - Rm) / 2, H - 6, "True change (points)", "lab m", "middle"))
     g.append(text(14, (T + H - B) / 2, "Change the judge shows (points)", "lab m", "middle",
                   f' transform="rotate(-90 14 {(T + H - B) / 2:.1f})"'))
@@ -159,7 +171,7 @@ def fig_shrink():
     for i in range(1, len(labels)):  # keep end labels at least 15px apart
         labels[i][0] = max(labels[i][0], labels[i - 1][0] + 15)
     for ly, s in labels:
-        g.append(text(x(10) + 12, ly + 4, s))
+        g.append(text(x(10) + 12, ly + 5, s, "lab em"))
     body = svg(W, H, "".join(g), "Lines of slope J for each grader: the change a judge shows against the true change")
     cap = ("The uniform-error model: if a judge's TPR and TNR were the same for every output, it would show any change at "
            "J times its true size. Each line uses a grader's J measured on the baseline's train decisions. The climbs "
@@ -211,7 +223,7 @@ def fig_outcomes():
         g.append(text(L - 12, yy + 4, run_name(gname, n), "lab", "end"))
         parts = [f'<g class="{cls}">']
         if best is not None:
-            parts.append(f'<line x1="{x(0):.1f}" x2="{x(best):.1f}" y1="{yy:.1f}" y2="{yy:.1f}" class="leader"/>')
+            parts.append(f'<line x1="{x(0):.1f}" x2="{x(best):.1f}" y1="{yy:.1f}" y2="{yy:.1f}" class="ref"/>')
             parts.append(f'<g class="pt"{tip(run_name(gname, n), f"best change the loop reverted: true {sgn(best)} points")}>'
                          f'<circle cx="{x(best):.1f}" cy="{yy:.1f}" r="12" class="hit"/>'
                          f'<path d="M{x(best):.1f} {yy - 6:.1f} L{x(best) + 6:.1f} {yy:.1f} L{x(best):.1f} {yy + 6:.1f} '
@@ -245,18 +257,15 @@ def fig_jscatter():
     x, y = Lin(-0.3, 1.05, L, L + S), Lin(-0.3, 1.05, T + S, T)
     g = []
     for v in (0, 0.25, 0.5, 0.75, 1.0):
-        g.append(f'<line x1="{x(v):.1f}" x2="{x(v):.1f}" y1="{T}" y2="{T + S}" class="{"axis" if v == 0 else "grid"}"/>')
         g.append(f'<line x1="{L}" x2="{L + S}" y1="{y(v):.1f}" y2="{y(v):.1f}" class="{"axis" if v == 0 else "grid"}"/>')
-        g.append(text(x(v), T + S + 18, f2(v), "tick", "middle"))
+        g.append(f'<line x1="{x(v):.1f}" x2="{x(v):.1f}" y1="{T + S}" y2="{T + S + 5}" class="axis"/>')
+        g.append(text(x(v), T + S + 20, f2(v), "tick", "middle"))
         g.append(text(L - 8, y(v) + 4, f2(v), "tick", "end"))
-    g.append(f'<line x1="{x(-0.3):.1f}" y1="{y(-0.3):.1f}" x2="{x(1.05):.1f}" y2="{y(1.05):.1f}" class="diag"/>')
-    mx, my = x(0.38), y(0.38)
-    g.append(text(mx, my - 8, "uniform-error model: J on fixes = J on breaks", "lab m", "middle",
-                  f' transform="rotate(-45 {mx:.1f} {my:.1f})"'))
-    g.append(text(x(-0.27), y(1.0), "Misses fixes: real gains", "lab m"))
-    g.append(text(x(-0.27), y(1.0) + 16, "look smaller, or like losses", "lab m"))
-    g.append(text(x(1.03), y(-0.17), "Misses breaks: losses look", "lab m", "end"))
-    g.append(text(x(1.03), y(-0.17) + 16, "smaller, or like gains", "lab m", "end"))
+    g.append(f'<line x1="{x(0):.1f}" x2="{x(0):.1f}" y1="{T}" y2="{T + S}" class="axis"/>')
+    g.append(f'<line x1="{L}" x2="{L + S}" y1="{T + S}" y2="{T + S}" class="axis"/>')
+    g.append(f'<line x1="{x(-0.3):.1f}" y1="{y(-0.3):.1f}" x2="{x(1.05):.1f}" y2="{y(1.05):.1f}" class="ref"/>')
+    for num, (cx_, cy_) in ((1, (-0.2, 1.0)), (2, (0.95, -0.2)), (3, (0.38, 0.38))):
+        g.append(callout(x(cx_), y(cy_), num))
     g.append(text(L + S / 2, H - 8, "J on fixes: how much of each true fix the judge credits", "lab m", "middle"))
     g.append(text(14, T + S / 2, "J on breaks: how much of each true break it charges", "lab m", "middle",
                   f' transform="rotate(-90 14 {T + S / 2:.1f})"'))
@@ -276,12 +285,15 @@ def fig_jscatter():
                  f"true change {sgn(v['true_change_rows'], 0)} decisions, the judge saw {sgn(v['grader_change_rows'], 0)}"]
         g.append(f'<g class="pt {GCLS[gname]}"{tip(*lines)}><circle cx="{cx:.1f}" cy="{cy:.1f}" r="12" class="hit"/>'
                  f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="5.5" class="mark {"filled" if kept else "hollow"}"/></g>')
-    g.append(text(x(0.95), y(1.0) + 4, "answer key", "lab", "end"))
-    g.append(text(x(0.07), y(0.70) + 4, "lenient", "lab"))
-    g.append(text(x(0.0), y(0.205) + 4, "weak", "lab", "middle"))
-    g.append(text(x(1.0), y(0.30) + 4, "calibrated", "lab", "end"))
+    g.append(text(x(0.95), y(1.0) + 5, "Answer key", "lab em", "end"))
+    g.append(text(x(0.07), y(0.70) + 5, "Lenient", "lab em"))
+    g.append(text(x(0.0), y(0.205) + 5, "Weak", "lab em", "middle"))
+    g.append(text(x(1.0), y(0.30) + 5, "Calibrated", "lab em", "end"))
     lg = grader_legend([(dot_sw("g-ink"), "kept"), (dot_sw("g-ink", hollow=True), "reverted")])
-    body = lg + svg(W, H, "".join(g), "J on fixes against J on breaks for every round", "chart square")
+    key = callout_key(["Above the diagonal the judge misses fixes, so real gains look smaller, or like losses.",
+                       "Below it the judge misses breaks, so losses look smaller, or like gains.",
+                       "On it, J on fixes equals J on breaks: the uniform-error model."])
+    body = lg + svg(W, H, "".join(g), "J on fixes against J on breaks for every round", "chart square") + key
     cap = ("Every round of every climb, placed by how much of its true fixes and its true breaks the judge saw (train "
            "and validation decisions, each round against the version it was tested against). Under the uniform-error "
            "model every round would sit on the diagonal. Only the answer key's do. The lenient judge's rounds sit "
@@ -403,7 +415,7 @@ def fig_drift():
             merged[i][0] = max(merged[i][0], merged[i - 1][0] + 15)
         for ly, s, runs in merged:
             who = "run " + str(runs[0]) if len(runs) == 1 else "runs " + " and ".join(map(str, sorted(runs)))
-            g.append(text(xb + 12, ly + 4, f"{s} ({who})", "lab"))
+            g.append(text(xb + 12, ly + 5, f"{s} ({who})", "lab em"))
         data.append([title, fmt(b)] + [fmt(w) for w in ws])
     body = svg(W, H, "".join(g), "Open-ticket mistakes and the judge's false-pass share, baseline against kept version")
     cap = ("Each calibrated climb moved the agent's mistakes onto the open damage tickets, where this judge passes them "
@@ -495,7 +507,7 @@ def build_body():
         n[0] += 1
         dt = (f'<details class="data"><summary>Show the data</summary><div class="table-wrap">{data}</div></details>'
               if data else "")
-        return (f'\n<figure class="fig fig-{name}" id="figure-{n[0]}">{body}<figcaption><b>Figure {n[0]}.</b> '
+        return (f'\n<figure class="fig fig-{name}" id="figure-{n[0]}">{body}<figcaption><b>Fig {n[0]}</b> '
                 f'{esc(cap)}</figcaption>{dt}</figure>\n')
 
     figs = []

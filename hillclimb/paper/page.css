@@ -6,7 +6,7 @@
     --good: #2a5aa8; --bad: #c0562b; --bad-soft: #e9b49c; --on-bad: #ffffff;
     --c-key: #2c2c2c; --c-cal: #6250d6; --c-len: #eda100; --c-weak: #e87ba4;
     --nc1: #cfd3da; --nc2: #8b919c;
-    --grid: #eceef1; --axis: #c3c8d0;
+    --grid: rgba(44, 44, 44, .09); --axis: rgba(44, 44, 44, .24); --text-2: #474b53;
     --font-body: "Source Sans 3", "Source Sans Pro", "Segoe UI", Helvetica, Arial, sans-serif;
     --font-mono: "Roboto Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
   }
@@ -17,7 +17,7 @@
       --good: #6a95d8; --bad: #d6764a; --bad-soft: #7a4a35; --on-bad: #10141a;
       --c-key: #e4e6ea; --c-cal: #9085e9; --c-len: #c98500; --c-weak: #d55181;
       --nc1: #3d434e; --nc2: #7a818d;
-      --grid: #232830; --axis: #3d434e;
+      --grid: rgba(228, 230, 234, .08); --axis: rgba(228, 230, 234, .22); --text-2: #c4c8cf;
       color-scheme: dark;
     }
   }
@@ -27,7 +27,7 @@
     --good: #6a95d8; --bad: #d6764a; --bad-soft: #7a4a35; --on-bad: #10141a;
     --c-key: #e4e6ea; --c-cal: #9085e9; --c-len: #c98500; --c-weak: #d55181;
     --nc1: #3d434e; --nc2: #7a818d;
-    --grid: #232830; --axis: #3d434e;
+    --grid: rgba(228, 230, 234, .08); --axis: rgba(228, 230, 234, .22); --text-2: #c4c8cf;
     color-scheme: dark;
   }
   * { box-sizing: border-box; }
@@ -81,9 +81,9 @@
   td.jt { font-weight: 600; }
 
   /* Figures */
-  figure.fig { margin: 28px 0 30px; }
-  figcaption { font-size: 14.5px; color: var(--muted); margin-top: 10px; line-height: 1.5; }
-  figcaption b { color: var(--text); font-weight: 600; }
+  figure.fig { margin: 28px 0 30px; border: 1px solid var(--line); border-radius: 8px; padding: 16px; }
+  figcaption { font-size: 14.5px; color: var(--muted); margin-top: 12px; line-height: 1.5; }
+  figcaption b { color: var(--text); font-weight: 600; font-size: 12.5px; letter-spacing: .06em; text-transform: uppercase; margin-right: 6px; }
   details.data { margin-top: 6px; font-size: 14px; }
   details.data summary { cursor: pointer; color: var(--accent); width: max-content; }
   details.data table { font-size: 13.5px; margin-top: 8px; }
@@ -93,17 +93,24 @@
   .chart.square svg { max-width: 560px; min-width: 420px; margin: 0 auto; }
   .chart text { font-family: var(--font-body); }
   .chart .tick { fill: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
-  .chart .lab { fill: var(--text); font-size: 13px; }
+  .chart .lab { fill: var(--text-2); font-size: 12.5px; }
   .chart .lab.m { fill: var(--muted); }
+  .chart .lab.em { fill: var(--text); font-size: 14px; font-weight: 600; }
   .chart .inlab { fill: var(--on-bad); font-size: 12px; font-weight: 600; pointer-events: none; }
   .chart .grid { stroke: var(--grid); stroke-width: 1; }
   .chart .axis { stroke: var(--axis); stroke-width: 1; }
-  .chart .diag { stroke: var(--muted); stroke-width: 1; }
+  .chart .ref { stroke: var(--axis); stroke-width: 1; stroke-dasharray: 3 4; stroke-linecap: round; }
+  .callout circle { fill: var(--bg); stroke: var(--text-2); stroke-width: 1; }
+  .callout text { fill: var(--text-2); font-size: 11px; font-weight: 600; }
+  .callouts { margin: 8px 0 0; padding-left: 0; list-style: none; counter-reset: c; font-size: 14px; color: var(--text-2); }
+  .callouts li { counter-increment: c; display: flex; gap: 8px; align-items: baseline; margin-bottom: 4px; }
+  .callouts li::before { content: counter(c); flex: none; width: 17px; height: 17px; border: 1px solid var(--text-2); border-radius: 50%;
+                         font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; transform: translateY(2px); }
   .chart .leader { stroke: var(--axis); stroke-width: 1; }
   .chart .conn { stroke: var(--c); stroke-width: 2; opacity: .45; }
-  .chart .line { fill: none; stroke: var(--c); stroke-width: 2; stroke-linecap: round; }
-  .mark.filled { fill: var(--c); stroke: var(--bg); stroke-width: 2; }
-  .mark.hollow { fill: var(--bg); stroke: var(--c); stroke-width: 2; }
+  .chart .line { fill: none; stroke: var(--c); stroke-width: 1.75; stroke-linecap: round; }
+  .mark.filled { fill: var(--c); stroke: var(--bg); stroke-width: 1.5; }
+  .mark.hollow { fill: var(--bg); stroke: var(--c); stroke-width: 1.75; }
   .hit { fill: transparent; }
   .pt { cursor: default; outline: none; }
   .pt:hover .mark, .pt:focus-visible .mark { stroke: var(--text); stroke-width: 2; }
@@ -164,6 +171,7 @@
   .tip::first-line { font-weight: 600; }
 
   @media (max-width: 720px) {
+    figure.fig { padding: 12px; margin-inline: -4px; }
     .topbar, article { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
     h1 { font-size: 28px; }
     .glance { grid-template-columns: repeat(2, minmax(0, 1fr)); }
