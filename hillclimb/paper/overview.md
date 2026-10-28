@@ -35,8 +35,8 @@ Two documents started this study.
   each type. You can correct the judge's pass rate with these rates. The correction works only while the judge acts as
   it did when you measured it.
 
-The article already warns that grading errors are a common cause of a bad eval. It says that you must read a sample
-of graded transcripts before you trust the grader. Its account of the work also includes a phase of "fixing graders."
+The article already warns that grading errors are a common cause of a bad eval. It says that it is important to read a
+sample of graded transcripts before you trust the grader. Its account of the work also includes a phase of "fixing graders."
 
 This study examines a related question: what occurs when a grader does more than measure performance? In a hill
 climb, the grader's verdicts decide which changes stay. I use the measurements from my primer and an answer key to
@@ -44,7 +44,7 @@ examine how grader errors affect these choices. The answer key also shows which 
 or accepts, and why.
 
 **Terms.** On this page, a *grader* is anything that grades the agent's decisions. A *judge* is a grader that is an
-LLM. The *answer key* is a grader that is code. The article uses the word *evaluator* for any grader.
+LLM. The *answer key* is a grader that is code. The article also uses the word *grader*, and in one place *evaluator*.
 
 ## 2. Goals
 
@@ -76,7 +76,8 @@ The section numbers refer to the primer.
 
 **The app.** A support agent from my earlier work reads a ticket and selects one of four actions: refund, reship,
 escalate or reply. A written policy with five rules decides the correct action. An answer key, written as code, gives
-the correct action for each ticket. The loop could change only the agent's instructions.
+the correct action for each ticket. The loop could change only the agent's decision instructions and the descriptions of the four
+actions.
 
 **The tickets.** There were 400 new tickets in three sets. Fig 1 shows the sets and one round of the loop. The analyzer
 read the train set. The loop used the train and validation sets for each keep or revert choice. The loop did not use
@@ -91,9 +92,12 @@ isolate the grader's errors:
 |---|---|---|
 | What the loop can change | The system prompt, skills or instruction files, tool descriptions, model choice and API parameters, and harness code | Only the agent's decision instructions and its descriptions of the four actions |
 | Grader | Programmatic checks, or an LLM judge with a rubric. If there is a baseline, the judge compares two outputs in random order | One fixed grader for each climb: the answer key or one of three LLM judges. A judge grades each decision alone, with pass or fail |
-| Keep or revert rule | Keep a change if the train and test pass rates both increase | The same rule. This page calls the test set "validation" |
-| Final assessment | The version with the best test result, compared with the baseline | The final version, measured on a separate holdout set that the loop did not use |
-| Analysis of the grader | Validate the grader and examine grading failures | TPR and TNR before and after the climb, J on fixes and J on breaks in each round, and an answer key for every decision |
+| Keep or revert rule | Keep a change if the train and test scores both increase | The same rule, as the skill writes it. The skill adds a second run when only the test score increases. That case did not occur. This page calls the test set "validation" |
+| Validation of the grader | Check the grader before the first round, fix it if necessary, and check it again when the score stalls | The same checks were calculated, but the loop did not fix the grader. This was the design: the study measures what the grader's errors do |
+| Judge noise | Run the grader two times on the same output, and check that the verdict does not change | Each verdict was calculated one time before the climbs, for each ticket and action. Thus each judge had no run-to-run noise |
+| What the analyzer reads | The previous round's train transcripts | The train transcripts of the last kept version. After a revert, the analyzer did not see the transcripts of the reverted round |
+| Final assessment | The version with the best test result, compared with the baseline, with confidence intervals | The same comparison on the validation set. In addition, a separate holdout set that the loop did not use |
+| Analysis of the grader | Validate the grader and examine grading failures | TPR and TNR on the baseline and on the final version, J on fixes and J on breaks in each round, and an answer key for every decision |
 
 Thus the study is an implementation of the article's method, adapted to isolate grader errors. It is not an exact copy.
 The findings apply most directly to a judge that grades each output alone.
@@ -104,13 +108,16 @@ was not used during the climb, so it gives an independent measure of the final v
 explain the loop's choices, and holdout for the true gains.
 
 **The graders.** I ran the same loop with four graders. Each grader stayed the same for all rounds of its climb. I
-measured each judge with TPR and TNR before the climbs, as the primer teaches.
+measured each judge with TPR and TNR on the train decisions of the baseline, as the primer teaches. A team can make this
+measurement before a climb. In this study, I calculated it from the answer key after the climbs, so that the loop
+could not use it. Before the climbs, I had only the values from my earlier judge study, on different tickets. Those
+values were similar for the calibrated and lenient judges. For the weak judge, J was 0.32 there.
 
 | Grader | What it is | TPR | TNR | J |
 |---|---|---|---|---|
 | answer key | the policy as code | 1.00 | 1.00 | 1.00 |
 | calibrated | a judge (Claude Haiku 4.5). I refined its prompt with labelled tickets from earlier batches | 0.95 | 0.93 | 0.88 |
-| lenient | an earlier version of that judge (Jev), with a low threshold | 0.95 | 0.65 | 0.61 |
+| lenient | an earlier step of the same judge design, run on Jev, with a low threshold | 0.95 | 0.65 | 0.61 |
 | weak | the judge from my run-validity paper (Jev) | 0.76 | 0.24 | 0.00 |
 
 The name "calibrated" describes how I made the judge. It does not mean that the judge is reliable in a loop. The
@@ -143,7 +150,9 @@ model.
 ### Rule 1 holds: measure TPR and TNR, not one agreement number
 
 Two usual checks did not show the difference between the lenient judge and the calibrated judge. The first check reads
-the 10 cases with the lowest judge scores. It found approximately 2 grader errors for each judge. The second check
+the 10 cases with the lowest judge scores. It found approximately 2 grader errors for each judge. The skill's rule
+says to fix the grader if more than 1 case in 10 is a grader error. Thus this check flagged both judges in most
+samples: the lenient judge in 79% and the calibrated judge in 69%. It did not show which judge was worse. The second check
 measures agreement on 40 random decisions. Most of these decisions are correct, so the check measures mostly TPR. The
 lenient judge reached 90% agreement in 60% of random samples. The calibrated judge reached it in 95%.
 
@@ -172,7 +181,8 @@ Two examples show this. Each example occurred in all three runs.
   fix: the $500 refund limit applies to out-of-stock refunds. On the decisions that this fix corrected, the judge's J
   was 0 or less. The judge fails the correct escalation on 17 of 18 tickets of this kind. Thus the loop reverted the
   fix in all six rounds, although each round fixed more decisions than it broke. Then the analyzer concluded that the
-  fix did not work.
+  fix did not work. In this study, the analyzer did not see the transcripts of the reverted rounds. This possibly
+  contributed to its conclusion.
 - **The calibrated judge disagreed with the answer key on one kind of ticket.** Its J on the baseline was 0.88. On
   this kind of ticket, a customer reports damage on an order that did not arrive. The policy text does not decide the
   correct action. The judge passes the action of rule 3, and the answer key says reply. Thus this is a disagreement on
@@ -299,8 +309,8 @@ again, with the same agent, tickets and judges. It will examine these questions:
 
 ## 9. The practical result: check the judge three times
 
-The article says to validate the grader before you trust it. The results add two more checks. Together, they give
-three principles.
+The article checks the grader before the first round and again when the score stalls. The results add a check on the
+decisions that each change affects, and a new measurement after the climb. Together, they give three principles.
 
 1. **Measure the judge before the optimization.** One agreement number is not sufficient. Measure both types of error,
    and measure them for each important kind of output. *This study shows this.*
