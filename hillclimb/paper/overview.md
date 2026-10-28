@@ -15,17 +15,19 @@ analyzer proposes one change. The loop keeps the change only if the pass rates o
 increase. My primer, [Can You Trust Your Judge's Score?](https://bfalkowski.github.io/writing/judge-score.html), shows
 how to measure a judge with TPR and TNR. It also shows how to correct the pass rate that the judge reports.
 
-This study runs the loop from the article with three LLM judges of measured quality and with an answer key. It tests
-six rules from the primer in this loop. **All six rules stay correct.** But a hill climb breaks the conditions of some
+This study implements the loop from the article, adapted to isolate grader errors. It uses three LLM judges of
+measured quality and an answer key, and it tests six rules from the primer in this loop. **All six rules stay correct.** But a hill climb breaks the conditions of some
 rules, and it needs more measurement than the primer describes. The main finding is this: **a judge can be accurate on
 the baseline and still make incorrect keep or revert choices**, because each choice depends on how the judge grades
-the small number of outputs that the change affects.
+the small number of outputs that the change affects. The practical result is a check of the judge at three times:
+before the climb, on the decisions that each change affects, and after the climb.
 
 ## 1. Where the study started
 
 Two documents started this study.
 
-- **Anthropic's article on hill climbing with Claude** (Martin 2026) and the `claude-api` skill that it describes. In
+- **Anthropic's article on hill climbing with Claude** (Lance Martin, September 28, 2026) and the `claude-api` skill
+  that it describes. In
   this loop, an analyzer reads the failures on the train set and proposes one change. The loop keeps the change only if
   the pass rates on the train set and the test set both increase. The two sets protect the loop from overfitting to
   the cases that the analyzer reads.
@@ -33,10 +35,13 @@ Two documents started this study.
   each type. You can correct the judge's pass rate with these rates. The correction works only while the judge acts as
   it did when you measured it.
 
-The article already gives a warning about graders. It says that you must read a sample of graded transcripts before you
-trust the evaluator. The reason is that grading errors are a common cause of a bad eval. In the article's own example,
-the third phase of work was "fixing graders." This study measures the same type of problem with the tools from the
-primer.
+The article already warns that grading errors are a common cause of a bad eval. It says that you must read a sample
+of graded transcripts before you trust the grader. Its account of the work also includes a phase of "fixing graders."
+
+This study examines a related question: what occurs when a grader does more than measure performance? In a hill
+climb, the grader's verdicts decide which changes stay. I use the measurements from my primer and an answer key to
+examine how grader errors affect these choices. The answer key also shows which changes the grader incorrectly rejects
+or accepts, and why.
 
 **Terms.** On this page, a *grader* is anything that grades the agent's decisions. A *judge* is a grader that is an
 LLM. The *answer key* is a grader that is code. The article uses the word *evaluator* for any grader.
@@ -78,6 +83,20 @@ read the train set. The loop used the train and validation sets for each keep or
 the holdout set. I scored the holdout set only after the climbs.
 
 <!-- figure:loop -->
+
+**What follows the article, and what I changed.** The study follows the method of the article, with changes that
+isolate the grader's errors:
+
+| Part of the method | In the article | In this study |
+|---|---|---|
+| What the loop can change | The system prompt, skills or instruction files, tool descriptions, model choice and API parameters, and harness code | Only the agent's decision instructions and its descriptions of the four actions |
+| Grader | Programmatic checks, or an LLM judge with a rubric. If there is a baseline, the judge compares two outputs in random order | One fixed grader for each climb: the answer key or one of three LLM judges. A judge grades each decision alone, with pass or fail |
+| Keep or revert rule | Keep a change if the train and test pass rates both increase | The same rule. This page calls the test set "validation" |
+| Final assessment | The version with the best test result, compared with the baseline | The final version, measured on a separate holdout set that the loop did not use |
+| Analysis of the grader | Validate the grader and examine grading failures | TPR and TNR before and after the climb, J on fixes and J on breaks in each round, and an answer key for every decision |
+
+Thus the study is an implementation of the article's method, adapted to isolate grader errors. It is not an exact copy.
+The findings apply most directly to a judge that grades each output alone.
 
 **Validation and holdout answer different questions.** The loop used the validation set in every round. Thus the
 selection of changes depends on it, and a gain on validation is partly a result of that selection. The holdout set
@@ -278,7 +297,10 @@ again, with the same agent, tickets and judges. It will examine these questions:
 - Can the loop stop a change that decides a case that the specification leaves open?
 - How many labels does each round need?
 
-## 9. Three principles
+## 9. The practical result: check the judge three times
+
+The article says to validate the grader before you trust it. The results add two more checks. Together, they give
+three principles.
 
 1. **Measure the judge before the optimization.** One agreement number is not sufficient. Measure both types of error,
    and measure them for each important kind of output. *This study shows this.*
@@ -295,6 +317,6 @@ selection can make the judge's own blind spots more important with each round.
 ## Sources
 
 - Falkowski. [Can You Trust Your Judge's Score? A Primer on TPR and TNR for LLM Judges](https://bfalkowski.github.io/writing/judge-score.html). bfalkowski.github.io, October 2026.
-- Martin. [Automating eval design and hillclimbing with Claude](https://claude.dev/blog/automating-eval-design-and-hillclimbing/). claude.dev, September 2026.
+- Martin, Lance. [Automating eval design and hillclimbing with Claude](https://claude.dev/blog/automating-eval-design-and-hillclimbing/). claude.dev, September 28, 2026.
 - The full results: [`hillclimb/RESULTS.md`](https://github.com/bfalkowski/judge-tpr-tnr/blob/main/hillclimb/RESULTS.md), generated by `hillclimb/analyze.py`.
 - Wikipedia. [Goodhart's law](https://en.wikipedia.org/wiki/Goodhart%27s_law).
