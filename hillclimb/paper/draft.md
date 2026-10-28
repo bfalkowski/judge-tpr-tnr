@@ -73,10 +73,10 @@ support policy calls for: refund, reship, escalate, or reply. The climb could ch
 instructions sent with every question, and the descriptions of the four actions. The policy text, the fields the agent
 sees, the model and the code were off-limits.
 
-**The answer key.** The policy written as code, as in my previous two papers. Every decision has a known correct action.
+**The answer key.** The policy written as code, as in my run-validity paper. Every decision has a known correct action.
 
-**Tickets.** 400 new tickets from the same generator as my judge-calibration study (Falkowski 2026c), split at random
-within each customer framing into three sets:
+**Tickets.** 400 new tickets from the same generator as the labelled tickets I used to refine the judges below, split
+at random within each customer framing into three sets:
 
 | Set | Tickets | Role in the loop |
 |---|---|---|
@@ -104,8 +104,8 @@ decisions, 46 of which were wrong:
 | Grader | What it is | TPR | TNR | J |
 |---|---|---|---|---|
 | answer key | the policy as code | 1.00 | 1.00 | 1.00 |
-| calibrated | the final judge from my judge-calibration study (Claude Haiku 4.5) | 0.95 | 0.93 | 0.88 |
-| lenient | an earlier judge from that study (Jev), at a low threshold | 0.95 | 0.65 | 0.61 |
+| calibrated | a judge (Claude Haiku 4.5) whose prompt I refined against labelled tickets from earlier batches; its code is in the repo | 0.95 | 0.93 | 0.88 |
+| lenient | an earlier judge from that refinement (Jev), at a low threshold | 0.95 | 0.65 | 0.61 |
 | weak | the judge from my run-validity paper (Jev, one sentence) | 0.76 | 0.24 | 0.00 |
 
 A judge's input is fully set by the ticket, order, stock and action, so I ran each judge once on all four actions of
@@ -332,7 +332,7 @@ makes. The calibrated judge's TNR fell in all three runs (Section 5). Re-measure
 winner's outputs, including outputs the judge passed, and report them next to the gain. Don't correct the winner's pass
 rate with the baseline's rates. With them, the three calibrated winners correct to 86.7%, 92.4% and 89.9% on holdout.
 The truth was 84.4%, 86.2% and 87.2%, and the raw pass rates, 83.1%, 88.1% and 85.9%, were closer each time. The
-correction needs rates that hold on the data it corrects, as my judge-calibration study found (Falkowski 2026c).
+correction needs rates that hold on the data it corrects.
 
 ## 8. Limitations
 
@@ -343,7 +343,7 @@ correction needs rates that hold on the data it corrects, as my judge-calibratio
   runs show which results repeat, not how often they would.
 - Judge verdicts were computed once per ticket and action, so the judges had no run-to-run noise in the loop. Real climbs
   have that noise on top of the effects here.
-- The lenient judge is an earlier judge from my judge-calibration study, at a threshold I chose to make it lenient.
+- The lenient judge is an earlier judge from the calibrated judge's refinement, at a threshold I chose to make it lenient.
 - The analyzer was a Claude Opus 5.5 subagent following the guide's text, not the guide running inside Claude Code. It
   saw the current version's transcripts each round. After a reverted round, the guide's text would have given it the
   reverted version's, which might have helped it notice the lenient judge failing the correct escalations. Without
@@ -373,14 +373,9 @@ separate Claude agent checked their numbers the same way. The judges, agent runs
 
 ## References
 
-- Altman and Bland. [Diagnostic tests 1: sensitivity and specificity](https://www.bmj.com/content/308/6943/1552). BMJ, 1994.
 - Anthropic. `claude-api` skill, [`shared/evals/eval-hillclimb.md`](https://github.com/anthropics/skills/tree/main/skills/claude-api), commit `dbd4588`. 2026.
 - Falkowski. [Can You Trust Your Judge's Score? A Primer on TPR and TNR for LLM Judges](https://bfalkowski.github.io/writing/judge-score.html). 2026a.
 - Falkowski. [Is This Run Valid? Attributing Pipeline Failures Before Scoring LLM Evaluations](https://bfalkowski.github.io/writing/run-valid.html). 2026b.
-- Falkowski. Hill Climbing an LLM Judge on TPR and TNR: A Worked Example With an Answer Key. Draft, [judge-tpr-tnr](https://github.com/bfalkowski/judge-tpr-tnr) `paper/draft.md`. 2026c.
 - Goodhart. Problems of monetary management: the U.K. experience. Papers in Monetary Economics, Reserve Bank of Australia, 1975.
-- Husain and Shankar. [evals-skills](https://github.com/ai-evals-course/evals-skills), `validate-evaluator`.
 - Martin. [Automating eval design and hillclimbing with Claude](https://claude.dev/blog/automating-eval-design-and-hillclimbing/). claude.dev, September 2026.
-- Rogan and Gladen. Estimating prevalence from the results of a screening test. American Journal of Epidemiology, 1978.
-- Shankar, Zamfirescu-Pereira, Hartmann, Parameswaran and Arawjo. [Who Validates the Validators?](https://arxiv.org/abs/2404.12272) UIST 2024.
 - Youden. Index for rating diagnostic tests. Cancer, 1950.
