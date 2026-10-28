@@ -630,6 +630,30 @@ or report its pass rate.</p>
 <li>For the ambiguous kind of ticket, the answer key gives one possible reading of the policy. The size of the TNR
   decrease depends on that reading. The argument does not.</li>
 </ul>
+<h2 id="the-next-study"><span class="num">8.</span>The next study</h2>
+<p>The next study will test the additions from Section 5 in a running loop. This study tested some of them only on the
+completed climbs.</p>
+<p><strong>Step 1: change the hillclimb skill.</strong> Six changes are already written, in <code>hillclimb/skill_patch/</code>:</p>
+<ul>
+<li>Before round 1, measure TPR and TNR for each main kind of output. If the app does not give a correct output for a
+  kind, grade a correct reference output.</li>
+<li>Sort the failures by cause on the baseline, not only after two rounds without an increase.</li>
+<li>In the audit of the judge, measure TPR and TNR, not one agreement number. Also read a sample of the outputs that
+  the judge passed.</li>
+<li>Tell the analyzer that the specification has priority over the grader.</li>
+<li>After a revert, show the analyzer the changed cases, with their old and new grades.</li>
+<li>After the climb, measure the judge again on the final version. Report its rates with the gain.</li>
+</ul>
+<p>One more change is not in the patch yet: label a small sample of the changed outputs in each round.</p>
+<p><strong>Step 2: run the same climbs again with the changed skill.</strong> Use the same agent, tickets and judges. Then compare the
+results with this study.</p>
+<p><strong>Questions for the next study:</strong></p>
+<ul>
+<li>Does the measurement before round 1 find the lenient judge's problem with the correct escalation?</li>
+<li>With a labelled sample in each round, does the loop keep the $500 fix when the lenient judge grades it?</li>
+<li>Does the priority of the specification stop the calibrated climbs from deciding the open tickets?</li>
+<li>Is the cost of the labels small, at approximately 20 decisions for each round?</li>
+</ul>
 <h2 id="sources">Sources</h2>
 <ul>
 <li>Falkowski. <a href="https://bfalkowski.github.io/writing/judge-score.html">Can You Trust Your Judge's Score? A Primer on TPR and TNR for LLM Judges</a>. 2026.</li>

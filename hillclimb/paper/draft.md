@@ -469,6 +469,15 @@ are correct for the data that it corrects.
 - Measure the judge again on the final version before you report its gain.
 - Measure the evaluator on the decisions that the optimization makes, not only on a fixed dataset.
 
+## Next study
+
+The next study will test the steps in Section 7 in a running loop. It will add them to the hillclimb skill and run the
+same climbs again, with the same agent, tickets and judges. Six of these changes are already written in
+`hillclimb/skill_patch/`. The step that labels a sample of the changed outputs in each round is not in the patch yet.
+The main questions are these. Does the measurement before round 1 find the lenient judge's problem? With labels in
+each round, does the loop keep the $500 fix? Does a rule that the specification has priority over the grader stop the
+calibrated climbs from deciding the open tickets?
+
 ## How this was made
 
 I selected the question and the four graders. Claude (Opus 5.5) built the harness, ran the loop, wrote the analysis
