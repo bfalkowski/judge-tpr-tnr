@@ -255,9 +255,7 @@ ticket are not independent, so I also counted one run per ticket: 53 of 57 at ba
 33 of 39 at the three winners. On its own, only run 2's drop is unlikely to be chance (p = 0.02, against 0.2 and 0.3).
 Three runs that share a baseline are not proof, but the drop has the same direction and the same cause in each.
 
-I don't think the answer key's reading of these tickets is clearly right. [TK: your view on which reading the policy
-intends, if you have one.] The argument doesn't need it to be. The point is that the loop resolved an ambiguity in the
-policy, resolved it the judge's way, and never showed that decision to anyone. Nothing in the loop's numbers says a
+The argument doesn't depend on which reading is right. The point is that the loop resolved an ambiguity in the policy, resolved it the judge's way, and never showed that decision to anyone. Nothing in the loop's numbers says a
 policy question was settled.
 
 ## 6. A judge with J near zero teaches the wrong rules
@@ -364,8 +362,6 @@ correction needs rates that hold on the data it corrects, as my judge-calibratio
   sample of the outputs the change touched. That is where the judge's errors decide the round.
 - Measure the judge again on the winner before you report its gain.
 - Evaluate the evaluator on the decisions the optimization actually makes, not only on a fixed dataset.
-
-[TK: optional. A sentence or two on where you've seen this in your own work, if you can say it publicly.]
 
 ## How this was made
 
