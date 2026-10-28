@@ -215,6 +215,15 @@ Truly broken rows on damage_open tickets and on the rest, and what the grader di
 | lenient-r3 | v1 | revert | 2 / 0 / 0 | 17 / 16 / 0 |
 | lenient-r3 | v2 | revert | 4 / 2 / 0 | 11 / 7 / 1 |
 
+Grader verdicts before -> after on the truly fixed and broken rows of each lenient-judge round (climb_train and climb_test):
+
+- lenient v1: fixed {'0->0': 23, '0->1': 3, '1->0': 3, '1->1': 7}; broken {'0->0': 4, '0->1': 1, '1->0': 16, '1->1': 2}
+- lenient v2: fixed {'0->0': 23, '0->1': 4, '1->0': 4, '1->1': 5}; broken {'0->0': 2, '1->0': 7, '1->1': 1}
+- lenient-r2 v1: fixed {'0->0': 23, '0->1': 3, '1->0': 4, '1->1': 3}; broken {'0->0': 2, '1->0': 18, '1->1': 1}
+- lenient-r2 v2: fixed {'0->0': 25, '0->1': 4, '1->0': 4, '1->1': 6}; broken {'0->0': 1, '1->0': 8, '1->1': 1}
+- lenient-r3 v1: fixed {'0->0': 23, '0->1': 3, '1->0': 4, '1->1': 7}; broken {'0->0': 2, '1->0': 16, '1->1': 1}
+- lenient-r3 v2: fixed {'0->0': 24, '0->1': 3, '1->0': 7, '1->1': 15}; broken {'0->0': 3, '0->1': 1, '1->0': 9, '1->1': 2}
+
 ## Labelling only the changed rows (retrospective)
 
 If a person had labelled k random rows whose action changed (climb_train and climb_test), the probability that the labelled net change has the same sign as the true net change (exact, from the hypergeometric distribution; a labelled net of 0 counts as a miss).

@@ -20,6 +20,8 @@ judge's TPR and TNR were the same for every output, it would show any change at 
 They are not, and the climbs show why that matters: a judge's quality on the baseline does not tell you how it grades
 the particular changes a loop explores. The last sections show how to measure that before, during and after a climb.
 
+<!-- figure:glance -->
+
 ## 1. The question
 
 Hill climbing is a common way to improve a prompt or an agent. Each round you make one change, run the eval, and keep
@@ -50,6 +52,8 @@ Under this model a judge shrinks every real improvement by J. A judge with J = 0
 points, a judge with J = 0.6 shows it as 6, and a judge with J = 0 shows nothing. A judge with negative J favors worse
 outputs. It also gives a rule of thumb: when J is clearly above zero, the smallest true gain the loop can tell from its
 noise is about the noise divided by J.
+
+<!-- figure:shrink -->
 
 The uniform-error model is the starting point, not the result. A change in a hill climb usually touches a few kinds of
 output, and a judge's rates differ by kind. Each fixed output adds its own J, the judge's TPR on its new answer minus its
@@ -97,6 +101,8 @@ sorted the remaining failures by cause, and it stopped after three such rounds o
 propose. The study's design and every decision made during it are recorded in the repo before the results they could
 affect, and the branch `hillclimb-history` keeps the commit-by-commit record with each round's timestamp. After the first four climbs, I ran the calibrated and lenient climbs twice more, from the same baseline with the
 same judge verdicts and rules. Only the analyzer's proposals, and so what the loop kept, could differ between runs.
+
+<!-- figure:loop -->
 
 **The graders.** Each climb used one fixed grader for every round. I measured each judge on the baseline's 240 train
 decisions, 46 of which were wrong:
@@ -147,6 +153,8 @@ The gain the loop reported on validation was off by +0.4, +5.4 and −1.3 points
 three lenient climbs reverted every round. The round-level results below show why even a good baseline judge can make the
 wrong call when a change touches outputs it grades differently.
 
+<!-- figure:outcomes -->
+
 Under the uniform-error model, with the paired noise of 3 to 8 points, the calibrated judge could register true changes
 of roughly 3.5 to 9 points, the lenient judge roughly 5 to 13, and the weak judge, with J near 0, none. The climbs are
 consistent with that: the answer key kept three large changes, the calibrated judge kept small ones, and the lenient and
@@ -172,6 +180,8 @@ runs show the same split. In all seven calibrated rounds across the three runs, 
 and in each run's last kept round J on breaks was between 0.10 and 0.19. In all six lenient rounds, J on fixes was
 between −0.08 and 0.00, and J on breaks between 0.53 and 0.86. `RESULTS.md` has every round of every run.
 
+<!-- figure:jscatter -->
+
 No judge had one J. Each had a J on fixes and a different J on breaks, and the difference decided the round. Two rounds
 show it most clearly on the validation set alone:
 
@@ -193,6 +203,8 @@ from pass to fail. Five it had passed before and after, because it had already p
 failed before and after. That last group explains most of it: on tickets where an out-of-stock order over $500 has to be
 escalated, this judge passes the correct escalation on 1 of 18. Its TPR on that kind of decision is close to zero.
 Twenty-six of the 27 fixed decisions it failed after the change are those escalations.
+
+<!-- figure:waffle -->
 
 So the change was a real improvement, and the judge scored it as a loss. The loop reverted it, correctly by its own
 rule. Round 1 tried the same fix, and the judge credited none of its 36 fixes either.
@@ -239,6 +251,8 @@ damage, a wrong item or only a request for an update." Run 3's said "reship if s
 when the ticket reports a damaged or wrong item." Across the seven calibrated rounds in the three runs, changes broke 43
 decisions on the open tickets, and the judge credited all 43 as fixes. It charged 105 of the other 127 breaks.
 
+<!-- figure:breaks -->
+
 Two related things are happening here.
 
 The first is selection. The loop keeps changes the judge rewards, so it pulls the agent toward the judge's reading of
@@ -254,6 +268,8 @@ and 0.84 (109 of 116 mistaken decisions failed at baseline, against 76 of 90, 62
 ticket are not independent, so I also counted one run per ticket: 53 of 57 at baseline, against 38 of 45, 32 of 43 and
 33 of 39 at the three winners. On its own, only run 2's drop is unlikely to be chance (p = 0.02, against 0.2 and 0.3).
 Three runs that share a baseline are not proof, but the drop has the same direction and the same cause in each.
+
+<!-- figure:drift -->
 
 The argument doesn't depend on which reading is right. The point is that the loop resolved an ambiguity in the policy, resolved it the judge's way, and never showed that decision to anyone. Nothing in the loop's numbers says a
 policy question was settled.
@@ -280,6 +296,8 @@ measuring the judge's TPR and TNR before tuning further. That was the first step
 
 The climbs suggest a procedure. Some steps are demonstrated here. Others are hypotheses this study supports but
 does not establish, and I mark them.
+
+<!-- figure:procedure -->
 
 **Before the climb: measure TPR, TNR and J.** *Demonstrated here.* Label decisions from the baseline, with at least
 about 30 wrong ones, and measure TPR and TNR with intervals. If J is not clearly above zero, the right move is to
@@ -320,6 +338,8 @@ k = 30 every other round was 91% or higher. These are rounds of one task, so the
 that 20 is enough in general. For this task, 20 decisions is a few minutes of review. The same labels show where J on fixes
 and J on breaks differ, which is how the lenient judge's reverts and the calibrated judge's round 2 would have been
 caught.
+
+<!-- figure:labels -->
 
 **During the climb: treat a change that breaks the spec as a judge problem.** *A hypothesis from a few examples.* When
 the analyzer proposes something the spec rules out, or settles a case the spec leaves open, because the grader rewards

@@ -387,6 +387,28 @@ def breaks_by_kind(arm, splits=("climb_train", "climb_test")):
     return out
 
 
+def transitions(arm, splits=("climb_train", "climb_test")):
+    """Each round, against the version it was compared with: for the rows the change truly fixed and truly broke, how
+    many went from each grader verdict to each other (e.g. "0->1": failed before, passed after)."""
+    st = hc.state(arm)
+    cur, out = "baseline", []
+    for h in [h for h in st["history"] if h["decision"] != "none"]:
+        a = {(x["ticket_id"], x["rep"]): x for x in sealed(arm, cur)}
+        row = {"round": h["round"], "decision": h["decision"], "fixed": defaultdict(int), "broken": defaultdict(int)}
+        for x in sealed(arm, h["round"]):
+            if x["split"] not in splits:
+                continue
+            o = a[(x["ticket_id"], x["rep"])]
+            k = {(0, 1): "fixed", (1, 0): "broken"}.get((o["true"], x["true"]))
+            if k:
+                row[k][f"{o['grader']}->{x['grader']}"] += 1
+        row["fixed"], row["broken"] = dict(row["fixed"]), dict(row["broken"])
+        out.append(row)
+        if h["decision"] == "keep":
+            cur = h["round"]
+    return out
+
+
 def holdout_change_by_kind(arm):
     """Each round's true change on holdout against the version it was compared with, in points, split by kind."""
     T = hc.tickets()
@@ -489,6 +511,7 @@ def main():
     res["tnr_drop_c3_runs"] = {arm: tnr_drop_c3(arm) for arm in RUNS["c3"]}
     res["visibility"] = {arm: visibility_by_round(arm) for arm in ARMS}
     res["breaks_by_kind"] = {arm: breaks_by_kind(arm) for arm in ARMS if hc.ARMS[arm]["grader"] == "judge"}
+    res["transitions"] = {arm: transitions(arm) for arm in ARMS if hc.ARMS[arm]["grader"] == "judge"}
     res["label_the_diff"] = {arm: label_the_diff(arm) for arm in ARMS}
     res["rates_without_open_case"] = {arm: rates_without_open(arm) for arm in ORIGINAL}
     res["open_case_verdicts"] = open_case_verdicts()
@@ -592,6 +615,10 @@ def report(res):
         for v in vs:
             d, r = v["damage_open"], v["rest"]
             L.append(f"| {arm} | {v['round']} | {v['decision']} | {d['broken']} / {d['charged']} / {d['credited']} | {r['broken']} / {r['charged']} / {r['credited']} |")
+    L += ["", "Grader verdicts before -> after on the truly fixed and broken rows of each lenient-judge round (climb_train and climb_test):", ""]
+    for arm in [a for a in res["transitions"] if hc.ARMS[a].get("replicate_of", a) == "lenient"]:
+        for v in res["transitions"][arm]:
+            L.append(f"- {arm} {v['round']}: fixed {dict(sorted(v['fixed'].items()))}; broken {dict(sorted(v['broken'].items()))}")
     L += ["", "## Labelling only the changed rows (retrospective)", "",
           "If a person had labelled k random rows whose action changed (climb_train and climb_test), the probability that the labelled net change has the same sign as the true net change (exact, from the hypergeometric distribution; a labelled net of 0 counts as a miss).", "",
           "| Arm | Round | Changed rows (of all) | True net change | k = 10 | k = 20 | k = 30 |", "|---|---|---|---|---|---|---|"]
