@@ -5,9 +5,10 @@ Bryan Falkowski · October 2026 · Code and data: [github.com/bfalkowski/judge-t
 *Fourth draft: the third draft, rewritten in ASD-STE100 Simplified Technical English. Every number comes from
 `hillclimb/analyze.py` and is in `hillclimb/RESULTS.md`.*
 
-**Abstract.** A judge that is good enough to measure an app is not always good enough to control a hill climb. A
-hill climb keeps a change only if the judge's pass rate increases. Thus each keep or revert choice depends on how the
-judge grades the small number of outputs that the change affects. On these outputs, the accuracy of the judge can be
+**Abstract.** A judge that is good enough to measure an app is not always good enough to control a hill climb.
+Anthropic's article on hill climbing with Claude (Martin 2026) describes a hill-climbing loop. The loop keeps a
+change only if the pass rates on a train set and a test set both increase. When an LLM judge gives these pass rates,
+each keep or revert choice depends on how the judge grades the outputs that the change affects. On these outputs, the accuracy of the judge can be
 very different from its average. I measure it with two values for each round: J on fixes and J on breaks.
 
 Two findings show this. Each finding occurred in all three runs.
@@ -24,8 +25,8 @@ The usual checks of a judge did not reliably separate the lenient judge from the
 procedure to detect these problems. Its main step is to label a small sample of the outputs that each change affects.
 I tested this step only on the completed climbs.
 
-I ran Anthropic's published hill-climbing loop on one support agent, with an answer key and three judges with a
-measured TPR and TNR. I ran the climbs with the calibrated and lenient judges three times each. The answer key graded
+I ran the loop from that article on one support agent, with an answer key and three judges with a measured TPR and
+TNR, as in my primer on TPR and TNR (Falkowski 2026a). I ran the climbs with the calibrated and lenient judges three times each. The answer key graded
 every decision after the climbs. With the answer key as the grader, the loop increased the holdout pass rate from 79%
 to 100%.
 
@@ -34,12 +35,14 @@ to 100%.
 ## 1. The question
 
 Hill climbing is a common way to improve a prompt or an agent. In each round, you make one change and run the eval.
-You keep the change only if the pass rate increases. Anthropic's guide for hill climbing with Claude divides the cases
-into two sets (Martin 2026). The analyzer that proposes changes reads only one set. The loop keeps a change only when
+You keep the change only if the pass rate increases. Anthropic's article on hill climbing with Claude describes such a
+loop, and this study uses it (Martin 2026). The loop divides the cases into two sets. The analyzer that proposes changes reads only one set. The loop keeps a change only when
 the pass rates on both sets increase. This rule decreases the risk of overfitting to the cases that the analyzer
 reads.
 
-The rule does not prevent errors that come from the grader. When the grader is an LLM judge, "the pass rate increased"
+The rule does not prevent errors that come from the grader. The article also gives a warning about this. It says that
+you must read a sample of graded transcripts before you trust the evaluator. The reason is that grading errors are a common cause of a bad eval. In the article's own example, the third phase of work was "fixing graders." This paper measures this
+type of problem in the loop with TPR and TNR. When the grader is an LLM judge, "the pass rate increased"
 means "the judge passed more outputs." The primer shows what a judge's pass rate contains (Falkowski 2026a):
 
 pass rate = TPR × θ + (1 − TNR) × (1 − θ)

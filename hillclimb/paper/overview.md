@@ -1,19 +1,22 @@
 # Hill-Climb Study Overview
 
-What the study tested, how it connects to the TPR and TNR primer, and what it found
+The hill-climbing loop from Anthropic's claude.dev article, run with LLM judges and measured with the TPR and TNR primer
 
 Bryan Falkowski · October 2026 · Code and data: [github.com/bfalkowski/judge-tpr-tnr](https://github.com/bfalkowski/judge-tpr-tnr) (`hillclimb/`)
 
-**Summary.** My primer, [Can You Trust Your Judge's Score?](https://bfalkowski.github.io/writing/judge-score.html),
-shows how to measure an LLM judge with TPR and TNR. It also shows how to use these two rates to correct the pass rate
-that the judge reports. In the primer, you measure the judge one time. Then you use it on new outputs that are similar
-to the outputs that you measured.
+**Summary.** Anthropic's article [Automating eval design and hillclimbing with
+Claude](https://claude.dev/blog/automating-eval-design-and-hillclimbing/) describes a hill-climbing loop. In each round,
+an analyzer proposes one change to the app. The loop keeps the change only if the pass rates on a train set and a test
+set both increase. When an LLM judge gives these pass rates, each keep or revert choice also depends on the judge's
+mistakes.
 
-A hill climb uses a judge in a different way. In each round, the loop makes one change to the app. Then it compares two
-pass rates from the judge, and it keeps the change only if the pass rate increases. Thus the outputs change in each
-round, and the judge decides which changes stay.
+My primer, [Can You Trust Your Judge's Score?](https://bfalkowski.github.io/writing/judge-score.html), shows how to
+measure these mistakes with TPR and TNR, and how to correct the pass rate that a judge reports. In the primer, you
+measure the judge one time. Then you use it on new outputs that are similar to the outputs that you measured. In the
+loop, the outputs change in each round, and the judge's pass rate decides which changes stay.
 
-This study asks one question: **do the rules in the primer still apply when a judge controls a hill climb?** The study
+This study runs the loop from the article with three LLM judges of measured quality and with an answer key. It asks one
+question: **do the rules in the primer still apply when a judge controls this loop?** The study
 tested six rules from the primer. Two rules apply as written. Two rules apply, but they need an addition. Two rules do
 not always apply in a hill climb.
 
@@ -21,21 +24,24 @@ not always apply in a hill climb.
 
 Two documents started this study.
 
+- **Anthropic's article on hill climbing with Claude** (Martin 2026) and the `claude-api` skill that it describes. In
+  this loop, an analyzer reads the failures on the train set and proposes one change. The loop keeps the change only if
+  the pass rates on the train set and the test set both increase. The two sets protect the loop from overfitting to
+  the cases that the analyzer reads.
 - **The primer.** It teaches four things. A judge makes two types of mistakes. TPR and TNR measure each type. You can
   correct the judge's pass rate with these rates. The correction works only while the judge acts as it did when you
   measured it.
-- **Anthropic's article on hill climbing with Claude** (Martin 2026) and the `claude-api` skill that it describes. In
-  this loop, an analyzer reads failures and proposes one change. The loop keeps the change only if the pass rates on
-  two sets of cases both increase.
 
-The connection is this. When an LLM judge gives the pass rates in this loop, the judge's mistakes are part of each keep
-or revert choice. The primer gives the tools to measure these mistakes. This study applies those tools to the loop.
+The article already gives a warning about graders. It says that you must read a sample of graded transcripts before you trust the evaluator. The reason is that grading errors are a common cause of a bad eval. In the article's own example, the
+third phase of work was "fixing graders." This study measures the same type of problem with the tools from the primer.
+It runs the loop from the article and measures the judge's mistakes in each round with TPR and TNR.
 
 ## 2. Goals
 
-1. Test the rules of the primer in a hill climb, and find which rules still apply.
-2. Find what a team must measure before, during and after a climb, to trust the result.
-3. Find changes that can improve Anthropic's hillclimb skill. A second article will cover this goal.
+1. Run the loop from the article with LLM judges of known quality, and see how the judge's mistakes affect each keep
+   or revert choice.
+2. Test the rules of the primer in this loop, and find which rules still apply.
+3. Find what a team must measure before, during and after a climb, to trust the result.
 
 The study does not try to show that hill climbing does not work. With a perfect grader, the same loop increased the
 pass rate on the holdout tickets from 79% to 100%.
