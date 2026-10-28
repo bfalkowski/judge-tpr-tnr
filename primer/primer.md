@@ -2,6 +2,8 @@
 
 Bryan Falkowski · October 2026
 
+*Updated October 28, 2026: added Section 9, Rules for using a judge, and short notes in Sections 3, 7 and 8. They come from a [study of hill climbing with LLM judges](https://github.com/bfalkowski/judge-tpr-tnr/blob/main/hillclimb/paper/overview.md).*
+
 An LLM judge reads an output and says PASS or FAIL. Teams use judges to answer questions like "what share of our replies are polite?" without reading every reply themselves. Before you trust the number a judge reports, you need to know how often it gets each kind of output right. That is what TPR and TNR measure.
 
 This primer works through one small example from start to finish: label some outputs, measure a judge, improve it, use it, and report the result with a range. The counts are invented for teaching; every calculation is checked by `primer/numbers.py`.
@@ -62,6 +64,8 @@ TPR says how well the judge recognizes good outputs. TNR says how well it catche
 Why two numbers and not one? This judge's accuracy is (19 + 12) / 40 = 78%, which sounds acceptable and hides the problem. Keeping the rows separate shows exactly which kind of mistake the judge makes. Each rate also only looks at its own row, so it does not change when the mix of polite and rude replies changes. That matters in Section 5.
 
 In other fields TPR and TNR are called sensitivity and specificity (Altman and Bland 1994).
+
+TPR and TNR are averages over the replies you labeled, and a judge can be much better on some kinds of reply than on others. If your labeled set has no examples of one kind, the rates say nothing about it. A judge that handles password resets well may never have been checked on a polite refusal of a refund. Include a polite and a rude example of each kind of reply that matters, including kinds your app does not produce yet.
 
 ## 4. Improve the judge
 
@@ -141,7 +145,7 @@ This gives the reader the number they care about, how sure it is, and why it can
 How much weight to give it depends on the use:
 
 - **Big changes** show up clearly. A drop from 74% to 50% after a template change is larger than the whole range.
-- **Comparing two versions** scored by the same judge on the same kind of data is more reliable than either number alone, because the judge's errors largely affect both the same way.
+- **Comparing two versions** scored by the same judge on the same kind of data is more reliable than either number alone, because the judge's errors largely affect both the same way. That holds when the two versions produce the same kinds of reply. If a change alters which kinds of reply the app gives, the judge's errors can fall differently on each version, so check a sample of the replies that changed.
 - **Small changes in the absolute level**, like 74% to 72%, sit inside the range and should not be read as real.
 
 For comparison, checking 100 random replies by hand would give about 74% ± 9 points. The uncertainty comes from how much checked evidence sits under the number, whether a person or a judge does the scoring.
@@ -156,7 +160,21 @@ For comparison, checking 100 random replies by hand would give about 74% ± 9 po
 
 The same applies whenever the replies change in other ways, such as new templates or new kinds of requests: re-check the judge on a fresh labeled sample. In practice that is the ongoing cost of using a judge.
 
-## 9. Summary
+**Using the judge to choose changes** is the strongest case of this. In a hill climb, each round makes one change to the app and keeps it only if the judge's score goes up. The replies change every round, and the judge's own verdicts decide which changes stay. A change that produces replies the judge wrongly passes can stay, and a real fix the judge does not recognize can be thrown away. Check a small labeled sample of the replies that each change affected, and measure the judge again on the final version before you report its score. The [hill-climbing study](https://github.com/bfalkowski/judge-tpr-tnr/blob/main/hillclimb/paper/overview.md) shows what goes wrong without these checks.
+
+## 9. Rules for using a judge
+
+The sections above come down to seven rules. Rules 1 to 6 restate points made earlier in this primer. The note on kinds of output in rule 3, the condition in rule 5, and rule 7 were added in October 2026, after the hill-climbing study.
+
+1. **Measure TPR and TNR separately.** One accuracy or agreement number hides which kind of mistake the judge makes. (Section 3)
+2. **Improve a weak judge before you correct it.** If J = TPR + TNR − 1 is close to zero, the correction cannot rescue the judge. (Section 6)
+3. **Carry TPR and TNR only to the same kinds of output.** They do not depend on the mix of good and bad outputs, so you can use them on new data. But they can differ by kind of output, so label examples of each kind that matters. (Sections 3 and 5)
+4. **Measure again when the outputs change.** A new model, new templates or new kinds of requests can move TPR and TNR. Label a fresh sample and check. (Section 8)
+5. **Compare versions with the same judge, when the change keeps the same kinds of output.** Then the judge's errors largely affect both versions the same way. (Section 7)
+6. **Correct the score with rates measured on outputs like the ones you are scoring.** The correction is only as good as those rates. (Sections 5 and 8)
+7. **When the judge chooses changes, check it three times:** before the optimization, on a sample of the outputs that each change affects, and on the final version. (Section 8)
+
+## 10. Summary
 
 The judge said 284 of last month's 400 replies were polite (71%). If you had hand-labeled all 400, you would have found 296 (74%). Three ideas explain the gap.
 
@@ -168,7 +186,7 @@ The judge said 284 of last month's 400 replies were polite (71%). If you had han
 
 The interactive version of this page shows the 400 replies as one bar, with sliders for TPR and TNR.
 
-## 10. Glossary
+## 11. Glossary
 
 | Term | Meaning |
 |---|---|
