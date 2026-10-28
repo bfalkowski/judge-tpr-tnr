@@ -159,7 +159,7 @@
   .proc h4 { margin: 0 0 10px; font-size: 12.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
   .proc .step { margin: 0 0 12px; font-size: 15px; line-height: 1.4; }
   .proc .step:last-child { margin-bottom: 0; }
-  .badge { display: inline-block; font-size: 12px; font-weight: 600; line-height: 1.5; border-radius: 999px; padding: 1px 9px; margin-top: 6px; }
+  .badge { display: inline-block; font-size: 12px; font-weight: 600; line-height: 1.45; border-radius: 6px; padding: 2px 8px; margin-top: 6px; }
   .badge.solid { background: var(--accent); color: var(--on-accent); border: 1.5px solid var(--accent); }
   .badge.outline { border: 1.5px solid var(--accent); color: var(--accent); }
   .badge.dashed { border: 1.5px dashed var(--muted); color: var(--muted); }

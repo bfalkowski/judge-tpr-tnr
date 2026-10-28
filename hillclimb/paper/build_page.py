@@ -132,11 +132,11 @@ def fig_glance():
     vis = [v for a in LEN_RUNS for v in R["visibility"][a]]
     good_reverts = sum(1 for v in vis if v["decision"] == "revert" and v["true_change_rows"] > 0)
     tiles = [
-        (f"+{min(gains):.0f} to +{max(gains):.0f} points", "true gain on holdout in each of the three calibrated-judge climbs"),
+        (f"+{min(gains):.0f} to +{max(gains):.0f} points", "true gain on holdout in each of the three climbs with the calibrated judge"),
         (f"{pct(fp0)} → {100 * min(fpw):.0f}–{pct(max(fpw))}",
-         "share of the agent's mistakes the calibrated judge passed, before and after each climb"),
-        (f"{oc} of {ob}", "decisions the calibrated climbs broke on open policy tickets that the judge counted as fixes"),
-        (f"{good_reverts} of {len(vis)}", "lenient-judge rounds reverted, though each truly fixed more decisions than it broke"),
+         "incorrect decisions that the calibrated judge passed, before and after each climb"),
+        (f"{oc} of {ob}", "decisions that the calibrated climbs broke on open tickets, which the judge showed as fixes"),
+        (f"{good_reverts} of {len(vis)}", "lenient rounds that the loop reverted, but each round fixed more decisions than it broke"),
     ]
     return ('<section class="glance" aria-label="At a glance">' + "".join(
         f'<div class="tile"><div class="v">{esc(v)}</div><div class="l">{esc(l)}</div></div>' for v, l in tiles)
@@ -173,9 +173,9 @@ def fig_shrink():
     for ly, s in labels:
         g.append(text(x(10) + 12, ly + 5, s, "lab em"))
     body = svg(W, H, "".join(g), "Lines of slope J for each grader: the change a judge shows against the true change")
-    cap = ("The uniform-error model: if a judge's TPR and TNR were the same for every output, it would show any change at "
-           "J times its true size. Each line uses a grader's J measured on the baseline's train decisions. The climbs "
-           "show where this model breaks down.")
+    cap = ("The uniform-error model. If the TPR and TNR of a judge are the same for all outputs, the judge shows each "
+           "change at J times its true size. Each line uses the J of one grader on the train decisions of the baseline. "
+           "The climbs show where this model is not correct.")
     return body, cap, table(["Grader", "TPR", "TNR", "J", "A true +10 points shows as"], rows)
 
 
@@ -184,16 +184,17 @@ def fig_loop():
              '<span class="tr" style="flex:120">Train · 120</span>'
              '<span class="va" style="flex:120">Validation · 120</span>'
              '<span class="ho" style="flex:160">Holdout · 160</span></div>')
-    steps = [("Read", "A fresh analyzer reads the current version's train transcripts and grades.", "Train"),
-             ("Change", "It proposes one change to the decision instructions or the action descriptions.", ""),
-             ("Run", "The agent runs every ticket twice, and the climb's grader scores each decision.", ""),
-             ("Decide", "Keep the change if train and validation both rise. Otherwise revert it.", "Train and validation")]
+    steps = [("Read", "A new analyzer reads the train transcripts and grades of the current version.", "Train"),
+             ("Change", "It proposes one change to the decision instructions or to the action descriptions.", ""),
+             ("Run", "The agent runs each ticket two times. The grader of the climb grades each decision.", ""),
+             ("Decide", "If the train and validation pass rates both increase, keep the change. If not, revert it.",
+              "Train and validation")]
     flow = '<ol class="flow">' + "".join(
         f'<li><b>{esc(h)}</b>{esc(t)}' + (f'<span class="uses">uses: {esc(u)}</span>' if u else "") + "</li>"
         for h, t, u in steps) + "</ol>"
-    note = ('<p class="flow-note">The next round starts from the kept version. The holdout tickets never enter the loop; '
-            'the answer key grades them, and every other decision, only afterwards.</p>')
-    cap = "The 400 tickets, and one round of the loop with the sets each step uses."
+    note = ('<p class="flow-note">The next round starts from the last kept version. The loop does not use the holdout '
+            'tickets. The answer key grades them, and all other decisions, only after the climbs.</p>')
+    cap = "The 400 tickets, and one round of the loop with the sets that each step uses."
     return split + flow + note, cap, None
 
 
@@ -231,7 +232,7 @@ def fig_outcomes():
             parts.append(text(x(best) + 11, yy + 4, f"{sgn(best)} reverted", "lab m"))
         if abs(judge - true) > 0.05:
             parts.append(f'<line x1="{x(judge):.1f}" x2="{x(true):.1f}" y1="{yy:.1f}" y2="{yy:.1f}" class="conn"/>')
-        lines = [run_name(gname, n), f"true change {sgn(true)} points", f"the judge's own score: {sgn(judge)}"]
+        lines = [run_name(gname, n), f"true change {sgn(true)} points", f"change from the climb's own judge: {sgn(judge)}"]
         parts.append(f'<g class="pt"{tip(*lines)}><circle cx="{x(true):.1f}" cy="{yy:.1f}" r="12" class="hit"/>'
                      + (f'<circle cx="{x(judge):.1f}" cy="{yy:.1f}" r="5" class="mark hollow"/>' if abs(judge - true) > 0.05 else "")
                      + f'<circle cx="{x(true):.1f}" cy="{yy:.1f}" r="5" class="mark filled"/></g>')
@@ -241,13 +242,14 @@ def fig_outcomes():
         g.append("".join(parts))
         data.append([run_name(gname, n), sgn(judge), sgn(true), "" if best is None else sgn(best)])
         yy += pitch
-    lg = legend([(dot_sw("g-ink"), "true change (answer key)"), (dot_sw("g-ink", hollow=True), "the climb's own judge"),
-                 (dot_sw("g-ink", shape="diamond"), "true gain of the best change the loop reverted")])
-    body = lg + svg(W, H, "".join(g), "Holdout gain per climb: the judge's score and the true change")
-    cap = ("Gain on the holdout tickets from the baseline to the version each climb kept, scored by the climb's own "
-           "grader (hollow) and by the answer key (filled). The calibrated judge overstated every gain. The lenient "
-           "climbs kept nothing, though each reverted a change that truly helped.")
-    return body, cap, table(["Climb", "Judge's score", "True change", "Best reverted change (true)"], data)
+    lg = legend([(dot_sw("g-ink"), "true change (answer key)"), (dot_sw("g-ink", hollow=True), "change from the climb's own judge"),
+                 (dot_sw("g-ink", shape="diamond"), "true gain of the best reverted change")])
+    body = lg + svg(W, H, "".join(g), "Holdout gain per climb: the judge's change and the true change")
+    cap = ("The gain on the holdout tickets, from the baseline to the final version of each climb. The hollow marker is "
+           "the change from the climb's own grader. The filled marker is the change from the answer key. The calibrated "
+           "judge showed each gain as larger than the true gain. The lenient climbs kept no change, but each climb "
+           "reverted a change that truly improved the agent.")
+    return body, cap, table(["Climb", "Judge's change", "True change", "Best reverted change (true)"], data)
 
 
 def fig_jscatter():
@@ -266,8 +268,8 @@ def fig_jscatter():
     g.append(f'<line x1="{x(-0.3):.1f}" y1="{y(-0.3):.1f}" x2="{x(1.05):.1f}" y2="{y(1.05):.1f}" class="ref"/>')
     for num, (cx_, cy_) in ((1, (-0.2, 1.0)), (2, (0.95, -0.2)), (3, (0.38, 0.38))):
         g.append(callout(x(cx_), y(cy_), num))
-    g.append(text(L + S / 2, H - 8, "J on fixes: how much of each true fix the judge credits", "lab m", "middle"))
-    g.append(text(14, T + S / 2, "J on breaks: how much of each true break it charges", "lab m", "middle",
+    g.append(text(L + S / 2, H - 8, "J on fixes: the part of each true fix that the judge sees", "lab m", "middle"))
+    g.append(text(14, T + S / 2, "J on breaks: the part of each true break that the judge sees", "lab m", "middle",
                   f' transform="rotate(-90 14 {T + S / 2:.1f})"'))
     data, pts = [], []
     for arm, gname, n in RUNS:
@@ -290,14 +292,14 @@ def fig_jscatter():
     g.append(text(x(0.0), y(0.205) + 5, "Weak", "lab em", "middle"))
     g.append(text(x(1.0), y(0.30) + 5, "Calibrated", "lab em", "end"))
     lg = grader_legend([(dot_sw("g-ink"), "kept"), (dot_sw("g-ink", hollow=True), "reverted")])
-    key = callout_key(["Above the diagonal the judge misses fixes, so real gains look smaller, or like losses.",
-                       "Below it the judge misses breaks, so losses look smaller, or like gains.",
-                       "On it, J on fixes equals J on breaks: the uniform-error model."])
+    key = callout_key(["Above the diagonal, the judge does not see all the fixes. Real gains look smaller, or look like losses.",
+                       "Below the diagonal, the judge does not see all the breaks. Losses look smaller, or look like gains.",
+                       "On the diagonal, J on fixes is equal to J on breaks. This is the uniform-error model."])
     body = lg + svg(W, H, "".join(g), "J on fixes against J on breaks for every round", "chart square") + key
-    cap = ("Every round of every climb, placed by how much of its true fixes and its true breaks the judge saw (train "
-           "and validation decisions, each round against the version it was tested against). Under the uniform-error "
-           "model every round would sit on the diagonal. Only the answer key's do. The lenient judge's rounds sit "
-           "above it, the calibrated judge's below it.")
+    cap = ("Each round of each climb, placed by the part of its true fixes and true breaks that the judge saw. The data "
+           "is the train and validation decisions. Each round is compared with the version that the loop tested it "
+           "against. In the uniform-error model, each round is on the diagonal. Only the rounds of the answer key are on "
+           "it. The rounds of the lenient judge are above it, and the rounds of the calibrated judge are below it.")
     return body, cap, table(["Climb", "Round", "Loop's call", "J on fixes", "J on breaks", "True change (decisions)",
                              "Judge's change"], data, num_from=3)
 
@@ -306,12 +308,12 @@ def fig_waffle():
     t = R["transitions"]["lenient"][1]
     assert t["round"] == "v2"
     fx, bk = t["fixed"], t["broken"]
-    cats = [("w-good", "judge moved the right way"), ("w-pp", "judge passed it before and after"),
-            ("w-ff", "judge failed it before and after"), ("w-bad", "judge moved the wrong way")]
+    cats = [("w-good", "judge changed in the correct direction"), ("w-pp", "judge passed it before and after"),
+            ("w-ff", "judge failed it before and after"), ("w-bad", "judge changed in the incorrect direction")]
     fixed = [("w-good", fx.get("0->1", 0)), ("w-pp", fx.get("1->1", 0)), ("w-ff", fx.get("0->0", 0)), ("w-bad", fx.get("1->0", 0))]
     broken = [("w-good", bk.get("1->0", 0)), ("w-pp", bk.get("1->1", 0)), ("w-ff", bk.get("0->0", 0)), ("w-bad", bk.get("0->1", 0))]
-    what = {"w-good": ("credited as a fix", "charged as a break"), "w-pp": ("passed before and after",) * 2,
-            "w-ff": ("failed before and after",) * 2, "w-bad": ("counted as a break", "counted as a fix")}
+    what = {"w-good": ("changed from fail to pass", "changed from pass to fail"), "w-pp": ("passed before and after",) * 2,
+            "w-ff": ("failed before and after",) * 2, "w-bad": ("changed from pass to fail", "changed from fail to pass")}
 
     def panel(title, parts, i):
         n = sum(k for _, k in parts)
@@ -323,10 +325,12 @@ def fig_waffle():
                 f'<div class="waffle">{cells}</div><div class="wcounts">{esc(counts)}</div></div>')
 
     body = (legend([(box_sw(c), l) for c, l in cats]) + '<div class="wpanels">'
-            + panel("N decisions the change truly fixed", fixed, 0) + panel("N decisions it truly broke", broken, 1) + "</div>")
-    cap = ("The lenient judge, run 1, round 2: every train and validation decision the change truly fixed or broke, and "
-           "what the judge did with it. It credited 4 fixes and counted 4 as breaks, so on balance it credited none. "
-           "The large group it failed before and after is mostly correct escalations, which this judge fails.")
+            + panel("N decisions that the change truly fixed", fixed, 0)
+            + panel("N decisions that it truly broke", broken, 1) + "</div>")
+    cap = ("The lenient judge, run 1, round 2. Each square is a train or validation decision that the change truly fixed "
+           "or broke. The color shows what the judge did. For the fixed decisions, the judge changed 4 from fail to pass "
+           "and 4 from pass to fail. Thus the fixes gave no net increase. Most of the fixed decisions that the judge "
+           "failed before and after are correct escalations, which this judge fails.")
     return body, cap, None
 
 
@@ -348,9 +352,10 @@ def fig_breaks():
     for v in (0, 10, 20, 30, 40, 50):
         g.append(f'<line x1="{x(v):.1f}" x2="{x(v):.1f}" y1="{T}" y2="{H - B + 4}" class="{"axis" if v == 0 else "grid"}"/>')
         g.append(text(x(v), H - B + 20, str(v), "tick", "middle"))
-    g.append(text((L + W - Rm) / 2, H - 4, "Train and validation decisions the change truly broke", "lab m", "middle"))
-    what = {"w-good": "the judge charged it as a break", "w-ff": "the judge's verdict did not change",
-            "w-bad2": "the judge counted it as a fix (other tickets)", "w-bad": "the judge counted it as a fix (open damage tickets)"}
+    g.append(text((L + W - Rm) / 2, H - 4, "Train and validation decisions that the change truly broke", "lab m", "middle"))
+    what = {"w-good": "the judge changed it from pass to fail", "w-ff": "the verdict of the judge did not change",
+            "w-bad2": "the judge changed it from fail to pass (other tickets)",
+            "w-bad": "the judge changed it from fail to pass (open tickets)"}
     yy, data = T + pitch / 2, []
     for i, (n, rnd, dec, segs, tot) in enumerate(rows):
         if i and n != rows[i - 1][0]:
@@ -369,22 +374,23 @@ def fig_breaks():
         g.append(text(x(tot) + 6, yy + 4, f"{tot}", "lab m"))
         data.append([f"Run {n}", round_name(rnd), "kept" if dec == "keep" else "reverted", tot] + [k for _, k in segs])
         yy += pitch
-    lg = legend([(box_sw("w-good"), "charged as a break"), (box_sw("w-ff"), "verdict unchanged"),
-                 (box_sw("w-bad2"), "counted as a fix, other tickets"), (box_sw("w-bad"), "counted as a fix, open damage tickets")])
+    lg = legend([(box_sw("w-good"), "pass to fail"), (box_sw("w-ff"), "no change in the verdict"),
+                 (box_sw("w-bad2"), "fail to pass, other tickets"), (box_sw("w-bad"), "fail to pass, open tickets")])
     body = lg + svg(W, H, "".join(g), "Broken decisions per calibrated round, by what the judge did")
-    cap = ("Every decision the calibrated judge's changes truly broke, round by round across the three runs. It charged "
-           "most ordinary breaks, and it counted every break on the open damage tickets as a fix.")
-    return body, cap, table(["Run", "Round", "Loop's call", "Broken", "Charged", "Unchanged", "Counted as fix, other",
-                             "Counted as fix, open tickets"], data, num_from=3)
+    cap = ("Each decision that a change in the calibrated climbs truly broke, for each round of the three runs. The "
+           "judge changed most ordinary breaks from pass to fail. It changed each break on the open tickets from fail "
+           "to pass, as if it were a fix.")
+    return body, cap, table(["Run", "Round", "Loop's decision", "Broken", "Pass to fail", "No change",
+                             "Fail to pass, other", "Fail to pass, open tickets"], data, num_from=3)
 
 
 def fig_drift():
     reps = R["replicates"]["c3"]
     base_open = R["drift_by_category"]["c3"]["baseline"]["damage_open"]["mistakes"]
     W, H, T, B = 700, 260, 30, 34
-    panels = [("Agent's mistakes on open damage tickets", base_open, [r["open_mistakes_winner"] for r in reps], 20,
+    panels = [("Incorrect decisions on the open tickets", base_open, [r["open_mistakes_winner"] for r in reps], 20,
                lambda v: f"{v:.0f}", (0, 5, 10, 15, 20)),
-              ("Share of its mistakes the judge passed", 1 - reps[0]["tnr_baseline"], [1 - r["tnr_winner"] for r in reps],
+              ("Incorrect decisions that the judge passed", 1 - reps[0]["tnr_baseline"], [1 - r["tnr_winner"] for r in reps],
                0.30, lambda v: pct(v), (0, 0.1, 0.2, 0.3))]
     g, data = [], []
     for p, (title, b, ws, top, fmt, ticks) in enumerate(panels):
@@ -396,10 +402,10 @@ def fig_drift():
             g.append(f'<line x1="{x0}" x2="{xb + 20}" y1="{y(t):.1f}" y2="{y(t):.1f}" class="{"axis" if t == 0 else "grid"}"/>')
             g.append(text(x0 - 6, y(t) + 4, fmt(t), "tick", "end"))
         g.append(text(xa, H - B + 18, "baseline", "tick", "middle"))
-        g.append(text(xb, H - B + 18, "kept version", "tick", "middle"))
+        g.append(text(xb, H - B + 18, "final version", "tick", "middle"))
         for i, w in enumerate(ws):
             g.append(f'<g class="g-cal"><line x1="{xa}" y1="{y(b):.1f}" x2="{xb}" y2="{y(w):.1f}" class="line"/>'
-                     f'<g class="pt"{tip(f"Calibrated, run {i + 1}", f"{title}: {fmt(b)} at baseline, {fmt(w)} at the kept version")}>'
+                     f'<g class="pt"{tip(f"Calibrated, run {i + 1}", f"{title}: {fmt(b)} at baseline, {fmt(w)} at the final version")}>'
                      f'<circle cx="{xb}" cy="{y(w):.1f}" r="12" class="hit"/>'
                      f'<circle cx="{xb}" cy="{y(w):.1f}" r="4.5" class="mark filled"/></g></g>')
         g.append(f'<g class="g-cal"><circle cx="{xa}" cy="{y(b):.1f}" r="4.5" class="mark filled"/></g>')
@@ -417,26 +423,27 @@ def fig_drift():
             who = "run " + str(runs[0]) if len(runs) == 1 else "runs " + " and ".join(map(str, sorted(runs)))
             g.append(text(xb + 12, ly + 5, f"{s} ({who})", "lab em"))
         data.append([title, fmt(b)] + [fmt(w) for w in ws])
-    body = svg(W, H, "".join(g), "Open-ticket mistakes and the judge's false-pass share, baseline against kept version")
-    cap = ("Each calibrated climb moved the agent's mistakes onto the open damage tickets, where this judge passes them "
-           "(validation and holdout decisions). The share of all its mistakes that the judge passed, 1 − TNR, rose "
-           "in every run.")
+    body = svg(W, H, "".join(g), "Incorrect decisions on the open tickets, and the fraction that the judge passed")
+    cap = ("Each calibrated climb moved incorrect decisions of the agent to the open tickets, where this judge passes "
+           "them. The data is the validation and holdout decisions. The fraction of all incorrect decisions that the "
+           "judge passed (1 − TNR) increased in each run.")
     return body, cap, table(["Measure", "Baseline", "Run 1", "Run 2", "Run 3"], data)
 
 
 def fig_procedure():
     sec = SRC.split("## 7.")[1].split("## 8.")[0]
-    steps = re.findall(r"\*\*(Before|During|After) the climb: (.+?)\.\*\* \*(.+?)\*", sec)
+    steps = re.findall(r"\*\*(Before|During|After) the climb: (.+?)\.\*\* \*(.+?)\*", sec, re.S)
     cols = {}
     for phase, step, ev in steps:
-        cls = "solid" if ev.startswith("Demonstrated") else "dashed" if "hypothesis" in ev.lower() else "outline"
+        step, ev = " ".join(step.split()), " ".join(ev.split())
+        cls = "solid" if ev.startswith("Shown in this study") else "dashed" if "hypothesis" in ev.lower() else "outline"
         cols.setdefault(phase, []).append((step[0].upper() + step[1:], ev.rstrip("."), cls))
     out = '<div class="proc">'
     for phase in ("Before", "During", "After"):
         out += f'<div class="ph"><h4>{phase} the climb</h4>' + "".join(
             f'<div class="step">{esc(s)}<br><span class="badge {c}">{esc(e)}</span></div>' for s, e, c in cols[phase]) + "</div>"
     out += "</div>"
-    cap = "The procedure in this section. Each tag says how strongly this study supports the step."
+    cap = "The procedure in this section. Each tag shows how strongly this study supports the step."
     return out, cap, None
 
 
@@ -449,7 +456,7 @@ def fig_labels():
     for v in (0.5, 0.6, 0.7, 0.8, 0.9, 1.0):
         g.append(f'<line x1="{x(v):.1f}" x2="{x(v):.1f}" y1="{T}" y2="{H - B + 4}" class="grid"/>')
         g.append(text(x(v), H - B + 20, pct(v), "tick", "middle"))
-    g.append(text((L + W - Rm) / 2, H - 4, "Chance that k labelled decisions give the true change's direction", "lab m", "middle"))
+    g.append(text((L + W - Rm) / 2, H - 4, "Probability that k labelled decisions give the correct direction", "lab m", "middle"))
     pts = [(gname, n, v) for arm, gname, n in RUNS for v in R["label_the_diff"][arm]]
     data = [[run_name(gn, n), round_name(v["round"]), v["changed_rows"], sgn(v["true_net"], 0)]
             + [pct(v["agree"][k], 1) for k in ks] for gn, n, v in pts]
@@ -467,17 +474,17 @@ def fig_labels():
             cy = cy0 + lane
             lines = [f"{run_name(gname, n)}, {round_name(v['round'])}",
                      f"{pct(v['agree'][k], 1)} with k = {k}",
-                     f"true net change {sgn(v['true_net'], 0)} among {v['changed_rows']} changed decisions"]
+                     f"true net change {sgn(v['true_net'], 0)} in {v['changed_rows']} changed decisions"]
             g.append(f'<g class="pt {GCLS[gname]}"{tip(*lines)}><circle cx="{cx:.1f}" cy="{cy:.1f}" r="11" class="hit"/>'
                      f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="5" class="mark filled"/></g>')
             if k == "20" and (gname, n, v) == worst:
                 g.append(f'<line x1="{cx:.1f}" y1="{cy + 7:.1f}" x2="{cx:.1f}" y2="{cy + 22:.1f}" class="leader"/>')
                 g.append(text(cx - 4, cy + 34, f"{run_name(gname, n)}, {round_name(v['round'])}: net "
-                              f"{sgn(v['true_net'], 0)} among {v['changed_rows']} changed decisions", "lab m"))
+                              f"{sgn(v['true_net'], 0)} in {v['changed_rows']} changed decisions", "lab m"))
     body = grader_legend() + svg(W, H, "".join(g), "Chance that k labelled changed decisions get the direction right, per round")
-    cap = ("For each of the 18 rounds, the chance that k changed decisions, drawn at random and labelled by hand, give "
-           "the same direction as the true net change. These are exact probabilities. The one hard round had a net "
-           "change close to zero.")
+    cap = ("For each of the 18 rounds: the probability that k changed decisions, selected at random and labelled by a "
+           "person, give the same direction as the true net change. These are exact probabilities. The one difficult "
+           "round had a net change near zero.")
     return body, cap, table(["Climb", "Round", "Changed decisions", "True net change", "k = 10", "k = 20", "k = 30"],
                             data, num_from=2)
 
@@ -527,8 +534,8 @@ def build_body():
     return head, body
 
 
-SLUGS = {"The question": "question", "Setup": "setup", "The climbs": "climbs", "A judge that passes": "lenient",
-         "The climb moves": "calibrated", "A judge with J near zero": "weak", "Applying TPR and TNR": "procedure",
+SLUGS = {"The question": "question", "Setup": "setup", "Results of the climbs": "climbs", "The lenient judge": "lenient",
+         "The climb moves": "calibrated", "A judge with J near zero": "weak", "How to use TPR and TNR": "procedure",
          "Limitations": "limitations", "In practice": "practice", "How this was made": "how-made", "References": "references"}
 
 
@@ -578,7 +585,7 @@ def polish(body):
                 for td in tds[1:]:
                     s = td.get_text().strip()
                     v = 0.0 if s.startswith("under") else float(s.rstrip("%"))
-                    v = v / 100 if s.endswith("%") else v / 10 if "lowest-scoring" in label else v
+                    v = v / 100 if s.endswith("%") else v / 10 if "lowest" in label else v
                     bar(soup, td, v)
         wrap = soup.new_tag("div", attrs={"class": "table-wrap"})
         tb.wrap(wrap)
