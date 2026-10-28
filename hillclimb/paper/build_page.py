@@ -268,8 +268,8 @@ def fig_jscatter():
     g.append(f'<line x1="{x(-0.3):.1f}" y1="{y(-0.3):.1f}" x2="{x(1.05):.1f}" y2="{y(1.05):.1f}" class="ref"/>')
     for num, (cx_, cy_) in ((1, (-0.2, 1.0)), (2, (0.95, -0.2)), (3, (0.38, 0.38))):
         g.append(callout(x(cx_), y(cy_), num))
-    g.append(text(L + S / 2, H - 8, "J on fixes: the part of each true fix that the judge sees", "lab m", "middle"))
-    g.append(text(14, T + S / 2, "J on breaks: the part of each true break that the judge sees", "lab m", "middle",
+    g.append(text(L + S / 2, H - 8, "J on fixes: the part of each true fix that the judge detects", "lab m", "middle"))
+    g.append(text(14, T + S / 2, "J on breaks: the part of each true break that the judge detects", "lab m", "middle",
                   f' transform="rotate(-90 14 {T + S / 2:.1f})"'))
     data, pts = [], []
     for arm, gname, n in RUNS:
@@ -292,15 +292,15 @@ def fig_jscatter():
     g.append(text(x(0.0), y(0.205) + 5, "Weak", "lab em", "middle"))
     g.append(text(x(1.0), y(0.30) + 5, "Calibrated", "lab em", "end"))
     lg = grader_legend([(dot_sw("g-ink"), "kept"), (dot_sw("g-ink", hollow=True), "reverted")])
-    key = callout_key(["Above the diagonal, the judge does not see all the fixes. Real gains look smaller, or look like losses.",
-                       "Below the diagonal, the judge does not see all the breaks. Losses look smaller, or look like gains.",
+    key = callout_key(["Above the diagonal, the judge does not detect all the fixes. Real gains look smaller, or look like losses.",
+                       "Below the diagonal, the judge does not detect all the breaks. Losses look smaller, or look like gains.",
                        "On the diagonal, J on fixes is equal to J on breaks. This is the uniform-error model."])
     body = lg + svg(W, H, "".join(g), "J on fixes against J on breaks for every round", "chart square") + key
-    cap = ("Each round of each climb, placed by the part of its true fixes and true breaks that the judge saw. The data "
+    cap = ("Each round of each climb, placed by the part of its true fixes and true breaks that the judge detected. The data "
            "is the train and validation decisions. Each round is compared with the version that the loop tested it "
            "against. In the uniform-error model, each round is on the diagonal. Only the rounds of the answer key are on "
            "it. The rounds of the lenient judge are above it, and the rounds of the calibrated judge are below it.")
-    return body, cap, table(["Climb", "Round", "Loop's call", "J on fixes", "J on breaks", "True change (decisions)",
+    return body, cap, table(["Climb", "Round", "Loop's choice", "J on fixes", "J on breaks", "True change (decisions)",
                              "Judge's change"], data, num_from=3)
 
 
@@ -380,7 +380,7 @@ def fig_breaks():
     cap = ("Each decision that a change in the calibrated climbs truly broke, for each round of the three runs. The "
            "judge changed most ordinary breaks from pass to fail. It changed each break on the open tickets from fail "
            "to pass, as if it were a fix.")
-    return body, cap, table(["Run", "Round", "Loop's decision", "Broken", "Pass to fail", "No change",
+    return body, cap, table(["Run", "Round", "Loop's choice", "Broken", "Pass to fail", "No change",
                              "Fail to pass, other", "Fail to pass, open tickets"], data, num_from=3)
 
 
@@ -534,7 +534,7 @@ def build_body():
     return head, body
 
 
-SLUGS = {"The question": "question", "Setup": "setup", "Results of the climbs": "climbs", "The lenient judge": "lenient",
+SLUGS = {"The question": "question", "Setup": "setup", "Results of the climbs": "climbs", "A judge that passes": "lenient",
          "The climb moves": "calibrated", "A judge with J near zero": "weak", "How to use TPR and TNR": "procedure",
          "Limitations": "limitations", "In practice": "practice", "How this was made": "how-made", "References": "references"}
 
