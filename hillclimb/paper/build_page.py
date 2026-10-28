@@ -238,6 +238,8 @@ def fig_outcomes():
                      + f'<circle cx="{x(true):.1f}" cy="{yy:.1f}" r="5" class="mark filled"/></g>')
         if gname == "answer key":
             parts.append(text(x(true) + 12, yy + 4, sgn(true), "lab m"))
+        elif judge - true > 0.05:
+            parts.append(text(x(judge) + 12, yy + 4, f"judge {judge - true:.1f} points too high", "lab m"))
         parts.append("</g>")
         g.append("".join(parts))
         data.append([run_name(gname, n), sgn(judge), sgn(true), "" if best is None else sgn(best)])
@@ -268,6 +270,8 @@ def fig_jscatter():
     g.append(f'<line x1="{x(-0.3):.1f}" y1="{y(-0.3):.1f}" x2="{x(1.05):.1f}" y2="{y(1.05):.1f}" class="ref"/>')
     for num, (cx_, cy_) in ((1, (-0.2, 1.0)), (2, (0.95, -0.2)), (3, (0.38, 0.38))):
         g.append(callout(x(cx_), y(cy_), num))
+    g.append(text(x(-0.2) + 14, y(1.0) + 4.5, "The judge shows changes as worse than they are", "lab em-s"))
+    g.append(text(x(0.95) - 14, y(-0.2) + 4.5, "The judge shows changes as better than they are", "lab em-s", "end"))
     g.append(text(L + S / 2, H - 8, "J on fixes: the part of each true fix that the judge detects", "lab m", "middle"))
     g.append(text(14, T + S / 2, "J on breaks: the part of each true break that the judge detects", "lab m", "middle",
                   f' transform="rotate(-90 14 {T + S / 2:.1f})"'))
@@ -292,8 +296,10 @@ def fig_jscatter():
     g.append(text(x(0.0), y(0.205) + 5, "Weak", "lab em", "middle"))
     g.append(text(x(1.0), y(0.30) + 5, "Calibrated", "lab em", "end"))
     lg = grader_legend([(dot_sw("g-ink"), "kept"), (dot_sw("g-ink", hollow=True), "reverted")])
-    key = callout_key(["Above the diagonal, the judge does not detect all the fixes. Real gains look smaller, or look like losses.",
-                       "Below the diagonal, the judge does not detect all the breaks. Losses look smaller, or look like gains.",
+    key = callout_key(["Above the diagonal, the judge detects fewer of the fixes than of the breaks. Thus true gains look "
+                       "smaller, or look like losses.",
+                       "Below the diagonal, the judge detects fewer of the breaks than of the fixes. Thus losses look "
+                       "smaller, or look like gains.",
                        "On the diagonal, J on fixes is equal to J on breaks. This is the uniform-error model."])
     body = lg + svg(W, H, "".join(g), "J on fixes against J on breaks for every round", "chart square") + key
     cap = ("Each round of each climb, placed by the part of its true fixes and true breaks that the judge detected. The data "
@@ -424,9 +430,13 @@ def fig_drift():
             g.append(text(xb + 12, ly + 5, f"{s} ({who})", "lab em"))
         data.append([title, fmt(b)] + [fmt(w) for w in ws])
     body = svg(W, H, "".join(g), "Incorrect decisions on the open tickets, and the fraction that the judge passed")
-    cap = ("Each calibrated climb moved incorrect decisions of the agent to the open tickets, where this judge passes "
-           "them. The data is the validation and holdout decisions. The fraction of all incorrect decisions that the "
-           "judge passed (1 − TNR) increased in each run.")
+    totals = [sum(c["mistakes"] for c in R["drift_by_category"][a][R["replicates"]["c3"][i]["winner"]].values())
+              for i, a in enumerate(CAL_RUNS)]
+    base_total = sum(c["mistakes"] for c in R["drift_by_category"]["c3"]["baseline"].values())
+    cap = (f"Each calibrated climb changed the types of the agent's incorrect decisions, not only their number. The total "
+           f"decreased, from {base_total} to {', '.join(map(str, totals[:-1]))} and {totals[-1]}. But more of them were on "
+           f"the open tickets, where this judge passes them. The data is the validation and holdout decisions. The "
+           f"fraction of all incorrect decisions that the judge passed (1 − TNR) increased in each run.")
     return body, cap, table(["Measure", "Baseline", "Run 1", "Run 2", "Run 3"], data)
 
 
@@ -551,7 +561,7 @@ def polish(body):
             s = soup.new_tag("span", attrs={"class": "num"})
             s.string = num + "."
             h.append(s)
-        h.append(name)
+        h.append((" " if num else "") + name)
     for p in soup.find_all("p"):  # formulas on their own line become equation blocks
         t = p.get_text().strip()
         only_strong = len(p.contents) == 1 and getattr(p.contents[0], "name", None) == "strong"

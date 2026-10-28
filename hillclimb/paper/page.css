@@ -48,7 +48,7 @@
   .byline { color: var(--muted); font-size: 15px; margin: 0 0 6px; }
   .note { color: var(--muted); font-size: 14.5px; margin: 0 0 28px; }
   h2 { font-size: 24px; font-weight: 700; margin: 48px 0 14px; text-wrap: balance; scroll-margin-top: 16px; }
-  h2 .num { color: var(--muted); font-weight: 600; margin-right: 6px; }
+  h2 .num { color: var(--muted); font-weight: 600; margin-right: 2px; }
   p { margin: 0 0 14px; }
   ul, ol { margin: 0 0 16px; padding-left: 24px; }
   li { margin-bottom: 6px; }
@@ -96,6 +96,7 @@
   .chart .lab { fill: var(--text-2); font-size: 12.5px; }
   .chart .lab.m { fill: var(--muted); }
   .chart .lab.em { fill: var(--text); font-size: 14px; font-weight: 600; }
+  .chart .lab.em-s { fill: var(--text); font-size: 12.5px; font-weight: 600; }
   .chart .inlab { fill: var(--on-bad); font-size: 12px; font-weight: 600; pointer-events: none; }
   .chart .grid { stroke: var(--grid); stroke-width: 1; }
   .chart .axis { stroke: var(--axis); stroke-width: 1; }
