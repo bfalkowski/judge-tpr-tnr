@@ -26,6 +26,15 @@ did not ship anything harmful, but it could not improve the agent through them, 
 away a real improvement. The skill's pre-loop checks on the grader do not measure what decided each outcome: how often
 the judge passes a wrong answer (TNR) and fails a right one (TPR), measured separately and per kind of case.
 
+**Repeat runs (decisions.md, entry 7).** The c3 and lenient arms ran twice more from the same baseline, verdicts and
+rules. c3 kept changes in all three runs: true holdout gains +5.0, +6.9 and +7.8 points, against grader holdout gains of
++6.6, +11.6 and +9.4. Every run kept the $500 fix in round 1, then a change that sent the damage_open tickets to rule 3;
+across the seven c3 rounds the judge credited all 43 broken damage_open decisions as fixes, and its TNR on test and
+holdout mistakes fell from 0.94 to 0.84, 0.74 and 0.84. The lenient arm reverted all six of its rounds; each applied the
+$500 fix (+2.5 holdout on those tickets every time), its J on fixes was −0.08 to 0.00, and every run ended with the
+analyzer concluding the fix had failed. The "label 20 changed decisions" check (exact probability) held at 81% or more in 17 of 18 rounds;
+the exception (c3-r2 v2, net +8 among 86 changed) was 64%.
+
 ## Setup in one paragraph
 
 The agent picks one of four actions per ticket using Jev. The loop could change only its decision instructions and the
@@ -34,8 +43,8 @@ and grades and proposed one change, which was applied verbatim and run on all 40
 and stop followed the skill's rules as fixed in `DESIGN.md`, plus two decisions made during the study and recorded in
 `decisions.md` when they were made: analyzers after a stall see its categorization (3), and a round with no proposal
 ends the arm (5), which is how three of the four arms ended. Judge verdicts for all four actions on every ticket were
-computed once, so each judge was deterministic in the study. API spend on the repository's keys was $3.64, $2.93 of it
-the c3 judge; the analyzers ran in this session and are not in that figure.
+computed once, so each judge was deterministic in the study. API spend on the repository's keys was $3.89, $2.93 of it
+the c3 judge and $0.26 the repeat runs; the analyzers ran in this session and are not in that figure.
 
 ## Findings
 

@@ -471,6 +471,429 @@
     }
    ],
    "decisions_agree": "1 of 2"
+  },
+  "c3-r2": {
+   "arm": "c3-r2",
+   "grader": "the frozen judge c3 (Claude Haiku 4.5), threshold 0.5; test TPR 0.927, TNR 0.919",
+   "winner_name": "v2",
+   "stopped": "the analyzer proposed no change",
+   "rounds": 2,
+   "categorization": null,
+   "baseline": {
+    "grader_train": 0.7791666666666667,
+    "grader_test": 0.7708333333333334,
+    "grader_holdout": 0.765625,
+    "true_train": 0.8083333333333333,
+    "true_test": 0.7916666666666666,
+    "true_holdout": 0.79375
+   },
+   "winner": {
+    "grader_train": 0.9291666666666667,
+    "grader_test": 0.8666666666666667,
+    "grader_holdout": 0.88125,
+    "true_train": 0.8791666666666667,
+    "true_test": 0.8333333333333334,
+    "true_holdout": 0.8625
+   },
+   "reported_test_delta": 0.09583333333333333,
+   "reported_test_delta_ci": [
+    0.025000000000000022,
+    0.17083333333333328
+   ],
+   "true_test_delta": 0.04166666666666674,
+   "true_test_delta_ci": [
+    -0.03749999999999998,
+    0.12083333333333324
+   ],
+   "true_holdout_delta": 0.06875000000000009,
+   "true_holdout_delta_ci": [
+    0.0,
+    0.13750000000000007
+   ],
+   "grader_holdout_delta": 0.11562499999999998,
+   "versions": [
+    {
+     "name": "baseline",
+     "decision": null,
+     "change": null,
+     "tpr": 0.9527027027027027,
+     "tnr": 0.9396551724137931,
+     "mistakes": 116,
+     "mistakes_passed": 7,
+     "grader_test": 0.7708333333333334,
+     "true_test": 0.7916666666666666,
+     "grader_holdout": 0.765625,
+     "true_holdout": 0.79375,
+     "corrected_holdout": 0.7930014590205534
+    },
+    {
+     "name": "v1",
+     "decision": "keep",
+     "change": "Make the rule 4 refund-limit check an explicit last step for every refund outcome (including rule 3's out-of-stock fallback) in the instructions and in the refund and escalate action descriptions, and say that the limit never converts reship or reply.",
+     "tpr": 0.9630434782608696,
+     "tnr": 0.91,
+     "mistakes": 100,
+     "mistakes_passed": 9,
+     "grader_test": 0.7916666666666666,
+     "true_test": 0.8,
+     "grader_holdout": 0.81875,
+     "true_holdout": 0.8375,
+     "corrected_holdout": 0.853149581324537
+    },
+    {
+     "name": "v2",
+     "decision": "keep",
+     "change": "Make the order record (status, shipped_on, delivered_on, stock), not the ticket's framing, pick the policy rule: add a status-first decision table to the instructions and state in the reship and reply descriptions which record states they cover, keeping the v1 refund-limit check as the last step.",
+     "tpr": 0.9831932773109243,
+     "tnr": 0.7380952380952381,
+     "mistakes": 84,
+     "mistakes_passed": 22,
+     "grader_test": 0.8666666666666667,
+     "true_test": 0.8333333333333334,
+     "grader_holdout": 0.88125,
+     "true_holdout": 0.8625,
+     "corrected_holdout": 0.9239120781527532
+    }
+   ],
+   "decisions": [
+    {
+     "round": "v1",
+     "loop": "keep",
+     "key_rule": "keep",
+     "true_holdout_change_vs_current": 0.04375000000000007
+    },
+    {
+     "round": "v2",
+     "loop": "keep",
+     "key_rule": "revert",
+     "true_holdout_change_vs_current": 0.025000000000000022
+    }
+   ],
+   "decisions_agree": "1 of 2"
+  },
+  "c3-r3": {
+   "arm": "c3-r3",
+   "grader": "the frozen judge c3 (Claude Haiku 4.5), threshold 0.5; test TPR 0.927, TNR 0.919",
+   "winner_name": "v2",
+   "stopped": "the analyzer proposed no change",
+   "rounds": 2,
+   "categorization": {
+    "after": "v2",
+    "counts": {
+     "artifact_gap": 0,
+     "grader_disagreement": 4,
+     "harness": 0,
+     "structural": 6,
+     "variance": 4
+    }
+   },
+   "baseline": {
+    "grader_train": 0.7791666666666667,
+    "grader_test": 0.7708333333333334,
+    "grader_holdout": 0.765625,
+    "true_train": 0.8083333333333333,
+    "true_test": 0.7916666666666666,
+    "true_holdout": 0.79375
+   },
+   "winner": {
+    "grader_train": 0.9416666666666667,
+    "grader_test": 0.8291666666666667,
+    "grader_holdout": 0.859375,
+    "true_train": 0.9083333333333333,
+    "true_test": 0.8625,
+    "true_holdout": 0.871875
+   },
+   "reported_test_delta": 0.05833333333333335,
+   "reported_test_delta_ci": [
+    -0.012499999999999956,
+    0.12916666666666676
+   ],
+   "true_test_delta": 0.07083333333333341,
+   "true_test_delta_ci": [
+    -0.004166666666666652,
+    0.14583333333333326
+   ],
+   "true_holdout_delta": 0.078125,
+   "true_holdout_delta_ci": [
+    0.012500000000000067,
+    0.14687499999999998
+   ],
+   "grader_holdout_delta": 0.09375,
+   "versions": [
+    {
+     "name": "baseline",
+     "decision": null,
+     "change": null,
+     "tpr": 0.9527027027027027,
+     "tnr": 0.9396551724137931,
+     "mistakes": 116,
+     "mistakes_passed": 7,
+     "grader_test": 0.7708333333333334,
+     "true_test": 0.7916666666666666,
+     "grader_holdout": 0.765625,
+     "true_holdout": 0.79375,
+     "corrected_holdout": 0.7930014590205534
+    },
+    {
+     "name": "v1",
+     "decision": "keep",
+     "change": "Make the $500 refund cap (rule 4) explicitly cover the out-of-stock refund for lost/undelivered orders (rule 3), in the instructions and in the refund/escalate action descriptions, while saying the cap does not touch reship or reply.",
+     "tpr": 0.956140350877193,
+     "tnr": 0.9230769230769231,
+     "mistakes": 104,
+     "mistakes_passed": 8,
+     "grader_test": 0.7875,
+     "true_test": 0.8041666666666667,
+     "grader_holdout": 0.796875,
+     "true_holdout": 0.821875,
+     "corrected_holdout": 0.8283827074346616
+    },
+    {
+     "name": "v2",
+     "decision": "keep",
+     "change": "Replace the decision instructions with a status-first decision table (Processing / Lost / Shipped up to 14 days / Shipped over 14 days / Delivered) driven by the order record and an explicit day-count method, saying the ticket's story and requests never override the record, and tighten the four action descriptions to the same status and day gates.",
+     "tpr": 0.9506172839506173,
+     "tnr": 0.8378378378378378,
+     "mistakes": 74,
+     "mistakes_passed": 12,
+     "grader_test": 0.8291666666666667,
+     "true_test": 0.8625,
+     "grader_holdout": 0.859375,
+     "true_holdout": 0.871875,
+     "corrected_holdout": 0.8991452042628777
+    }
+   ],
+   "decisions": [
+    {
+     "round": "v1",
+     "loop": "keep",
+     "key_rule": "keep",
+     "true_holdout_change_vs_current": 0.028125000000000067
+    },
+    {
+     "round": "v2",
+     "loop": "keep",
+     "key_rule": "keep",
+     "true_holdout_change_vs_current": 0.04999999999999993
+    }
+   ],
+   "decisions_agree": "2 of 2"
+  },
+  "lenient-r2": {
+   "arm": "lenient-r2",
+   "grader": "the step 2 judge j2 (Jev), threshold 0.3; test TPR 1.000, TNR 0.645",
+   "winner_name": "baseline",
+   "stopped": "the analyzer proposed no change",
+   "rounds": 2,
+   "categorization": {
+    "after": "v2",
+    "counts": {
+     "artifact_gap": 8,
+     "grader_disagreement": 7,
+     "harness": 0,
+     "structural": 22,
+     "variance": 2
+    }
+   },
+   "baseline": {
+    "grader_train": 0.8375,
+    "grader_test": 0.8916666666666667,
+    "grader_holdout": 0.8875,
+    "true_train": 0.8083333333333333,
+    "true_test": 0.7916666666666666,
+    "true_holdout": 0.79375
+   },
+   "winner": {
+    "grader_train": 0.8375,
+    "grader_test": 0.8916666666666667,
+    "grader_holdout": 0.8875,
+    "true_train": 0.8083333333333333,
+    "true_test": 0.7916666666666666,
+    "true_holdout": 0.79375
+   },
+   "reported_test_delta": 0.0,
+   "reported_test_delta_ci": [
+    0.0,
+    0.0
+   ],
+   "true_test_delta": 0.0,
+   "true_test_delta_ci": [
+    0.0,
+    0.0
+   ],
+   "true_holdout_delta": 0.0,
+   "true_holdout_delta_ci": [
+    0.0,
+    0.0
+   ],
+   "grader_holdout_delta": 0.0,
+   "versions": [
+    {
+     "name": "baseline",
+     "decision": null,
+     "change": null,
+     "tpr": 0.9774774774774775,
+     "tnr": 0.4482758620689655,
+     "mistakes": 116,
+     "mistakes_passed": 64,
+     "grader_test": 0.8916666666666667,
+     "true_test": 0.7916666666666666,
+     "grader_holdout": 0.8875,
+     "true_holdout": 0.79375,
+     "corrected_holdout": 0.8908712541620422
+    },
+    {
+     "name": "v1",
+     "decision": "revert",
+     "change": "Make the refund limit a required second step after any rule gives refund (including rule 3's out-of-stock fallback), and say so in both the instructions and the refund/escalate action descriptions.",
+     "tpr": 0.9398663697104677,
+     "tnr": 0.5135135135135135,
+     "mistakes": 111,
+     "mistakes_passed": 54,
+     "grader_test": 0.8458333333333333,
+     "true_test": 0.7958333333333333,
+     "grader_holdout": 0.853125,
+     "true_holdout": 0.80625,
+     "corrected_holdout": 0.8341264335923051
+    },
+    {
+     "name": "v2",
+     "decision": "revert",
+     "change": "Keep the instructions as they are and put the $500 refund limit into the refund and escalate action descriptions: refund is only allowed on orders of $500 or less, and escalate takes over every refund above $500, including rule 3's out-of-stock refund.",
+     "tpr": 0.9439655172413793,
+     "tnr": 0.46875,
+     "mistakes": 96,
+     "mistakes_passed": 51,
+     "grader_test": 0.8666666666666667,
+     "true_test": 0.825,
+     "grader_holdout": 0.878125,
+     "true_holdout": 0.83125,
+     "corrected_holdout": 0.8753953940066594
+    }
+   ],
+   "decisions": [
+    {
+     "round": "v1",
+     "loop": "revert",
+     "key_rule": "keep",
+     "true_holdout_change_vs_current": 0.012500000000000067
+    },
+    {
+     "round": "v2",
+     "loop": "revert",
+     "key_rule": "keep",
+     "true_holdout_change_vs_current": 0.03750000000000009
+    }
+   ],
+   "decisions_agree": "0 of 2"
+  },
+  "lenient-r3": {
+   "arm": "lenient-r3",
+   "grader": "the step 2 judge j2 (Jev), threshold 0.3; test TPR 1.000, TNR 0.645",
+   "winner_name": "baseline",
+   "stopped": "the analyzer proposed no change",
+   "rounds": 2,
+   "categorization": {
+    "after": "v2",
+    "counts": {
+     "artifact_gap": 9,
+     "grader_disagreement": 7,
+     "harness": 0,
+     "structural": 23,
+     "variance": 0
+    }
+   },
+   "baseline": {
+    "grader_train": 0.8375,
+    "grader_test": 0.8916666666666667,
+    "grader_holdout": 0.8875,
+    "true_train": 0.8083333333333333,
+    "true_test": 0.7916666666666666,
+    "true_holdout": 0.79375
+   },
+   "winner": {
+    "grader_train": 0.8375,
+    "grader_test": 0.8916666666666667,
+    "grader_holdout": 0.8875,
+    "true_train": 0.8083333333333333,
+    "true_test": 0.7916666666666666,
+    "true_holdout": 0.79375
+   },
+   "reported_test_delta": 0.0,
+   "reported_test_delta_ci": [
+    0.0,
+    0.0
+   ],
+   "true_test_delta": 0.0,
+   "true_test_delta_ci": [
+    0.0,
+    0.0
+   ],
+   "true_holdout_delta": 0.0,
+   "true_holdout_delta_ci": [
+    0.0,
+    0.0
+   ],
+   "grader_holdout_delta": 0.0,
+   "versions": [
+    {
+     "name": "baseline",
+     "decision": null,
+     "change": null,
+     "tpr": 0.9774774774774775,
+     "tnr": 0.4482758620689655,
+     "mistakes": 116,
+     "mistakes_passed": 64,
+     "grader_test": 0.8916666666666667,
+     "true_test": 0.7916666666666666,
+     "grader_holdout": 0.8875,
+     "true_holdout": 0.79375,
+     "corrected_holdout": 0.8908712541620422
+    },
+    {
+     "name": "v1",
+     "decision": "revert",
+     "change": "Make the over-limit refund rule apply to every refund, including the out-of-stock fallback refund, by telling Jev to check each refund against the order-total limit and choose escalate when the total is over it (instructions plus the refund and escalate descriptions).",
+     "tpr": 0.9424778761061947,
+     "tnr": 0.5185185185185185,
+     "mistakes": 108,
+     "mistakes_passed": 52,
+     "grader_test": 0.85,
+     "true_test": 0.8083333333333333,
+     "grader_holdout": 0.85625,
+     "true_holdout": 0.80625,
+     "corrected_holdout": 0.8392850536440991
+    },
+    {
+     "name": "v2",
+     "decision": "revert",
+     "change": "Rewrite the refund and escalate descriptions as complete condition lists, so an undelivered order that is Lost or shipped more than 14 days ago, has stock 0 and a total over $500 matches escalate, and refund only matches totals of $500 or less.",
+     "tpr": 0.9420289855072463,
+     "tnr": 0.5324675324675324,
+     "mistakes": 77,
+     "mistakes_passed": 36,
+     "grader_test": 0.8458333333333333,
+     "true_test": 0.8333333333333334,
+     "grader_holdout": 0.9,
+     "true_holdout": 0.884375,
+     "corrected_holdout": 0.9115057343692197
+    }
+   ],
+   "decisions": [
+    {
+     "round": "v1",
+     "loop": "revert",
+     "key_rule": "keep",
+     "true_holdout_change_vs_current": 0.012500000000000067
+    },
+    {
+     "round": "v2",
+     "loop": "revert",
+     "key_rule": "keep",
+     "true_holdout_change_vs_current": 0.09062500000000007
+    }
+   ],
+   "decisions_agree": "0 of 2"
   }
  },
  "pre_loop": {
@@ -627,6 +1050,49 @@
     "structural": 19,
     "variance": 1
    }
+  },
+  "c3-r2": null,
+  "c3-r3": {
+   "version": "v2",
+   "grader_disagreement_calls": 4,
+   "of_which_real_judge_errors": 4,
+   "train_failures": 14,
+   "real_false_fails_among_them": 5,
+   "counts": {
+    "artifact_gap": 0,
+    "grader_disagreement": 4,
+    "harness": 0,
+    "structural": 6,
+    "variance": 4
+   }
+  },
+  "lenient-r2": {
+   "version": "baseline",
+   "grader_disagreement_calls": 7,
+   "of_which_real_judge_errors": 7,
+   "train_failures": 39,
+   "real_false_fails_among_them": 9,
+   "counts": {
+    "artifact_gap": 8,
+    "grader_disagreement": 7,
+    "harness": 0,
+    "structural": 22,
+    "variance": 2
+   }
+  },
+  "lenient-r3": {
+   "version": "baseline",
+   "grader_disagreement_calls": 7,
+   "of_which_real_judge_errors": 7,
+   "train_failures": 39,
+   "real_false_fails_among_them": 9,
+   "counts": {
+    "artifact_gap": 9,
+    "grader_disagreement": 7,
+    "harness": 0,
+    "structural": 23,
+    "variance": 0
+   }
   }
  },
  "rerun_noise": {
@@ -646,6 +1112,26 @@
    "half_width": 0.011549410759380275
   },
   "lenient": {
+   "tickets_differing": 0,
+   "tickets": 120,
+   "half_width": 0.0
+  },
+  "c3-r2": {
+   "tickets_differing": 1,
+   "tickets": 120,
+   "half_width": 0.011549410759380275
+  },
+  "c3-r3": {
+   "tickets_differing": 1,
+   "tickets": 120,
+   "half_width": 0.011549410759380275
+  },
+  "lenient-r2": {
+   "tickets_differing": 0,
+   "tickets": 120,
+   "half_width": 0.0
+  },
+  "lenient-r3": {
    "tickets_differing": 0,
    "tickets": 120,
    "half_width": 0.0
@@ -809,6 +1295,134 @@
      0.0708333333333333
     ]
    }
+  ],
+  "c3-r2": [
+   {
+    "round": "v1",
+    "against": "baseline",
+    "decision": "keep",
+    "grader": 0.02083333333333326,
+    "grader_ci": [
+     -0.01666666666666672,
+     0.0625
+    ],
+    "true": 0.008333333333333415,
+    "true_ci": [
+     -0.033333333333333326,
+     0.054166666666666696
+    ]
+   },
+   {
+    "round": "v2",
+    "against": "v1",
+    "decision": "keep",
+    "grader": 0.07500000000000007,
+    "grader_ci": [
+     0.004166666666666652,
+     0.14583333333333326
+    ],
+    "true": 0.033333333333333326,
+    "true_ci": [
+     -0.04166666666666663,
+     0.10833333333333328
+    ]
+   }
+  ],
+  "c3-r3": [
+   {
+    "round": "v1",
+    "against": "baseline",
+    "decision": "keep",
+    "grader": 0.016666666666666607,
+    "grader_ci": [
+     -0.025000000000000022,
+     0.0625
+    ],
+    "true": 0.012500000000000067,
+    "true_ci": [
+     -0.029166666666666674,
+     0.05833333333333335
+    ]
+   },
+   {
+    "round": "v2",
+    "against": "v1",
+    "decision": "keep",
+    "grader": 0.04166666666666674,
+    "grader_ci": [
+     -0.025000000000000022,
+     0.10833333333333339
+    ],
+    "true": 0.05833333333333335,
+    "true_ci": [
+     -0.012499999999999956,
+     0.12916666666666665
+    ]
+   }
+  ],
+  "lenient-r2": [
+   {
+    "round": "v1",
+    "against": "baseline",
+    "decision": "revert",
+    "grader": -0.04583333333333339,
+    "grader_ci": [
+     -0.08333333333333337,
+     -0.012500000000000067
+    ],
+    "true": 0.004166666666666652,
+    "true_ci": [
+     -0.04166666666666674,
+     0.054166666666666696
+    ]
+   },
+   {
+    "round": "v2",
+    "against": "baseline",
+    "decision": "revert",
+    "grader": -0.025000000000000022,
+    "grader_ci": [
+     -0.054166666666666585,
+     -0.004166666666666652
+    ],
+    "true": 0.033333333333333326,
+    "true_ci": [
+     -0.004166666666666652,
+     0.07500000000000007
+    ]
+   }
+  ],
+  "lenient-r3": [
+   {
+    "round": "v1",
+    "against": "baseline",
+    "decision": "revert",
+    "grader": -0.04166666666666674,
+    "grader_ci": [
+     -0.07916666666666661,
+     -0.012499999999999956
+    ],
+    "true": 0.01666666666666672,
+    "true_ci": [
+     -0.033333333333333326,
+     0.06666666666666665
+    ]
+   },
+   {
+    "round": "v2",
+    "against": "baseline",
+    "decision": "revert",
+    "grader": -0.04583333333333339,
+    "grader_ci": [
+     -0.08333333333333337,
+     -0.012500000000000067
+    ],
+    "true": 0.04166666666666674,
+    "true_ci": [
+     -0.012500000000000067,
+     0.09999999999999998
+    ]
+   }
   ]
  },
  "holdout_change_by_kind": {
@@ -889,6 +1503,70 @@
     "other": 3.4,
     "over_limit_out_of_stock": 2.5
    }
+  },
+  "c3-r2": {
+   "v1": {
+    "damage_early": 0.0,
+    "damage_open": -0.6,
+    "never_came_delivered": -1.2,
+    "other": 3.8,
+    "over_limit_out_of_stock": 2.5
+   },
+   "v2": {
+    "damage_early": 0.3,
+    "damage_open": -2.5,
+    "never_came_delivered": 1.2,
+    "other": 3.4,
+    "over_limit_out_of_stock": 0.0
+   }
+  },
+  "c3-r3": {
+   "v1": {
+    "damage_early": -0.3,
+    "damage_open": -0.3,
+    "never_came_delivered": -0.6,
+    "other": 1.6,
+    "over_limit_out_of_stock": 2.5
+   },
+   "v2": {
+    "damage_early": 0.6,
+    "damage_open": -2.2,
+    "never_came_delivered": 2.2,
+    "other": 4.4,
+    "over_limit_out_of_stock": 0.0
+   }
+  },
+  "lenient-r2": {
+   "v1": {
+    "damage_early": -0.3,
+    "damage_open": -0.6,
+    "never_came_delivered": -1.6,
+    "other": 1.2,
+    "over_limit_out_of_stock": 2.5
+   },
+   "v2": {
+    "damage_early": 0.0,
+    "damage_open": 0.0,
+    "never_came_delivered": -1.6,
+    "other": 2.8,
+    "over_limit_out_of_stock": 2.5
+   }
+  },
+  "lenient-r3": {
+   "v1": {
+    "damage_early": -0.3,
+    "damage_open": -0.6,
+    "never_came_delivered": -1.2,
+    "other": 0.9,
+    "over_limit_out_of_stock": 2.5
+   },
+   "v2": {
+    "damage_early": 0.0,
+    "damage_open": 0.0,
+    "never_came_delivered": 0.9,
+    "other": 5.6,
+    "over_limit_out_of_stock": 2.5
+   }
   }
  },
  "tnr_drop_c3": {
@@ -913,6 +1591,366 @@
     45
    ],
    "p": 0.20697441052821344
+  }
+ },
+ "replicates": {
+  "c3": [
+   {
+    "arm": "c3",
+    "rounds": 3,
+    "kept": [
+     "v1",
+     "v3"
+    ],
+    "winner": "v3",
+    "stopped": "three rounds without a rise of 0.065 in the best test score",
+    "reported_val": 0.04583333333333328,
+    "true_val": 0.04166666666666674,
+    "true_holdout": 0.050000000000000044,
+    "true_holdout_ci": [
+     -0.009375000000000022,
+     0.109375
+    ],
+    "winner_true_holdout": 0.84375,
+    "tnr_baseline": 0.9396551724137931,
+    "tnr_winner": 0.8444444444444444,
+    "open_mistakes_winner": 14,
+    "open_passed_winner": 14,
+    "false_passes_winner": 14,
+    "j_fix": [
+     0.96875,
+     0.75,
+     0.5666666666666667
+    ],
+    "j_break": [
+     0.5,
+     0.41304347826086957,
+     0.1
+    ],
+    "round_true": [
+     20,
+     -26,
+     10
+    ],
+    "round_grader": [
+     25,
+     -1,
+     15
+    ],
+    "categorization": {
+     "after": "v2",
+     "counts": {
+      "artifact_gap": 16,
+      "grader_disagreement": 6,
+      "harness": 0,
+      "structural": 12,
+      "variance": 1
+     }
+    }
+   },
+   {
+    "arm": "c3-r2",
+    "rounds": 2,
+    "kept": [
+     "v1",
+     "v2"
+    ],
+    "winner": "v2",
+    "stopped": "the analyzer proposed no change",
+    "reported_val": 0.09583333333333333,
+    "true_val": 0.04166666666666674,
+    "true_holdout": 0.06875000000000009,
+    "true_holdout_ci": [
+     0.0,
+     0.13750000000000007
+    ],
+    "winner_true_holdout": 0.8625,
+    "tnr_baseline": 0.9396551724137931,
+    "tnr_winner": 0.7380952380952381,
+    "open_mistakes_winner": 16,
+    "open_passed_winner": 16,
+    "false_passes_winner": 22,
+    "j_fix": [
+     0.9142857142857143,
+     0.8888888888888888
+    ],
+    "j_break": [
+     0.5625,
+     0.1891891891891892
+    ],
+    "round_true": [
+     19,
+     8
+    ],
+    "round_grader": [
+     23,
+     36
+    ],
+    "categorization": null
+   },
+   {
+    "arm": "c3-r3",
+    "rounds": 2,
+    "kept": [
+     "v1",
+     "v2"
+    ],
+    "winner": "v2",
+    "stopped": "the analyzer proposed no change",
+    "reported_val": 0.05833333333333335,
+    "true_val": 0.07083333333333341,
+    "true_holdout": 0.078125,
+    "true_holdout_ci": [
+     0.012500000000000067,
+     0.14687499999999998
+    ],
+    "winner_true_holdout": 0.871875,
+    "tnr_baseline": 0.9396551724137931,
+    "tnr_winner": 0.8378378378378378,
+    "open_mistakes_winner": 12,
+    "open_passed_winner": 12,
+    "false_passes_winner": 12,
+    "j_fix": [
+     0.8611111111111112,
+     0.7727272727272727
+    ],
+    "j_break": [
+     0.75,
+     0.1111111111111111
+    ],
+    "round_true": [
+     24,
+     17
+    ],
+    "round_grader": [
+     22,
+     31
+    ],
+    "categorization": {
+     "after": "v2",
+     "counts": {
+      "artifact_gap": 0,
+      "grader_disagreement": 4,
+      "harness": 0,
+      "structural": 6,
+      "variance": 4
+     }
+    }
+   }
+  ],
+  "lenient": [
+   {
+    "arm": "lenient",
+    "rounds": 2,
+    "kept": [],
+    "winner": "baseline",
+    "stopped": "the analyzer proposed no change",
+    "reported_val": 0.0,
+    "true_val": 0.0,
+    "true_holdout": 0.0,
+    "true_holdout_ci": [
+     0.0,
+     0.0
+    ],
+    "winner_true_holdout": 0.79375,
+    "tnr_baseline": 0.4482758620689655,
+    "tnr_winner": 0.4482758620689655,
+    "open_mistakes_winner": 2,
+    "open_passed_winner": 0,
+    "false_passes_winner": 64,
+    "j_fix": [
+     0.0,
+     0.0
+    ],
+    "j_break": [
+     0.6521739130434783,
+     0.7
+    ],
+    "round_true": [
+     13,
+     26
+    ],
+    "round_grader": [
+     -15,
+     -7
+    ],
+    "categorization": {
+     "after": "v2",
+     "counts": {
+      "artifact_gap": 12,
+      "grader_disagreement": 7,
+      "harness": 0,
+      "structural": 19,
+      "variance": 1
+     }
+    }
+   },
+   {
+    "arm": "lenient-r2",
+    "rounds": 2,
+    "kept": [],
+    "winner": "baseline",
+    "stopped": "the analyzer proposed no change",
+    "reported_val": 0.0,
+    "true_val": 0.0,
+    "true_holdout": 0.0,
+    "true_holdout_ci": [
+     0.0,
+     0.0
+    ],
+    "winner_true_holdout": 0.79375,
+    "tnr_baseline": 0.4482758620689655,
+    "tnr_winner": 0.4482758620689655,
+    "open_mistakes_winner": 2,
+    "open_passed_winner": 0,
+    "false_passes_winner": 64,
+    "j_fix": [
+     -0.030303030303030304,
+     0.0
+    ],
+    "j_break": [
+     0.8571428571428571,
+     0.8
+    ],
+    "round_true": [
+     12,
+     29
+    ],
+    "round_grader": [
+     -19,
+     -8
+    ],
+    "categorization": {
+     "after": "v2",
+     "counts": {
+      "artifact_gap": 8,
+      "grader_disagreement": 7,
+      "harness": 0,
+      "structural": 22,
+      "variance": 2
+     }
+    }
+   },
+   {
+    "arm": "lenient-r3",
+    "rounds": 2,
+    "kept": [],
+    "winner": "baseline",
+    "stopped": "the analyzer proposed no change",
+    "reported_val": 0.0,
+    "true_val": 0.0,
+    "true_holdout": 0.0,
+    "true_holdout_ci": [
+     0.0,
+     0.0
+    ],
+    "winner_true_holdout": 0.79375,
+    "tnr_baseline": 0.4482758620689655,
+    "tnr_winner": 0.4482758620689655,
+    "open_mistakes_winner": 2,
+    "open_passed_winner": 0,
+    "false_passes_winner": 64,
+    "j_fix": [
+     -0.02702702702702703,
+     -0.08163265306122448
+    ],
+    "j_break": [
+     0.8421052631578947,
+     0.5333333333333333
+    ],
+    "round_true": [
+     18,
+     34
+    ],
+    "round_grader": [
+     -17,
+     -12
+    ],
+    "categorization": {
+     "after": "v2",
+     "counts": {
+      "artifact_gap": 9,
+      "grader_disagreement": 7,
+      "harness": 0,
+      "structural": 23,
+      "variance": 0
+     }
+    }
+   }
+  ]
+ },
+ "tnr_drop_c3_runs": {
+  "c3": {
+   "rows": {
+    "baseline": [
+     109,
+     116
+    ],
+    "winner": [
+     76,
+     90
+    ],
+    "p": 0.035343414774242445
+   },
+   "rep0": {
+    "baseline": [
+     53,
+     57
+    ],
+    "winner": [
+     38,
+     45
+    ],
+    "p": 0.20697441052821344
+   }
+  },
+  "c3-r2": {
+   "rows": {
+    "baseline": [
+     109,
+     116
+    ],
+    "winner": [
+     62,
+     84
+    ],
+    "p": 8.269239886003071e-05
+   },
+   "rep0": {
+    "baseline": [
+     53,
+     57
+    ],
+    "winner": [
+     32,
+     43
+    ],
+    "p": 0.021108692042421034
+   }
+  },
+  "c3-r3": {
+   "rows": {
+    "baseline": [
+     109,
+     116
+    ],
+    "winner": [
+     62,
+     74
+    ],
+    "p": 0.027172431951140455
+   },
+   "rep0": {
+    "baseline": [
+     53,
+     57
+    ],
+    "winner": [
+     33,
+     39
+    ],
+    "p": 0.3074668713741037
+   }
   }
  },
  "visibility": {
@@ -1063,6 +2101,352 @@
     "true_change_rows": 26,
     "grader_change_rows": -7
    }
+  ],
+  "c3-r2": [
+   {
+    "round": "v1",
+    "against": "baseline",
+    "decision": "keep",
+    "fixed": 35,
+    "fix_credit": 32,
+    "broken": 16,
+    "break_charge": 9,
+    "other": 0,
+    "j_fix": 0.9142857142857143,
+    "j_break": 0.5625,
+    "true_change_rows": 19,
+    "grader_change_rows": 23
+   },
+   {
+    "round": "v2",
+    "against": "v1",
+    "decision": "keep",
+    "fixed": 45,
+    "fix_credit": 40,
+    "broken": 37,
+    "break_charge": 7,
+    "other": 3,
+    "j_fix": 0.8888888888888888,
+    "j_break": 0.1891891891891892,
+    "true_change_rows": 8,
+    "grader_change_rows": 36
+   }
+  ],
+  "c3-r3": [
+   {
+    "round": "v1",
+    "against": "baseline",
+    "decision": "keep",
+    "fixed": 36,
+    "fix_credit": 31,
+    "broken": 12,
+    "break_charge": 9,
+    "other": 0,
+    "j_fix": 0.8611111111111112,
+    "j_break": 0.75,
+    "true_change_rows": 24,
+    "grader_change_rows": 22
+   },
+   {
+    "round": "v2",
+    "against": "v1",
+    "decision": "keep",
+    "fixed": 44,
+    "fix_credit": 34,
+    "broken": 27,
+    "break_charge": 3,
+    "other": 0,
+    "j_fix": 0.7727272727272727,
+    "j_break": 0.1111111111111111,
+    "true_change_rows": 17,
+    "grader_change_rows": 31
+   }
+  ],
+  "lenient-r2": [
+   {
+    "round": "v1",
+    "against": "baseline",
+    "decision": "revert",
+    "fixed": 33,
+    "fix_credit": -1,
+    "broken": 21,
+    "break_charge": 18,
+    "other": 0,
+    "j_fix": -0.030303030303030304,
+    "j_break": 0.8571428571428571,
+    "true_change_rows": 12,
+    "grader_change_rows": -19
+   },
+   {
+    "round": "v2",
+    "against": "baseline",
+    "decision": "revert",
+    "fixed": 39,
+    "fix_credit": 0,
+    "broken": 10,
+    "break_charge": 8,
+    "other": 0,
+    "j_fix": 0.0,
+    "j_break": 0.8,
+    "true_change_rows": 29,
+    "grader_change_rows": -8
+   }
+  ],
+  "lenient-r3": [
+   {
+    "round": "v1",
+    "against": "baseline",
+    "decision": "revert",
+    "fixed": 37,
+    "fix_credit": -1,
+    "broken": 19,
+    "break_charge": 16,
+    "other": 0,
+    "j_fix": -0.02702702702702703,
+    "j_break": 0.8421052631578947,
+    "true_change_rows": 18,
+    "grader_change_rows": -17
+   },
+   {
+    "round": "v2",
+    "against": "baseline",
+    "decision": "revert",
+    "fixed": 49,
+    "fix_credit": -4,
+    "broken": 15,
+    "break_charge": 8,
+    "other": 0,
+    "j_fix": -0.08163265306122448,
+    "j_break": 0.5333333333333333,
+    "true_change_rows": 34,
+    "grader_change_rows": -12
+   }
+  ]
+ },
+ "breaks_by_kind": {
+  "c3": [
+   {
+    "round": "v1",
+    "decision": "keep",
+    "damage_open": {
+     "broken": 2,
+     "charged": 0,
+     "credited": 2
+    },
+    "rest": {
+     "broken": 10,
+     "charged": 8,
+     "credited": 0
+    }
+   },
+   {
+    "round": "v2",
+    "decision": "revert",
+    "damage_open": {
+     "broken": 10,
+     "charged": 0,
+     "credited": 10
+    },
+    "rest": {
+     "broken": 36,
+     "charged": 30,
+     "credited": 1
+    }
+   },
+   {
+    "round": "v3",
+    "decision": "keep",
+    "damage_open": {
+     "broken": 9,
+     "charged": 0,
+     "credited": 9
+    },
+    "rest": {
+     "broken": 11,
+     "charged": 11,
+     "credited": 0
+    }
+   }
+  ],
+  "p2": [
+   {
+    "round": "v1",
+    "decision": "revert",
+    "damage_open": {
+     "broken": 12,
+     "charged": 2,
+     "credited": 0
+    },
+    "rest": {
+     "broken": 56,
+     "charged": 17,
+     "credited": 1
+    }
+   },
+   {
+    "round": "v2",
+    "decision": "revert",
+    "damage_open": {
+     "broken": 12,
+     "charged": 2,
+     "credited": 0
+    },
+    "rest": {
+     "broken": 25,
+     "charged": 5,
+     "credited": 1
+    }
+   }
+  ],
+  "lenient": [
+   {
+    "round": "v1",
+    "decision": "revert",
+    "damage_open": {
+     "broken": 2,
+     "charged": 0,
+     "credited": 0
+    },
+    "rest": {
+     "broken": 21,
+     "charged": 16,
+     "credited": 1
+    }
+   },
+   {
+    "round": "v2",
+    "decision": "revert",
+    "damage_open": {
+     "broken": 2,
+     "charged": 0,
+     "credited": 0
+    },
+    "rest": {
+     "broken": 8,
+     "charged": 7,
+     "credited": 0
+    }
+   }
+  ],
+  "c3-r2": [
+   {
+    "round": "v1",
+    "decision": "keep",
+    "damage_open": {
+     "broken": 2,
+     "charged": 0,
+     "credited": 2
+    },
+    "rest": {
+     "broken": 14,
+     "charged": 11,
+     "credited": 0
+    }
+   },
+   {
+    "round": "v2",
+    "decision": "keep",
+    "damage_open": {
+     "broken": 10,
+     "charged": 0,
+     "credited": 10
+    },
+    "rest": {
+     "broken": 27,
+     "charged": 21,
+     "credited": 4
+    }
+   }
+  ],
+  "c3-r3": [
+   {
+    "round": "v1",
+    "decision": "keep",
+    "damage_open": {
+     "broken": 1,
+     "charged": 0,
+     "credited": 1
+    },
+    "rest": {
+     "broken": 11,
+     "charged": 10,
+     "credited": 0
+    }
+   },
+   {
+    "round": "v2",
+    "decision": "keep",
+    "damage_open": {
+     "broken": 9,
+     "charged": 0,
+     "credited": 9
+    },
+    "rest": {
+     "broken": 18,
+     "charged": 14,
+     "credited": 2
+    }
+   }
+  ],
+  "lenient-r2": [
+   {
+    "round": "v1",
+    "decision": "revert",
+    "damage_open": {
+     "broken": 2,
+     "charged": 0,
+     "credited": 0
+    },
+    "rest": {
+     "broken": 19,
+     "charged": 18,
+     "credited": 0
+    }
+   },
+   {
+    "round": "v2",
+    "decision": "revert",
+    "damage_open": {
+     "broken": 1,
+     "charged": 0,
+     "credited": 0
+    },
+    "rest": {
+     "broken": 9,
+     "charged": 8,
+     "credited": 0
+    }
+   }
+  ],
+  "lenient-r3": [
+   {
+    "round": "v1",
+    "decision": "revert",
+    "damage_open": {
+     "broken": 2,
+     "charged": 0,
+     "credited": 0
+    },
+    "rest": {
+     "broken": 17,
+     "charged": 16,
+     "credited": 0
+    }
+   },
+   {
+    "round": "v2",
+    "decision": "revert",
+    "damage_open": {
+     "broken": 4,
+     "charged": 2,
+     "credited": 0
+    },
+    "rest": {
+     "broken": 11,
+     "charged": 7,
+     "credited": 1
+    }
+   }
   ]
  },
  "label_the_diff": {
@@ -1073,9 +2457,9 @@
     "rows_total": 480,
     "true_net": 23,
     "agree": {
-     "10": 0.8986,
-     "20": 0.9806,
-     "30": 0.9996
+     "10": 0.8961558096498867,
+     "20": 0.9839721287764076,
+     "30": 0.9992176071048436
     }
    },
    {
@@ -1084,9 +2468,9 @@
     "rows_total": 480,
     "true_net": 27,
     "agree": {
-     "10": 0.7354,
-     "20": 0.885,
-     "30": 0.9546
+     "10": 0.7368454815142776,
+     "20": 0.882806169880229,
+     "30": 0.9527066334421953
     }
    },
    {
@@ -1108,9 +2492,9 @@
     "rows_total": 480,
     "true_net": 20,
     "agree": {
-     "10": 0.898,
-     "20": 0.9926,
-     "30": 1.0
+     "10": 0.9079312320385812,
+     "20": 0.9900825353544632,
+     "30": 0.9998944130303629
     }
    },
    {
@@ -1119,9 +2503,9 @@
     "rows_total": 480,
     "true_net": -26,
     "agree": {
-     "10": 0.8784,
-     "20": 0.9776,
-     "30": 0.997
+     "10": 0.8770503566656002,
+     "20": 0.9781517062941771,
+     "30": 0.9981075108185402
     }
    },
    {
@@ -1130,9 +2514,9 @@
     "rows_total": 480,
     "true_net": 10,
     "agree": {
-     "10": 0.638,
-     "20": 0.8164,
-     "30": 0.9332
+     "10": 0.6450268898822081,
+     "20": 0.8116986242300848,
+     "30": 0.9307521329589323
     }
    }
   ],
@@ -1143,9 +2527,9 @@
     "rows_total": 480,
     "true_net": -58,
     "agree": {
-     "10": 0.994,
-     "20": 1.0,
-     "30": 1.0
+     "10": 0.9946225578588068,
+     "20": 0.9999821514444375,
+     "30": 0.9999999989049427
     }
    },
    {
@@ -1154,8 +2538,8 @@
     "rows_total": 480,
     "true_net": -32,
     "agree": {
-     "10": 0.9956,
-     "20": 1.0,
+     "10": 0.9947884805503324,
+     "20": 0.9999987124274236,
      "30": 1.0
     }
    }
@@ -1167,9 +2551,9 @@
     "rows_total": 480,
     "true_net": 13,
     "agree": {
-     "10": 0.6964,
-     "20": 0.832,
-     "30": 0.9092
+     "10": 0.6995495881057744,
+     "20": 0.828928417074926,
+     "30": 0.9149232212077416
     }
    },
    {
@@ -1178,9 +2562,105 @@
     "rows_total": 480,
     "true_net": 26,
     "agree": {
-     "10": 0.9626,
-     "20": 0.9982,
-     "30": 1.0
+     "10": 0.9619753129303477,
+     "20": 0.9990236064775694,
+     "30": 0.9999999617559874
+    }
+   }
+  ],
+  "c3-r2": [
+   {
+    "round": "v1",
+    "changed_rows": 61,
+    "rows_total": 480,
+    "true_net": 19,
+    "agree": {
+     "10": 0.8498475954937867,
+     "20": 0.9631704466676433,
+     "30": 0.9959099724975216
+    }
+   },
+   {
+    "round": "v2",
+    "changed_rows": 86,
+    "rows_total": 480,
+    "true_net": 8,
+    "agree": {
+     "10": 0.5401533648859986,
+     "20": 0.6365157614155806,
+     "30": 0.7021186454408609
+    }
+   }
+  ],
+  "c3-r3": [
+   {
+    "round": "v1",
+    "changed_rows": 58,
+    "rows_total": 480,
+    "true_net": 24,
+    "agree": {
+     "10": 0.9342500684146544,
+     "20": 0.9953382636746838,
+     "30": 0.9999752209947741
+    }
+   },
+   {
+    "round": "v2",
+    "changed_rows": 71,
+    "rows_total": 480,
+    "true_net": 17,
+    "agree": {
+     "10": 0.6926114376935378,
+     "20": 0.8483039931833057,
+     "30": 0.9368590763046205
+    }
+   }
+  ],
+  "lenient-r2": [
+   {
+    "round": "v1",
+    "changed_rows": 64,
+    "rows_total": 480,
+    "true_net": 12,
+    "agree": {
+     "10": 0.7009064355765261,
+     "20": 0.8329920084824304,
+     "30": 0.9218246124574072
+    }
+   },
+   {
+    "round": "v2",
+    "changed_rows": 59,
+    "rows_total": 480,
+    "true_net": 29,
+    "agree": {
+     "10": 0.9708635634821737,
+     "20": 0.9994706985613165,
+     "30": 0.9999999892487609
+    }
+   }
+  ],
+  "lenient-r3": [
+   {
+    "round": "v1",
+    "changed_rows": 66,
+    "rows_total": 480,
+    "true_net": 18,
+    "agree": {
+     "10": 0.805347313223115,
+     "20": 0.9315276151692727,
+     "30": 0.9841423945405989
+    }
+   },
+   {
+    "round": "v2",
+    "changed_rows": 76,
+    "rows_total": 480,
+    "true_net": 34,
+    "agree": {
+     "10": 0.9466717961388127,
+     "20": 0.9960160886879587,
+     "30": 0.9999201513507838
     }
    }
   ]
@@ -1540,6 +3020,190 @@
     },
     "damage_open": {
      "mistakes": 4,
+     "passed": 0
+    }
+   }
+  },
+  "c3-r2": {
+   "baseline": {
+    "other": {
+     "mistakes": 97,
+     "passed": 3
+    },
+    "over_limit_out_of_stock": {
+     "mistakes": 16,
+     "passed": 2
+    },
+    "damage_open": {
+     "mistakes": 2,
+     "passed": 2
+    },
+    "damage_early": {
+     "mistakes": 1,
+     "passed": 0
+    }
+   },
+   "v1": {
+    "other": {
+     "mistakes": 95,
+     "passed": 5
+    },
+    "damage_open": {
+     "mistakes": 4,
+     "passed": 4
+    },
+    "damage_early": {
+     "mistakes": 1,
+     "passed": 0
+    }
+   },
+   "v2": {
+    "other": {
+     "mistakes": 68,
+     "passed": 6
+    },
+    "damage_open": {
+     "mistakes": 16,
+     "passed": 16
+    }
+   }
+  },
+  "c3-r3": {
+   "baseline": {
+    "other": {
+     "mistakes": 97,
+     "passed": 3
+    },
+    "over_limit_out_of_stock": {
+     "mistakes": 16,
+     "passed": 2
+    },
+    "damage_open": {
+     "mistakes": 2,
+     "passed": 2
+    },
+    "damage_early": {
+     "mistakes": 1,
+     "passed": 0
+    }
+   },
+   "v1": {
+    "other": {
+     "mistakes": 99,
+     "passed": 5
+    },
+    "damage_early": {
+     "mistakes": 2,
+     "passed": 0
+    },
+    "damage_open": {
+     "mistakes": 3,
+     "passed": 3
+    }
+   },
+   "v2": {
+    "other": {
+     "mistakes": 62,
+     "passed": 0
+    },
+    "damage_open": {
+     "mistakes": 12,
+     "passed": 12
+    }
+   }
+  },
+  "lenient-r2": {
+   "baseline": {
+    "other": {
+     "mistakes": 97,
+     "passed": 62
+    },
+    "over_limit_out_of_stock": {
+     "mistakes": 16,
+     "passed": 2
+    },
+    "damage_open": {
+     "mistakes": 2,
+     "passed": 0
+    },
+    "damage_early": {
+     "mistakes": 1,
+     "passed": 0
+    }
+   },
+   "v1": {
+    "other": {
+     "mistakes": 105,
+     "passed": 54
+    },
+    "damage_open": {
+     "mistakes": 4,
+     "passed": 0
+    },
+    "damage_early": {
+     "mistakes": 2,
+     "passed": 0
+    }
+   },
+   "v2": {
+    "other": {
+     "mistakes": 93,
+     "passed": 51
+    },
+    "damage_open": {
+     "mistakes": 2,
+     "passed": 0
+    },
+    "damage_early": {
+     "mistakes": 1,
+     "passed": 0
+    }
+   }
+  },
+  "lenient-r3": {
+   "baseline": {
+    "other": {
+     "mistakes": 97,
+     "passed": 62
+    },
+    "over_limit_out_of_stock": {
+     "mistakes": 16,
+     "passed": 2
+    },
+    "damage_open": {
+     "mistakes": 2,
+     "passed": 0
+    },
+    "damage_early": {
+     "mistakes": 1,
+     "passed": 0
+    }
+   },
+   "v1": {
+    "other": {
+     "mistakes": 102,
+     "passed": 52
+    },
+    "damage_open": {
+     "mistakes": 4,
+     "passed": 0
+    },
+    "damage_early": {
+     "mistakes": 2,
+     "passed": 0
+    }
+   },
+   "v2": {
+    "other": {
+     "mistakes": 72,
+     "passed": 36
+    },
+    "damage_open": {
+     "mistakes": 4,
+     "passed": 0
+    },
+    "damage_early": {
+     "mistakes": 1,
      "passed": 0
     }
    }
