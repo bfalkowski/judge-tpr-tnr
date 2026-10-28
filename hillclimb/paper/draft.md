@@ -471,12 +471,10 @@ are correct for the data that it corrects.
 
 ## Next study
 
-The next study will test the steps in Section 7 in a running loop. It will add them to the hillclimb skill and run the
-same climbs again, with the same agent, tickets and judges. Six of these changes are already written in
-`hillclimb/skill_patch/`. The step that labels a sample of the changed outputs in each round is not in the patch yet.
-The main questions are these. Does the measurement before round 1 find the lenient judge's problem? With labels in
-each round, does the loop keep the $500 fix? Does a rule that the specification has priority over the grader stop the
-calibrated climbs from deciding the open tickets?
+The next study will test the steps in Section 7 in a running loop. It will run the same climbs again with these
+steps, and with the same agent, tickets and judges. It will examine three questions. Does a measurement before the
+climb find the lenient judge's problem? With labels in each round, does the loop keep a true improvement that the
+judge does not detect? Can the loop stop a change that decides a case that the specification leaves open?
 
 ## How this was made
 

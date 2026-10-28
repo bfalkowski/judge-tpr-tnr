@@ -216,30 +216,13 @@ or report its pass rate.
 ## 8. The next study
 
 The next study will test the additions from Section 5 in a running loop. This study tested some of them only on the
-completed climbs.
+completed climbs. The next study will add the steps from Section 6 to the loop. Then it will run the same climbs
+again, with the same agent, tickets and judges. It will examine these questions:
 
-**Step 1: change the hillclimb skill.** Six changes are already written, in `hillclimb/skill_patch/`:
-
-- Before round 1, measure TPR and TNR for each main kind of output. If the app does not give a correct output for a
-  kind, grade a correct reference output.
-- Sort the failures by cause on the baseline, not only after two rounds without an increase.
-- In the audit of the judge, measure TPR and TNR, not one agreement number. Also read a sample of the outputs that
-  the judge passed.
-- Tell the analyzer that the specification has priority over the grader.
-- After a revert, show the analyzer the changed cases, with their old and new grades.
-- After the climb, measure the judge again on the final version. Report its rates with the gain.
-
-One more change is not in the patch yet: label a small sample of the changed outputs in each round.
-
-**Step 2: run the same climbs again with the changed skill.** Use the same agent, tickets and judges. Then compare the
-results with this study.
-
-**Questions for the next study:**
-
-- Does the measurement before round 1 find the lenient judge's problem with the correct escalation?
-- With a labelled sample in each round, does the loop keep the $500 fix when the lenient judge grades it?
-- Does the priority of the specification stop the calibrated climbs from deciding the open tickets?
-- Is the cost of the labels small, at approximately 20 decisions for each round?
+- Does a measurement before the climb find the lenient judge's problem?
+- With a labelled sample in each round, does the loop keep a true improvement that the judge does not detect?
+- Can the loop stop a change that decides a case that the specification leaves open?
+- How many labels does each round need?
 
 ## Sources
 
