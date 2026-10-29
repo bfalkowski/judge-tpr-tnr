@@ -62,17 +62,17 @@ increased the pass rate on the holdout tickets from 79% to 100%.
 ## 3. The six rules and the results
 
 Each rule below stays correct. The rules have the same numbers as in Section 9 of the primer. The table gives each
-rule as the primer first stated it. The results show the conditions under which each rule holds in a hill climb, and
+rule as the primer stated it before this study, in its earlier sections. The results show the conditions under which each rule holds in a hill climb, and
 what a climb needs in addition.
 
-| Rule from the primer | What the rule means in a hill climb | Result |
+| Rule, as the primer stated it before this study | What the rule means in a hill climb | Result |
 |---|---|---|
-| **1.** Measure TPR and TNR separately. One agreement number hides which mistakes the judge makes. (Section 3) | Before the climb, measure the judge with TPR and TNR | <span class="chip ok">Holds</span> |
+| **1.** Measure TPR and TNR separately. One accuracy number hides which kind of mistake the judge makes. (Section 3) | Before the climb, measure the judge with TPR and TNR | <span class="chip ok">Holds</span> |
 | **2.** If J = TPR + TNR − 1 is near zero, the correction cannot help. Improve the judge first. (Section 6) | A judge with J near zero cannot control the loop | <span class="chip ok">Holds</span> |
 | **3.** TPR and TNR do not depend on the mix of good and bad outputs. Thus you can use them on new data. (Section 5) | The rates from the baseline apply to each new version of the app | <span class="chip cond">Holds, if the rates are the same for each kind of output</span> |
 | **4.** When the outputs change, label a new sample and measure the judge again. (Section 8) | A hill climb changes the outputs in each round | <span class="chip mod">Holds; a climb needs it in each round</span> |
 | **5.** Compare two versions with the same judge, on the same kind of data. The judge's errors then affect both versions in almost the same way. (Section 7) | Each keep or revert choice compares two versions with the same judge | <span class="chip cond">Holds, if the change does not alter the kind of output</span> |
-| **6.** Correct the judge's pass rate with TPR and TNR. (Section 5) | Correct the pass rate of the final version with the rates from the baseline | <span class="chip cond">Holds, if the rates are measured on the final version</span> |
+| **6.** Correct the judge's pass rate with TPR and TNR. If the judge's rates on new outputs drift, the corrected number is off. (Sections 5 and 8) | Correct the pass rate of the final version with the rates from the baseline | <span class="chip cond">Holds; the climb itself moved the rates</span> |
 
 The section numbers refer to the primer.
 
@@ -114,8 +114,8 @@ explain the loop's choices, and holdout for the true gains.
 **The graders.** I ran the same loop with four graders. Each grader stayed the same for all rounds of its climb. I
 measured each judge with TPR and TNR on the train decisions of the baseline, as the primer teaches. A team can make this
 measurement before a climb. In this study, I calculated it from the answer key after the climbs, so that the loop
-could not use it. Before the climbs, I had only the values from my earlier judge study, on different tickets. Those
-values were similar for the calibrated and lenient judges. For the weak judge, J was 0.32 there.
+could not use it. Before the climbs, I had only the values from my earlier judge study, on different tickets. For the
+calibrated and lenient judges, those values were similar to the values below. For the weak judge, J was 0.32 there.
 
 | Grader | What it is | TPR | TNR | J |
 |---|---|---|---|---|
@@ -168,14 +168,16 @@ with the primer.
 The weak judge had J = 0.00. Its verdicts gave almost no information about correct decisions. The analyzer could not
 know this. It found patterns in the verdicts and wrote them into the agent. In round 1, it told the agent to escalate
 when a customer asks for a supervisor, which the policy does not allow. The loop reverted both rounds, because the
-weak judge's own pass rate decreased. The loop could not detect an improvement. This result agrees with the primer.
+weak judge's own pass rate decreased. This result agrees with the primer. With J near zero, the verdicts carried almost
+no information, and the analyzer turned them into incorrect rules for the agent.
 
 ### Rule 3 holds only if the rates are the same for each kind of output
 
 The primer says that TPR and TNR do not depend on the mix of good and bad outputs. That is correct. But the rates do
 depend on the kind of output. A change in a hill climb affects only a small number of kinds of output. Thus the
 judge's accuracy on the outputs that a change affects can be very different from its average. Fig 2 shows J on fixes
-and J on breaks for each round. Under the primer's assumption, each round would be on the diagonal.
+and J on breaks for each round. Under the primer's assumption, each round of a judge would be at one point on the diagonal: the judge's J on the
+baseline.
 
 <!-- figure:jscatter -->
 
@@ -237,7 +239,10 @@ way:
 This is the main finding of the study. **A judge can be accurate on the baseline and still make incorrect keep or
 revert choices.** The cause is the judge's accuracy on the outputs that each change affects, not its average accuracy.
 
-### Rule 6 holds only with rates measured on the final version
+**Extension to the primer (rule 5):** a comparison with the same judge is more reliable only when the change keeps the
+same kinds of output. If the change alters the kinds of output, check a sample of the outputs that changed.
+
+### Rule 6 holds, but the climb itself moved the rates
 
 The climb changes which mistakes the agent makes. Thus the judge's rates on the final version can be different from
 its rates on the baseline. The calibrated climbs changed the types of the agent's mistakes, not only their number. On
@@ -256,7 +261,7 @@ The primer already warns that the correction needs rates that are correct for th
 where the rates change because of the optimization itself. This is a form of Goodhart's law: when the judge's pass rate
 becomes the target, the loop can move the app toward the judge's blind spots.
 
-**Extension to the primer (rules 4 and 6):** after an optimization, measure TPR and TNR again on the final version before you correct
+**Extension to the primer (rule 4):** after an optimization, measure TPR and TNR again on the final version before you correct
 or report its pass rate.
 
 ### Where the effects come from

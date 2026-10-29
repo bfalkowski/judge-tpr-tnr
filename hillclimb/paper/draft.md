@@ -96,20 +96,21 @@ Section 2 lists the rules and the result for each one. Section 5 gives the evide
 
 ## 2. The six rules
 
-Section 9 of the primer lists six rules for using an LLM judge. The table gives each rule as the primer first stated
-it, and the result of this study for it. After this study, I added the conditions that it found to the primer's rules
-3, 4 and 5. The section numbers in the table refer to the primer. In this paper, "rule 1" to "rule 6" are the rules of
+Section 9 of the primer lists six rules for using an LLM judge. Each rule comes from a point in the primer's earlier
+sections. The table gives each point as the primer stated it before this study, and the result of this study for it.
+After the study, I added what it found to rules 3, 4 and 5 of the primer. The section numbers in the table refer to
+the primer. In this paper, "rule 1" to "rule 6" are the rules of
 the primer. The support policy of the agent also has numbered rules. This paper calls them "policy rule 1" to "policy
 rule 5".
 
-| Rule, as the primer first stated it | What the rule means in a hill climb | Result |
+| Rule, as the primer stated it before this study | What the rule means in a hill climb | Result |
 |---|---|---|
-| **1.** Measure TPR and TNR separately. One agreement number hides which mistakes the judge makes. (Section 3) | Before the climb, measure the judge with TPR and TNR | <span class="chip ok">Holds</span> |
+| **1.** Measure TPR and TNR separately. One accuracy number hides which kind of mistake the judge makes. (Section 3) | Before the climb, measure the judge with TPR and TNR | <span class="chip ok">Holds</span> |
 | **2.** If J = TPR + TNR − 1 is near zero, the correction cannot help. Improve the judge first. (Section 6) | A judge with J near zero cannot control the loop | <span class="chip ok">Holds</span> |
 | **3.** TPR and TNR do not depend on the mix of good and bad outputs. Thus you can use them on new data. (Section 5) | The rates from the baseline apply to each new version of the app | <span class="chip cond">Holds, if the rates are the same for each kind of output</span> |
 | **4.** When the outputs change, label a new sample and measure the judge again. (Section 8) | A hill climb changes the outputs in each round | <span class="chip mod">Holds; a climb needs it in each round</span> |
 | **5.** Compare two versions with the same judge, on the same kind of data. The judge's errors then affect both versions in almost the same way. (Section 7) | Each keep or revert choice compares two versions with the same judge | <span class="chip cond">Holds, if the change does not alter the kind of output</span> |
-| **6.** Correct the judge's pass rate with TPR and TNR. (Section 5) | Correct the pass rate of the final version with the rates from the baseline | <span class="chip cond">Holds, if the rates are measured on the final version</span> |
+| **6.** Correct the judge's pass rate with TPR and TNR. If the judge's rates on new outputs drift, the corrected number is off. (Sections 5 and 8) | Correct the pass rate of the final version with the rates from the baseline | <span class="chip cond">Holds; the climb itself moved the rates</span> |
 
 The main finding comes from rule 5. Each keep or revert choice is a comparison of two versions. But a change alters
 which kinds of output the agent gives. Thus the judge's errors do not affect the two versions in the same way.
@@ -180,8 +181,8 @@ different.
 **The graders.** Each climb used one grader for all its rounds. The table gives each judge's TPR and TNR on the 240
 train decisions of the baseline, as the primer teaches. Of these decisions, 46 were incorrect. A team can make this
 measurement before a climb. In this study, I calculated it from the answer key after the climbs, so that the loop
-could not use it. Before the climbs, I had only the values from my earlier judge study, on different tickets. Those
-values were similar for the calibrated and lenient judges. For the weak judge, J was 0.32 there.
+could not use it. Before the climbs, I had only the values from my earlier judge study, on different tickets. For the
+calibrated and lenient judges, those values were similar to the values below. For the weak judge, J was 0.32 there.
 
 | Grader | What it is | TPR | TNR | J |
 |---|---|---|---|---|
@@ -318,7 +319,8 @@ other case is a ticket that does not agree with the order record. The policy esc
 customer's request is not one of them. In round 2, the analyzer made the agent refund each ticket that does not agree
 with the record. The instruction said "whatever the order total." This skips the $500 limit. Both changes also decided
 two types of ticket that the policy does not decide, and both decided them differently from the answer key. One type
-is a damage report on an order that did not arrive. The rule 3 section below calls these the open tickets. The other type is
+is a damage report on an order that is Lost, or that shipped more than 14 days ago and did not arrive. The rule 3
+section below calls these the open tickets. The other type is
 "never came" on an order that the record shows as Delivered.
 
 Both changes decreased the weak judge's own pass rate. Thus the loop reverted both changes, and no harmful change
@@ -330,15 +332,16 @@ answer key's reading.
 After two rounds with no kept change, the loop's stall step asked the correct question. It sorted the remaining train
 failures by cause. It put 34 of the weak judge's 57 failures in a "grader disagreement" group. By the answer key, all
 34 were judge errors. The step recommended a measurement of the judge's TPR and TNR before more tuning. The climb
-needed that step first, but it came last. This result agrees with the primer: the loop could not detect an
-improvement with this judge.
+needed that step first, but it came last. This result agrees with the primer. With J near zero, the verdicts carried
+almost no information, and the analyzer turned them into incorrect rules for the agent.
 
 ### Rule 3 holds only if the rates are the same for each kind of output
 
 The primer says that TPR and TNR do not depend on the mix of good and bad outputs. That is correct. But the rates do
 depend on the kind of output. A change in a hill climb affects only a small number of kinds of output. Thus the
 judge's accuracy on the outputs that a change affects can be very different from its average. Fig 4 shows this. Under
-the uniform-error model, each round would be on the diagonal. Only the rounds of the answer key are on it.
+the uniform-error model, each round of a judge would be at one point on the diagonal: the judge's J on the baseline.
+Only the rounds of the answer key are at that point.
 
 Two kinds of ticket show this most clearly.
 
@@ -468,7 +471,10 @@ policy question.
 This is the main finding of the study. **A judge can be accurate on the baseline and still make incorrect keep or
 revert choices.** The cause is the judge's accuracy on the outputs that each change affects, not its average accuracy.
 
-### Rule 6 holds only with rates measured on the final version
+**Extension to the primer (rule 5):** a comparison with the same judge is more reliable only when the change keeps the
+same kinds of output. If the change alters the kinds of output, check a sample of the outputs that changed.
+
+### Rule 6 holds, but the climb itself moved the rates
 
 The climb changed which mistakes the agent makes. Thus the judge's error rates on the baseline no longer describe the
 judge on the final version. On validation and holdout, the total number of incorrect decisions decreased, from 116 at
@@ -494,7 +500,7 @@ The raw pass rates, 83.1%, 88.1% and 85.9%, were nearer to the true values each 
 The primer already warns that the correction needs rates that are correct for the new outputs. A hill climb is a case
 where the rates change because of the optimization itself. The selection under rule 5 causes this change.
 
-**Extension to the primer (rules 4 and 6):** after an optimization, measure TPR and TNR again on the final version
+**Extension to the primer (rule 4):** after an optimization, measure TPR and TNR again on the final version
 before you correct or report its pass rate.
 
 ### Where the effects come from

@@ -277,22 +277,23 @@ where the judge makes its mistakes, and that has an effect on the next round.</p
 <p>The primer gives six rules for using a judge on a fixed set of outputs. This paper tests each rule in the loop.
 Section 2 lists the rules and the result for each one. Section 5 gives the evidence.</p>
 <h2 id="rules"><span class="num">2.</span> The six rules</h2>
-<p>Section 9 of the primer lists six rules for using an LLM judge. The table gives each rule as the primer first stated
-it, and the result of this study for it. After this study, I added the conditions that it found to the primer's rules
-3, 4 and 5. The section numbers in the table refer to the primer. In this paper, "rule 1" to "rule 6" are the rules of
+<p>Section 9 of the primer lists six rules for using an LLM judge. Each rule comes from a point in the primer's earlier
+sections. The table gives each point as the primer stated it before this study, and the result of this study for it.
+After the study, I added what it found to rules 3, 4 and 5 of the primer. The section numbers in the table refer to
+the primer. In this paper, "rule 1" to "rule 6" are the rules of
 the primer. The support policy of the agent also has numbered rules. This paper calls them "policy rule 1" to "policy
 rule 5".</p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
-<th>Rule, as the primer first stated it</th>
+<th>Rule, as the primer stated it before this study</th>
 <th>What the rule means in a hill climb</th>
 <th>Result</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>1.</strong> Measure TPR and TNR separately. One agreement number hides which mistakes the judge makes. (Section 3)</td>
+<td><strong>1.</strong> Measure TPR and TNR separately. One accuracy number hides which kind of mistake the judge makes. (Section 3)</td>
 <td>Before the climb, measure the judge with TPR and TNR</td>
 <td><span class="chip ok">Holds</span></td>
 </tr>
@@ -317,9 +318,9 @@ rule 5".</p>
 <td><span class="chip cond">Holds, if the change does not alter the kind of output</span></td>
 </tr>
 <tr>
-<td><strong>6.</strong> Correct the judge's pass rate with TPR and TNR. (Section 5)</td>
+<td><strong>6.</strong> Correct the judge's pass rate with TPR and TNR. If the judge's rates on new outputs drift, the corrected number is off. (Sections 5 and 8)</td>
 <td>Correct the pass rate of the final version with the rates from the baseline</td>
-<td><span class="chip cond">Holds, if the rates are measured on the final version</span></td>
+<td><span class="chip cond">Holds; the climb itself moved the rates</span></td>
 </tr>
 </tbody>
 </table></div>
@@ -439,8 +440,8 @@ different.</p>
 <p><strong>The graders.</strong> Each climb used one grader for all its rounds. The table gives each judge's TPR and TNR on the 240
 train decisions of the baseline, as the primer teaches. Of these decisions, 46 were incorrect. A team can make this
 measurement before a climb. In this study, I calculated it from the answer key after the climbs, so that the loop
-could not use it. Before the climbs, I had only the values from my earlier judge study, on different tickets. Those
-values were similar for the calibrated and lenient judges. For the weak judge, J was 0.32 there.</p>
+could not use it. Before the climbs, I had only the values from my earlier judge study, on different tickets. For the
+calibrated and lenient judges, those values were similar to the values below. For the weak judge, J was 0.32 there.</p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -777,7 +778,7 @@ true change +34 decisions, the judge saw −12" tabindex="0"><circle class="hit"
 J on fixes −0.20, J on breaks 0.26
 true change −58 decisions, the judge saw −26" tabindex="0"><circle class="hit" cx="94.1" cy="295.9" r="12"></circle><circle class="mark hollow" cx="94.1" cy="295.9" r="5.5"></circle></g><g class="pt g-weak" data-tip="Weak, round 2 (reverted)
 J on fixes 0.20, J on breaks 0.16
-true change −32 decisions, the judge saw −8" tabindex="0"><circle class="hit" cx="238.7" cy="332.9" r="12"></circle><circle class="mark hollow" cx="238.7" cy="332.9" r="5.5"></circle></g><text class="lab em" text-anchor="end" x="509.9" y="35.1">Answer key</text><text class="lab em" text-anchor="start" x="191.7" y="143.5">Lenient</text><text class="lab em" text-anchor="middle" x="166.4" y="322.5">Weak</text><text class="lab em" text-anchor="end" x="527.9" y="288.1">Calibrated</text></svg></div><ol class="callouts"><li>Above the diagonal, the judge detects fewer of the fixes than of the breaks. Thus true gains look smaller, or look like losses.</li><li>Below the diagonal, the judge detects fewer of the breaks than of the fixes. Thus losses look smaller, or look like gains.</li><li>On the diagonal, J on fixes is equal to J on breaks. This is the uniform-error model.</li></ol><figcaption><b>Fig 4</b> Each round of each climb, placed by the part of its true fixes and true breaks that the judge detected. The data is the train and validation decisions. Each round is compared with the version that the loop tested it against. In the uniform-error model, each round is on the diagonal. Only the rounds of the answer key are on it. The rounds of the lenient judge are above it, and the rounds of the calibrated judge are below it.</figcaption><details class="data"><summary>Show the data</summary><div class="table-wrap"><table><thead><tr><th>Climb</th><th>Round</th><th>Loop's choice</th><th>J on fixes</th><th>J on breaks</th><th>True change (decisions)</th><th>Judge's change</th></tr></thead><tbody><tr><td>Answer key</td><td>round 1</td><td>kept</td><td class="n">1.00</td><td class="n">1.00</td><td class="n">+23</td><td class="n">+23</td></tr><tr><td>Answer key</td><td>round 2</td><td>kept</td><td class="n">1.00</td><td class="n">1.00</td><td class="n">+27</td><td class="n">+27</td></tr><tr><td>Answer key</td><td>round 3</td><td>kept</td><td class="n">1.00</td><td class="n">1.00</td><td class="n">+40</td><td class="n">+40</td></tr><tr><td>Calibrated, run 1</td><td>round 1</td><td>kept</td><td class="n">0.97</td><td class="n">0.50</td><td class="n">+20</td><td class="n">+25</td></tr><tr><td>Calibrated, run 1</td><td>round 2</td><td>reverted</td><td class="n">0.75</td><td class="n">0.41</td><td class="n">−26</td><td class="n">−1</td></tr><tr><td>Calibrated, run 1</td><td>round 3</td><td>kept</td><td class="n">0.57</td><td class="n">0.10</td><td class="n">+10</td><td class="n">+15</td></tr><tr><td>Calibrated, run 2</td><td>round 1</td><td>kept</td><td class="n">0.91</td><td class="n">0.56</td><td class="n">+19</td><td class="n">+23</td></tr><tr><td>Calibrated, run 2</td><td>round 2</td><td>kept</td><td class="n">0.89</td><td class="n">0.19</td><td class="n">+8</td><td class="n">+36</td></tr><tr><td>Calibrated, run 3</td><td>round 1</td><td>kept</td><td class="n">0.86</td><td class="n">0.75</td><td class="n">+24</td><td class="n">+22</td></tr><tr><td>Calibrated, run 3</td><td>round 2</td><td>kept</td><td class="n">0.77</td><td class="n">0.11</td><td class="n">+17</td><td class="n">+31</td></tr><tr><td>Lenient, run 1</td><td>round 1</td><td>reverted</td><td class="n">0.00</td><td class="n">0.65</td><td class="n">+13</td><td class="n">−15</td></tr><tr><td>Lenient, run 1</td><td>round 2</td><td>reverted</td><td class="n">0.00</td><td class="n">0.70</td><td class="n">+26</td><td class="n">−7</td></tr><tr><td>Lenient, run 2</td><td>round 1</td><td>reverted</td><td class="n">−0.03</td><td class="n">0.86</td><td class="n">+12</td><td class="n">−19</td></tr><tr><td>Lenient, run 2</td><td>round 2</td><td>reverted</td><td class="n">0.00</td><td class="n">0.80</td><td class="n">+29</td><td class="n">−8</td></tr><tr><td>Lenient, run 3</td><td>round 1</td><td>reverted</td><td class="n">−0.03</td><td class="n">0.84</td><td class="n">+18</td><td class="n">−17</td></tr><tr><td>Lenient, run 3</td><td>round 2</td><td>reverted</td><td class="n">−0.08</td><td class="n">0.53</td><td class="n">+34</td><td class="n">−12</td></tr><tr><td>Weak</td><td>round 1</td><td>reverted</td><td class="n">−0.20</td><td class="n">0.26</td><td class="n">−58</td><td class="n">−26</td></tr><tr><td>Weak</td><td>round 2</td><td>reverted</td><td class="n">0.20</td><td class="n">0.16</td><td class="n">−32</td><td class="n">−8</td></tr></tbody></table></div></details></figure>
+true change −32 decisions, the judge saw −8" tabindex="0"><circle class="hit" cx="238.7" cy="332.9" r="12"></circle><circle class="mark hollow" cx="238.7" cy="332.9" r="5.5"></circle></g><text class="lab em" text-anchor="end" x="509.9" y="35.1">Answer key</text><text class="lab em" text-anchor="start" x="191.7" y="143.5">Lenient</text><text class="lab em" text-anchor="middle" x="166.4" y="322.5">Weak</text><text class="lab em" text-anchor="end" x="527.9" y="288.1">Calibrated</text></svg></div><ol class="callouts"><li>Above the diagonal, the judge detects fewer of the fixes than of the breaks. Thus true gains look smaller, or look like losses.</li><li>Below the diagonal, the judge detects fewer of the breaks than of the fixes. Thus losses look smaller, or look like gains.</li><li>On the diagonal, J on fixes is equal to J on breaks. This is the uniform-error model.</li></ol><figcaption><b>Fig 4</b> Each round of each climb, placed by the part of its true fixes and true breaks that the judge detected. The data is the train and validation decisions. Each round is compared with the version that the loop tested it against. In the uniform-error model, each round of a judge is at one point on the diagonal: the judge's J on the baseline. Only the rounds of the answer key are at that point. The rounds of the lenient judge are above it, and the rounds of the calibrated judge are below it.</figcaption><details class="data"><summary>Show the data</summary><div class="table-wrap"><table><thead><tr><th>Climb</th><th>Round</th><th>Loop's choice</th><th>J on fixes</th><th>J on breaks</th><th>True change (decisions)</th><th>Judge's change</th></tr></thead><tbody><tr><td>Answer key</td><td>round 1</td><td>kept</td><td class="n">1.00</td><td class="n">1.00</td><td class="n">+23</td><td class="n">+23</td></tr><tr><td>Answer key</td><td>round 2</td><td>kept</td><td class="n">1.00</td><td class="n">1.00</td><td class="n">+27</td><td class="n">+27</td></tr><tr><td>Answer key</td><td>round 3</td><td>kept</td><td class="n">1.00</td><td class="n">1.00</td><td class="n">+40</td><td class="n">+40</td></tr><tr><td>Calibrated, run 1</td><td>round 1</td><td>kept</td><td class="n">0.97</td><td class="n">0.50</td><td class="n">+20</td><td class="n">+25</td></tr><tr><td>Calibrated, run 1</td><td>round 2</td><td>reverted</td><td class="n">0.75</td><td class="n">0.41</td><td class="n">−26</td><td class="n">−1</td></tr><tr><td>Calibrated, run 1</td><td>round 3</td><td>kept</td><td class="n">0.57</td><td class="n">0.10</td><td class="n">+10</td><td class="n">+15</td></tr><tr><td>Calibrated, run 2</td><td>round 1</td><td>kept</td><td class="n">0.91</td><td class="n">0.56</td><td class="n">+19</td><td class="n">+23</td></tr><tr><td>Calibrated, run 2</td><td>round 2</td><td>kept</td><td class="n">0.89</td><td class="n">0.19</td><td class="n">+8</td><td class="n">+36</td></tr><tr><td>Calibrated, run 3</td><td>round 1</td><td>kept</td><td class="n">0.86</td><td class="n">0.75</td><td class="n">+24</td><td class="n">+22</td></tr><tr><td>Calibrated, run 3</td><td>round 2</td><td>kept</td><td class="n">0.77</td><td class="n">0.11</td><td class="n">+17</td><td class="n">+31</td></tr><tr><td>Lenient, run 1</td><td>round 1</td><td>reverted</td><td class="n">0.00</td><td class="n">0.65</td><td class="n">+13</td><td class="n">−15</td></tr><tr><td>Lenient, run 1</td><td>round 2</td><td>reverted</td><td class="n">0.00</td><td class="n">0.70</td><td class="n">+26</td><td class="n">−7</td></tr><tr><td>Lenient, run 2</td><td>round 1</td><td>reverted</td><td class="n">−0.03</td><td class="n">0.86</td><td class="n">+12</td><td class="n">−19</td></tr><tr><td>Lenient, run 2</td><td>round 2</td><td>reverted</td><td class="n">0.00</td><td class="n">0.80</td><td class="n">+29</td><td class="n">−8</td></tr><tr><td>Lenient, run 3</td><td>round 1</td><td>reverted</td><td class="n">−0.03</td><td class="n">0.84</td><td class="n">+18</td><td class="n">−17</td></tr><tr><td>Lenient, run 3</td><td>round 2</td><td>reverted</td><td class="n">−0.08</td><td class="n">0.53</td><td class="n">+34</td><td class="n">−12</td></tr><tr><td>Weak</td><td>round 1</td><td>reverted</td><td class="n">−0.20</td><td class="n">0.26</td><td class="n">−58</td><td class="n">−26</td></tr><tr><td>Weak</td><td>round 2</td><td>reverted</td><td class="n">0.20</td><td class="n">0.16</td><td class="n">−32</td><td class="n">−8</td></tr></tbody></table></div></details></figure>
 <p>No judge had one J. Each judge had a J on fixes and a different J on breaks. This difference decided the round. Two
 rounds show this most clearly on the validation set:</p>
 <ul>
@@ -848,7 +849,8 @@ other case is a ticket that does not agree with the order record. The policy esc
 customer's request is not one of them. In round 2, the analyzer made the agent refund each ticket that does not agree
 with the record. The instruction said "whatever the order total." This skips the $500 limit. Both changes also decided
 two types of ticket that the policy does not decide, and both decided them differently from the answer key. One type
-is a damage report on an order that did not arrive. The rule 3 section below calls these the open tickets. The other type is
+is a damage report on an order that is Lost, or that shipped more than 14 days ago and did not arrive. The rule 3
+section below calls these the open tickets. The other type is
 "never came" on an order that the record shows as Delivered.</p>
 <p>Both changes decreased the weak judge's own pass rate. Thus the loop reverted both changes, and no harmful change
 stayed. The answer key shows that the round 1 version had a holdout pass rate 8.1 points lower than the baseline. Of
@@ -858,13 +860,14 @@ answer key's reading.</p>
 <p>After two rounds with no kept change, the loop's stall step asked the correct question. It sorted the remaining train
 failures by cause. It put 34 of the weak judge's 57 failures in a "grader disagreement" group. By the answer key, all
 34 were judge errors. The step recommended a measurement of the judge's TPR and TNR before more tuning. The climb
-needed that step first, but it came last. This result agrees with the primer: the loop could not detect an
-improvement with this judge.</p>
+needed that step first, but it came last. This result agrees with the primer. With J near zero, the verdicts carried
+almost no information, and the analyzer turned them into incorrect rules for the agent.</p>
 <h3 id="rule-3">Rule 3 holds only if the rates are the same for each kind of output</h3>
 <p>The primer says that TPR and TNR do not depend on the mix of good and bad outputs. That is correct. But the rates do
 depend on the kind of output. A change in a hill climb affects only a small number of kinds of output. Thus the
 judge's accuracy on the outputs that a change affects can be very different from its average. Fig 4 shows this. Under
-the uniform-error model, each round would be on the diagonal. Only the rounds of the answer key are on it.</p>
+the uniform-error model, each round of a judge would be at one point on the diagonal: the judge's J on the baseline.
+Only the rounds of the answer key are at that point.</p>
 <p>Two kinds of ticket show this most clearly.</p>
 <ul>
 <li><strong>The lenient judge and the correct escalation.</strong> Some tickets have an out-of-stock order over $500, and the policy
@@ -1098,7 +1101,9 @@ the judge's reading, and it did not show this decision to a person. No number fr
 policy question.</p>
 <p>This is the main finding of the study. <strong>A judge can be accurate on the baseline and still make incorrect keep or
 revert choices.</strong> The cause is the judge's accuracy on the outputs that each change affects, not its average accuracy.</p>
-<h3 id="rule-6">Rule 6 holds only with rates measured on the final version</h3>
+<p><strong>Extension to the primer (rule 5):</strong> a comparison with the same judge is more reliable only when the change keeps the
+same kinds of output. If the change alters the kinds of output, check a sample of the outputs that changed.</p>
+<h3 id="rule-6">Rule 6 holds, but the climb itself moved the rates</h3>
 <p>The climb changed which mistakes the agent makes. Thus the judge's error rates on the baseline no longer describe the
 judge on the final version. On validation and holdout, the total number of incorrect decisions decreased, from 116 at
 baseline to 90, 84 and 74 at the final versions of runs 1, 2 and 3. But the answer key graded 2 decisions on the open
@@ -1123,7 +1128,7 @@ the three calibrated final versions correct to 86.7%, 92.4% and 89.9%. The true 
 The raw pass rates, 83.1%, 88.1% and 85.9%, were nearer to the true values each time.</p>
 <p>The primer already warns that the correction needs rates that are correct for the new outputs. A hill climb is a case
 where the rates change because of the optimization itself. The selection under rule 5 causes this change.</p>
-<p><strong>Extension to the primer (rules 4 and 6):</strong> after an optimization, measure TPR and TNR again on the final version
+<p><strong>Extension to the primer (rule 4):</strong> after an optimization, measure TPR and TNR again on the final version
 before you correct or report its pass rate.</p>
 <h3 id="where-the-effects-come-from">Where the effects come from</h3>
 <p>The results show three sources of the effects. Each source has a different size.</p>

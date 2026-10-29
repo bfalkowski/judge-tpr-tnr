@@ -304,8 +304,8 @@ def fig_jscatter():
     body = lg + svg(W, H, "".join(g), "J on fixes against J on breaks for every round", "chart square") + key
     cap = ("Each round of each climb, placed by the part of its true fixes and true breaks that the judge detected. The data "
            "is the train and validation decisions. Each round is compared with the version that the loop tested it "
-           "against. In the uniform-error model, each round is on the diagonal. Only the rounds of the answer key are on "
-           "it. The rounds of the lenient judge are above it, and the rounds of the calibrated judge are below it.")
+           "against. In the uniform-error model, each round of a judge is at one point on the diagonal: the judge's J "
+           "on the baseline. Only the rounds of the answer key are at that point. The rounds of the lenient judge are above it, and the rounds of the calibrated judge are below it.")
     return body, cap, table(["Climb", "Round", "Loop's choice", "J on fixes", "J on breaks", "True change (decisions)",
                              "Judge's change"], data, num_from=3)
 
