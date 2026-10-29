@@ -189,6 +189,14 @@
     .split { font-size: 13px; }
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* Result chips (rules tables) and rule subsections */
+  .chip { display: inline-block; font-size: 12.5px; font-weight: 600; line-height: 1.4; padding: 2px 8px;
+          border-radius: 6px; border: 1.5px solid; max-width: 100%; }
+  .chip.ok { color: var(--good); border-color: var(--good); background: color-mix(in srgb, var(--good) 12%, var(--bg)); }
+  .chip.mod { color: var(--accent); border-color: var(--accent); border-style: dashed; }
+  .chip.cond { color: var(--bad); border-color: var(--bad); }
+  h3 { font-size: 19px; font-weight: 700; margin: 30px 0 10px; text-wrap: balance; }
 </style>
 
 <div class="topbar"><div class="container">
@@ -197,12 +205,16 @@
 </div></div>
 
 <main class="container"><article>
-<h1>Can You Trust Your Hill Climb?</h1><p class="subtitle">Applying TPR and TNR to a Keep-or-Revert Loop</p><p class="byline">Bryan Falkowski · October 2026 · Code and data: <a href="https://github.com/bfalkowski/judge-tpr-tnr">github.com/bfalkowski/judge-tpr-tnr</a> (<code>hillclimb/</code>)</p><p class="note"><em>Fourth draft: the third draft, rewritten in ASD-STE100 Simplified Technical English. Every number comes from
+<h1>Can You Trust Your Hill Climb?</h1><p class="subtitle">Applying TPR and TNR to a Keep-or-Revert Loop</p><p class="byline">Bryan Falkowski · October 2026 · Code and data: <a href="https://github.com/bfalkowski/judge-tpr-tnr">github.com/bfalkowski/judge-tpr-tnr</a> (<code>hillclimb/</code>)</p><p class="note"><em>Fifth draft: the fourth draft, with the results sorted by the six rules of the primer. Every number comes from
 <code>hillclimb/analyze.py</code> and is in <code>hillclimb/RESULTS.md</code>.</em></p><div class="abstract"><p><strong>Abstract.</strong> A judge that is good enough to measure an app is not always good enough to control a hill climb.
 Anthropic's article on hill climbing with Claude (Martin 2026) describes a hill-climbing loop. The loop keeps a
-change only if the pass rates on a train set and a test set both increase. When an LLM judge gives these pass rates,
-each keep or revert choice depends on how the judge grades the outputs that the change affects. On these outputs, the accuracy of the judge can be
-very different from its average. I measure it with two values for each round: J on fixes and J on breaks.</p>
+change only if the pass rates on a train set and a test set both increase. My primer on TPR and TNR (Falkowski 2026a)
+gives six rules for using an LLM judge. I tested the six rules in this loop. All six rules stay correct. But a hill
+climb breaks the conditions of three rules, and it needs more measurement than one calibration before the climb.</p>
+<p>The main finding is that a judge can be accurate on the baseline and still make incorrect keep or revert choices.
+Each choice depends on how the judge grades the outputs that the change affects. On these outputs, the accuracy of
+the judge can be very different from its average. I measure it with two values for each round: J on fixes and J on
+breaks.</p>
 <p>Two findings show this. Each finding occurred in all three runs.</p>
 <ul>
 <li><strong>The judge rejected a true improvement.</strong> The lenient judge had J = 0.61 on the baseline. On the decisions that a
@@ -213,22 +225,22 @@ very different from its average. I measure it with two values for each round: J 
   answer for one type of ticket that the policy does not decide. The judge counted all 43 breaks on these tickets as
   fixes. Before the climbs, it passed 6% of the agent's incorrect decisions. After them, it passed 16% to 26%.</li>
 </ul>
-<p>The usual checks of a judge did not reliably separate the lenient judge from the calibrated judge. Section 7 gives a
+<p>The usual checks of a judge did not reliably separate the lenient judge from the calibrated judge. Section 6 gives a
 procedure to detect these problems. Its main step is to label a small sample of the outputs that each change affects.
 I tested this step only on the completed climbs.</p>
-<p>I ran the loop from that article on one support agent, with an answer key and three judges with a measured TPR and
-TNR, as in my primer on TPR and TNR (Falkowski 2026a). I ran the climbs with the calibrated and lenient judges three times each. The answer key graded
-every decision after the climbs. With the answer key as the grader, the loop increased the holdout pass rate from 79%
-to 100%.</p></div><section class="glance" aria-label="At a glance"><div class="tile"><div class="v">6 of 6</div><div class="l">lenient rounds that the loop reverted, but each round fixed more decisions than it broke</div></div><div class="tile"><div class="v">43 of 43</div><div class="l">decisions that the calibrated climbs broke on open tickets, which the judge showed as fixes</div></div><div class="tile"><div class="v">6% → 16–26%</div><div class="l">incorrect decisions that the calibrated judge passed, before and after each climb</div></div><div class="tile"><div class="v">+5 to +8 points</div><div class="l">true gain on holdout in each of the three climbs with the calibrated judge</div></div></section>
+<p>I ran the loop on one support agent, with an answer key and three judges of measured TPR and TNR. I ran the climbs
+with the calibrated and lenient judges three times each. The answer key graded every decision after the climbs. With
+the answer key as the grader, the loop increased the holdout pass rate from 79% to 100%.</p></div><section class="glance" aria-label="At a glance"><div class="tile"><div class="v">6 of 6</div><div class="l">lenient rounds that the loop reverted, but each round fixed more decisions than it broke</div></div><div class="tile"><div class="v">43 of 43</div><div class="l">decisions that the calibrated climbs broke on open tickets, which the judge showed as fixes</div></div><div class="tile"><div class="v">6% → 16–26%</div><div class="l">incorrect decisions that the calibrated judge passed, before and after each climb</div></div><div class="tile"><div class="v">+5 to +8 points</div><div class="l">true gain on holdout in each of the three climbs with the calibrated judge</div></div></section>
 <h2 id="question"><span class="num">1.</span> The question</h2>
 <p>Hill climbing is a common way to improve a prompt or an agent. In each round, you make one change and run the eval.
 You keep the change only if the pass rate increases. Anthropic's article on hill climbing with Claude describes such a
-loop, and this study uses it (Martin 2026). The loop divides the cases into two sets. The analyzer that proposes changes reads only one set. The loop keeps a change only when
-the pass rates on both sets increase. This rule decreases the risk of overfitting to the cases that the analyzer
-reads.</p>
+loop, and this study uses its method (Martin 2026). The loop divides the cases into two sets. The analyzer that
+proposes changes reads only one set. The loop keeps a change only when the pass rates on both sets increase. This rule
+decreases the risk of overfitting to the cases that the analyzer reads.</p>
 <p>The rule does not prevent errors that come from the grader. The article also gives a warning about this. It says that
-you must read a sample of graded transcripts before you trust the evaluator. The reason is that grading errors are a common cause of a bad eval. In the article's own example, the third phase of work was "fixing graders." This paper measures this
-type of problem in the loop with TPR and TNR. When the grader is an LLM judge, "the pass rate increased"
+you must read a sample of graded transcripts before you trust the evaluator. The reason is that grading errors are a
+common cause of a bad eval. In the article's own example, the third phase of work was "fixing graders." This paper
+measures this type of problem in the loop with TPR and TNR. When the grader is an LLM judge, "the pass rate increased"
 means "the judge passed more outputs." The primer shows what a judge's pass rate contains (Falkowski 2026a):</p>
 <div class="eq">pass rate = TPR × θ + (1 − TNR) × (1 − θ)</div>
 <p>In this equation, θ is the true fraction of correct outputs. Each keep or revert choice compares two of these pass
@@ -258,13 +270,64 @@ new answer minus its false-pass rate on the old answer. Each broken output remov
 <p>Thus the net count F − B does not decide what the judge shows. The mix of fixes and breaks decides it. A change can be
 a true improvement and still decrease the judge's pass rate. This can occur when the judge grades the fixed outputs
 badly. I call the average J over the fixes of a change its "J on fixes." I call the average J over its breaks its
-"J on breaks."</p>
+"J on breaks." A small term also comes from decisions that changed but stayed correct, or stayed incorrect.</p>
 <p>This changes the question. The question is not only "Is the judge accurate?" It is also "Can the judge control an
 optimization correctly?" These are two different questions. The loop changes the outputs of the agent. This changes
-where the judge makes its mistakes, and that has an effect on the next round. The main finding of this paper is that a judge
-can be accurate on the baseline and still control the optimization incorrectly. The remainder of this paper shows this
-effect in the climbs of this study. It also shows how to measure it.</p>
-<h2 id="setup"><span class="num">2.</span> Setup</h2>
+where the judge makes its mistakes, and that has an effect on the next round.</p>
+<p>The primer gives six rules for using a judge on a fixed set of outputs. This paper tests each rule in the loop.
+Section 2 lists the rules and the result for each one. Section 5 gives the evidence.</p>
+<h2 id="rules"><span class="num">2.</span> The six rules</h2>
+<p>Section 9 of the primer lists six rules for using an LLM judge. The table gives each rule as the primer first stated
+it, and the result of this study for it. After this study, I added the conditions that it found to the primer's rules
+3, 4 and 5. The section numbers in the table refer to the primer. In this paper, "rule 1" to "rule 6" are the rules of
+the primer. The support policy of the agent also has numbered rules. This paper calls them "policy rule 1" to "policy
+rule 5".</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Rule, as the primer first stated it</th>
+<th>What the rule means in a hill climb</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1.</strong> Measure TPR and TNR separately. One agreement number hides which mistakes the judge makes. (Section 3)</td>
+<td>Before the climb, measure the judge with TPR and TNR</td>
+<td><span class="chip ok">Holds</span></td>
+</tr>
+<tr>
+<td><strong>2.</strong> If J = TPR + TNR − 1 is near zero, the correction cannot help. Improve the judge first. (Section 6)</td>
+<td>A judge with J near zero cannot control the loop</td>
+<td><span class="chip ok">Holds</span></td>
+</tr>
+<tr>
+<td><strong>3.</strong> TPR and TNR do not depend on the mix of good and bad outputs. Thus you can use them on new data. (Section 5)</td>
+<td>The rates from the baseline apply to each new version of the app</td>
+<td><span class="chip cond">Holds, if the rates are the same for each kind of output</span></td>
+</tr>
+<tr>
+<td><strong>4.</strong> When the outputs change, label a new sample and measure the judge again. (Section 8)</td>
+<td>A hill climb changes the outputs in each round</td>
+<td><span class="chip mod">Holds; a climb needs it in each round</span></td>
+</tr>
+<tr>
+<td><strong>5.</strong> Compare two versions with the same judge, on the same kind of data. The judge's errors then affect both versions in almost the same way. (Section 7)</td>
+<td>Each keep or revert choice compares two versions with the same judge</td>
+<td><span class="chip cond">Holds, if the change does not alter the kind of output</span></td>
+</tr>
+<tr>
+<td><strong>6.</strong> Correct the judge's pass rate with TPR and TNR. (Section 5)</td>
+<td>Correct the pass rate of the final version with the rates from the baseline</td>
+<td><span class="chip cond">Holds, if the rates are measured on the final version</span></td>
+</tr>
+</tbody>
+</table></div>
+<p>The main finding comes from rule 5. Each keep or revert choice is a comparison of two versions. But a change alters
+which kinds of output the agent gives. Thus the judge's errors do not affect the two versions in the same way.</p>
+<h2 id="setup"><span class="num">3.</span> Setup</h2>
+<p><strong>Terms.</strong> A <em>grader</em> is anything that grades the agent's decisions. A <em>judge</em> is a grader that is an LLM. The <em>answer
+key</em> is a grader that is code.</p>
 <p><strong>The agent.</strong> I used the support agent from my run-validity paper without changes (Falkowski 2026b). For each
 ticket, the agent gets the order record and the stock level. Then it asks Jev which of four actions the support policy
 requires: refund, reship, escalate or reply. Jev is a small decision model from TypeSafe. The policy has five rules.
@@ -292,7 +355,7 @@ approximately the same mix of framings.</p>
 <tr>
 <td>Validation</td>
 <td>120</td>
-<td>The loop scores this set in each round, and keeps a change only if the pass rate here increases. The guide calls this set "test"</td>
+<td>The loop scores this set in each round, and keeps a change only if the pass rate here increases. The article calls this set "test"</td>
 </tr>
 <tr>
 <td>Holdout</td>
@@ -301,25 +364,83 @@ approximately the same mix of framings.</p>
 </tr>
 </tbody>
 </table></div>
-<p>The validation set decides which changes stay. Thus it is part of the optimization. The holdout set gives independent
-evidence about the true gain. Each version of the agent ran each ticket two times. Thus the pass rate of a set is the
-mean over two decisions for each ticket. The validation set has 240 decisions.</p>
-<p><strong>The loop.</strong> I followed Anthropic's hill-climbing guide as written. The guide is the <code>eval-hillclimb.md</code> file of the
-<code>claude-api</code> skill (Anthropic 2026). The repo has a copy of it at a fixed commit. In each round, a new analyzer
-(Claude Opus 5.5) read the train transcripts and grades of the current version. It proposed one change. The Claude session that ran
-the study applied the change exactly, without edits. The loop kept a change when the train and validation pass rates both increased. When the
-validation pass rate increased and the train pass rate did not, the loop ran the change one more time. It kept the
-change only if the validation pass rate increased again. After two rounds without an increase larger than the noise
-level, the loop ran one round that sorted the remaining failures by cause. The loop stopped after three consecutive
-rounds without such an increase, or when the analyzer had no change to propose.</p>
-<p>The repo records the design, and each change to the design during the study, before the results that they could
-affect. The
-branch <code>hillclimb-history</code> keeps each commit, with the time of each round. After the first four climbs, I ran the
-climbs with the calibrated judge and the lenient judge two more times. These repeat runs used the same baseline, judge
-verdicts and rules. Only the analyzer's proposals, and thus the changes that the loop kept, could be different.</p>
+<p>The validation set decides which changes stay. Thus it is part of the optimization, and a gain on validation is
+partly a result of that selection. The holdout set gives independent evidence about the true gain. Each version of the
+agent ran each ticket two times. Thus the pass rate of a set is the mean over two decisions for each ticket. The
+validation set has 240 decisions.</p>
+<p><strong>The loop.</strong> The article's method is in the <code>claude-api</code> skill, in the file <code>eval-hillclimb.md</code> (Anthropic 2026).
+This paper calls that file the guide. The repo has a copy of it at a fixed commit. In each round, a new analyzer
+(Claude Opus 5.5) read the train transcripts and grades of the current version. It proposed one change. The Claude
+session that ran the study applied the change exactly, without edits. The loop kept a change when the train and
+validation pass rates both increased. When the validation pass rate increased and the train pass rate did not, the
+guide runs the change one more time. That case did not occur. After two rounds without an increase larger than the
+noise level, the loop ran one round that sorted the remaining failures by cause. The loop stopped after three
+consecutive rounds without such an increase, or when the analyzer had no change to propose.</p>
 <figure class="fig fig-loop" id="figure-2"><div aria-label="The 400 tickets: 120 train, 120 validation, 160 holdout" class="split"><span class="tr" style="flex:120">Train · 120</span><span class="va" style="flex:120">Validation · 120</span><span class="ho" style="flex:160">Holdout · 160</span></div><ol class="flow"><li><b>Read</b>A new analyzer reads the train transcripts and grades of the current version.<span class="uses">uses: Train</span></li><li><b>Change</b>It proposes one change to the decision instructions or to the action descriptions.</li><li><b>Run</b>The agent runs each ticket two times. The grader of the climb grades each decision.</li><li><b>Decide</b>If the train and validation pass rates both increase, keep the change. If not, revert it.<span class="uses">uses: Train and validation</span></li></ol><p class="flow-note">The next round starts from the last kept version. The loop does not use the holdout tickets. The answer key grades them, and all other decisions, only after the climbs.</p><figcaption><b>Fig 2</b> The 400 tickets, and one round of the loop with the sets that each step uses.</figcaption></figure>
-<p><strong>The graders.</strong> Each climb used one grader for all its rounds. I measured each judge on the 240 train decisions of
-the baseline. Of these decisions, 46 were incorrect.</p>
+<p>The study follows the method of the article, with changes that isolate the grader's errors:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Part of the method</th>
+<th>In the article</th>
+<th>In this study</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>What the loop can change</td>
+<td>The system prompt, skills or instruction files, tool descriptions, model choice and API parameters, and harness code</td>
+<td>Only the agent's decision instructions and its descriptions of the four actions</td>
+</tr>
+<tr>
+<td>Grader</td>
+<td>Programmatic checks, or an LLM judge with a rubric. If there is a baseline, the judge compares two outputs in random order</td>
+<td>One fixed grader for each climb: the answer key or one of three LLM judges. A judge grades each decision alone, with pass or fail</td>
+</tr>
+<tr>
+<td>Keep or revert rule</td>
+<td>Keep a change if the train and test scores both increase</td>
+<td>The same rule, as the guide writes it</td>
+</tr>
+<tr>
+<td>Validation of the grader</td>
+<td>Check the grader before the first round, fix it if necessary, and check it again when the score stalls</td>
+<td>The same checks were calculated, but the loop did not fix the grader. This was the design: the study measures what the grader's errors do</td>
+</tr>
+<tr>
+<td>Judge noise</td>
+<td>Run the grader two times on the same output, and check that the verdict does not change</td>
+<td>Each verdict was calculated one time before the climbs, for each ticket and action. Thus each judge had no run-to-run noise</td>
+</tr>
+<tr>
+<td>What the analyzer reads</td>
+<td>The previous round's train transcripts</td>
+<td>The train transcripts of the last kept version. After a revert, the analyzer did not see the transcripts of the reverted round</td>
+</tr>
+<tr>
+<td>Final assessment</td>
+<td>The version with the best test result, compared with the baseline, with confidence intervals</td>
+<td>The same comparison on the validation set. In addition, a separate holdout set that the loop did not use</td>
+</tr>
+<tr>
+<td>Analysis of the grader</td>
+<td>Validate the grader and examine grading failures</td>
+<td>TPR and TNR on the baseline and on the final version, J on fixes and J on breaks in each round, and an answer key for every decision</td>
+</tr>
+</tbody>
+</table></div>
+<p>Thus the study is an implementation of the article's method, adapted to isolate grader errors. It is not an exact
+copy. The findings apply most directly to a judge that grades each output alone.</p>
+<p>The repo records the design, and each change to the design during the study, before the results that they could
+affect. The branch <code>hillclimb-history</code> keeps each commit, with the time of each round. After the first four climbs, I
+ran the climbs with the calibrated judge and the lenient judge two more times. These repeat runs used the same
+baseline, judge verdicts and rules. Only the analyzer's proposals, and thus the changes that the loop kept, could be
+different.</p>
+<p><strong>The graders.</strong> Each climb used one grader for all its rounds. The table gives each judge's TPR and TNR on the 240
+train decisions of the baseline, as the primer teaches. Of these decisions, 46 were incorrect. A team can make this
+measurement before a climb. In this study, I calculated it from the answer key after the climbs, so that the loop
+could not use it. Before the climbs, I had only the values from my earlier judge study, on different tickets. Those
+values were similar for the calibrated and lenient judges. For the weak judge, J was 0.32 there.</p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -361,6 +482,7 @@ the baseline. Of these decisions, 46 were incorrect.</p>
 </tr>
 </tbody>
 </table></div>
+<p>The name "calibrated" describes how I made the judge. It does not mean that the judge is reliable in a loop.</p>
 <p>The input to a judge is only the ticket, the order, the stock and the action. Thus I ran each judge one time on all
 four actions of each ticket before the climbs started. The loop then found the verdict for the action that the agent
 selected. The total API cost was $3.89. Of this, $2.93 was for the calibrated judge's verdicts and $0.26 was for the
@@ -369,11 +491,11 @@ repeat runs. In the repo, the three judges are <code>c3</code>, <code>j2</code> 
 6.5 points. This value assumes that all 240 validation decisions are independent. Also, it applies to one pass rate,
 not to a comparison of two. I measured two types of noise directly. First, a rerun of the same version changed very
 little. Between the two repetitions of the baseline, 0 to 2 of the 120 validation tickets got a different grade. The
-number depended on the grader. This is approximately 1 to 2 points of noise when you compare two versions. Second, the selection
-of tickets in the set causes more noise. I calculated paired 95% intervals on the change in each round by resampling
-tickets. The half-widths of these intervals were approximately 3 to 8 points. The sections below use the paired
-intervals.</p>
-<h2 id="climbs"><span class="num">3.</span> Results of the climbs</h2>
+number depended on the grader. This is approximately 1 to 2 points of noise when you compare two versions. Second, the
+selection of tickets in the set causes more noise. I calculated paired 95% intervals on the change in each round by
+resampling tickets. The half-widths of these intervals were approximately 3 to 8 points. The sections below use the
+paired intervals.</p>
+<h2 id="climbs"><span class="num">4.</span> Results of the climbs</h2>
 <p>The final version of a climb is the version that the climb ends with. If the loop kept no change, the final version
 is the baseline. The table shows the first run of each climb.</p>
 <div class="table-wrap"><table>
@@ -484,9 +606,7 @@ that the loop reported was close to the true gain. The repeat runs show that thi
 <p>All three calibrated climbs increased the true pass rate on holdout. But only the interval for run 3 clearly excludes
 zero. The gain that the loop reported on validation was different from the true gain by +0.4, +5.4 and −1.3 points.
 On holdout, the judge's own pass rates showed a larger gain than the true gain in all three runs, by 1.6, 4.7 and 1.6
-points. All three lenient climbs reverted every round. The results for each round below show why a judge that is
-good on the baseline can make an incorrect keep or revert choice. This can occur when a change affects outputs that
-the judge grades differently.</p>
+points. All three lenient climbs reverted every round.</p>
 <figure class="fig fig-outcomes" id="figure-3"><div class="legend"><span class="k"><svg aria-hidden="true" class="sw-svg g-ink" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>true change (answer key)</span><span class="k"><svg aria-hidden="true" class="sw-svg g-ink" viewbox="0 0 14 14"><circle class="mark hollow" cx="7" cy="7" r="5"></circle></svg>change from the climb's own judge</span><span class="k"><svg aria-hidden="true" class="sw-svg g-ink" viewbox="0 0 14 14"><path class="mark hollow" d="M7 1.5 L12.5 7 L7 12.5 L1.5 7 Z"></path></svg>true gain of the best reverted change</span></div><div class="chart"><svg aria-label="Holdout gain per climb: the judge's change and the true change" role="img" viewbox="0 0 680 326"><line class="axis" x1="189.5" x2="189.5" y1="10" y2="290"></line><text class="tick" text-anchor="middle" x="189.5" y="306.0">0</text><line class="grid" x1="288.2" x2="288.2" y1="10" y2="290"></line><text class="tick" text-anchor="middle" x="288.2" y="306.0">+5</text><line class="grid" x1="387.0" x2="387.0" y1="10" y2="290"></line><text class="tick" text-anchor="middle" x="387.0" y="306.0">+10</text><line class="grid" x1="485.8" x2="485.8" y1="10" y2="290"></line><text class="tick" text-anchor="middle" x="485.8" y="306.0">+15</text><line class="grid" x1="584.5" x2="584.5" y1="10" y2="290"></line><text class="tick" text-anchor="middle" x="584.5" y="306.0">+20</text><text class="lab m" text-anchor="middle" x="387.0" y="322.0">Change in pass rate on the 160 holdout tickets (points)</text><text class="lab" text-anchor="end" x="138.0" y="29.0">Answer key</text><g class="g-key"><g class="pt" data-tip="Answer key
 true change +20.6 points
 change from the climb's own judge: +20.6" tabindex="0"><circle class="hit" cx="596.8" cy="25.0" r="12"></circle><circle class="mark filled" cx="596.8" cy="25.0" r="5"></circle></g><text class="lab m" text-anchor="start" x="608.8" y="29.0">+20.6</text></g><text class="lab" text-anchor="end" x="138.0" y="71.0">Calibrated, run 1</text><g class="g-cal"><line class="conn" x1="319.1" x2="288.3" y1="67.0" y2="67.0"></line><g class="pt" data-tip="Calibrated, run 1
@@ -508,15 +628,14 @@ change from the climb's own judge: +0.0" tabindex="0"><circle class="hit" cx="18
 true change +0.0 points
 change from the climb's own judge: +0.0" tabindex="0"><circle class="hit" cx="189.5" cy="271.0" r="12"></circle><circle class="mark filled" cx="189.5" cy="271.0" r="5"></circle></g></g></svg></div><figcaption><b>Fig 3</b> The gain on the holdout tickets, from the baseline to the final version of each climb. The hollow marker is the change from the climb's own grader. The filled marker is the change from the answer key. The calibrated judge showed each gain as larger than the true gain. The lenient climbs kept no change, but each climb reverted a change that truly improved the agent.</figcaption><details class="data"><summary>Show the data</summary><div class="table-wrap"><table><thead><tr><th>Climb</th><th>Judge's change</th><th>True change</th><th>Best reverted change (true)</th></tr></thead><tbody><tr><td>Answer key</td><td class="n">+20.6</td><td class="n">+20.6</td><td class="n"></td></tr><tr><td>Calibrated, run 1</td><td class="n">+6.6</td><td class="n">+5.0</td><td class="n"></td></tr><tr><td>Calibrated, run 2</td><td class="n">+11.6</td><td class="n">+6.9</td><td class="n"></td></tr><tr><td>Calibrated, run 3</td><td class="n">+9.4</td><td class="n">+7.8</td><td class="n"></td></tr><tr><td>Lenient, run 1</td><td class="n">+0.0</td><td class="n">+0.0</td><td class="n">+5.0</td></tr><tr><td>Lenient, run 2</td><td class="n">+0.0</td><td class="n">+0.0</td><td class="n">+3.8</td></tr><tr><td>Lenient, run 3</td><td class="n">+0.0</td><td class="n">+0.0</td><td class="n">+9.1</td></tr><tr><td>Weak</td><td class="n">+0.0</td><td class="n">+0.0</td><td class="n"></td></tr></tbody></table></div></details></figure>
 <p>In the uniform-error model, the paired noise of 3 to 8 points sets the smallest true change that each judge can
-detect.
-For the calibrated judge, it is approximately 3.5 to 9 points. For the lenient judge, it is approximately 5 to 13
-points. The weak judge, with J near 0, can detect no change. The climbs are consistent with this model. The answer key kept three
-large changes, and the calibrated judge kept small changes. The lenient and weak judges kept no change. But the
-uniform-error model does not show what occurred in each round.</p>
+detect. For the calibrated judge, it is approximately 3.5 to 9 points. For the lenient judge, it is approximately 5 to
+13 points. The weak judge, with J near 0, can detect no change. The climbs are consistent with this model. The answer
+key kept three large changes, and the calibrated judge kept small changes. The lenient and weak judges kept no change.
+But the uniform-error model does not show what occurred in each round.</p>
 <p>The next table divides each change into the decisions that it truly fixed and the decisions that it truly broke. It
-also shows how much of each the grader detected. Here, a decision is one run of one ticket. Thus the train and validation
-sets have 480 decisions. "Fixed" and "broken" are counts of decisions. The last two columns are net counts, and each
-decision is 0.21 points of the 480.</p>
+also shows how much of each the grader detected. Here, a decision is one run of one ticket. Thus the train and
+validation sets have 480 decisions. "Fixed" and "broken" are counts of decisions. The last two columns are net
+counts, and each decision is 0.21 points of the 480.</p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -667,156 +786,19 @@ rounds show this most clearly on the validation set:</p>
   excludes zero (−6.2 to −0.4).</li>
 <li>The calibrated judge's round 2 decreased the true validation pass rate by 6.2 points (−11.7 to −0.8). The judge
   showed a decrease of only 2.5 points (−7.9 to +2.9), which is not larger than the noise. The loop reverted the change
-  because the judge's validation pass rate decreased. But on train and validation together, the judge showed a net loss of only one
-  decision.</li>
+  because the judge's validation pass rate decreased. But on train and validation together, the judge showed a net loss
+  of only one decision.</li>
 </ul>
-<p>The next three sections examine each case.</p>
-<h2 id="lenient"><span class="num">4.</span> A judge that passes incorrect outputs cannot detect fixes</h2>
-<p>The lenient judge's J on the baseline was 0.61. On the decisions that the two rounds of its first run fixed, its J was
-0.00.</p>
-<p>Round 2 applied the $500 refund limit to every refund, as the policy requires. The change fixed 36 decisions and broke
-10. For 7 of the 10 broken decisions, the judge's verdict changed from pass to fail. But for the 36 fixed
-decisions, the number of passes did not increase:</p>
-<ul>
-<li>4 changed from fail to pass.</li>
-<li>4 changed from pass to fail.</li>
-<li>5 passed before and after, because the judge already passed the old incorrect decision.</li>
-<li>23 failed before and after.</li>
-</ul>
-<p>The last group is the main cause. Some tickets have an out-of-stock order over $500, and the policy requires the
-agent to escalate them. On these tickets, this judge passes the correct escalation on only 1 of 18. Its TPR on this
-type of decision is almost zero. After the change, the judge failed 27 of the fixed decisions. Of these 27, 26 are
-those escalations.</p>
-<p>Thus the change was a true improvement, but the judge showed it as a loss. The loop reverted it, which is correct by
-the loop's rule. Round 1 tried the same fix. In round 1 also, the number of passes did not increase for the 36 fixed
-decisions.</p>
-<figure class="fig fig-waffle" id="figure-5"><div class="legend"><span class="k"><span aria-hidden="true" class="sw w-good"></span>judge changed in the correct direction</span><span class="k"><span aria-hidden="true" class="sw w-pp"></span>judge passed it before and after</span><span class="k"><span aria-hidden="true" class="sw w-ff"></span>judge failed it before and after</span><span class="k"><span aria-hidden="true" class="sw w-bad"></span>judge changed in the incorrect direction</span></div><div class="wpanels"><div class="wpanel"><div class="wtitle">36 decisions that the change truly fixed</div><div class="waffle"><span class="cell w-good" data-tip="Fixed decision: the judge changed from fail to pass" tabindex="0"></span><span class="cell w-good" data-tip="Fixed decision: the judge changed from fail to pass" tabindex="0"></span><span class="cell w-good" data-tip="Fixed decision: the judge changed from fail to pass" tabindex="0"></span><span class="cell w-good" data-tip="Fixed decision: the judge changed from fail to pass" tabindex="0"></span><span class="cell w-pp" data-tip="Fixed decision: the judge passed before and after" tabindex="0"></span><span class="cell w-pp" data-tip="Fixed decision: the judge passed before and after" tabindex="0"></span><span class="cell w-pp" data-tip="Fixed decision: the judge passed before and after" tabindex="0"></span><span class="cell w-pp" data-tip="Fixed decision: the judge passed before and after" tabindex="0"></span><span class="cell w-pp" data-tip="Fixed decision: the judge passed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-bad" data-tip="Fixed decision: the judge changed from pass to fail" tabindex="0"></span><span class="cell w-bad" data-tip="Fixed decision: the judge changed from pass to fail" tabindex="0"></span><span class="cell w-bad" data-tip="Fixed decision: the judge changed from pass to fail" tabindex="0"></span><span class="cell w-bad" data-tip="Fixed decision: the judge changed from pass to fail" tabindex="0"></span></div><div class="wcounts">4 changed from fail to pass · 5 passed before and after · 23 failed before and after · 4 changed from pass to fail</div></div><div class="wpanel"><div class="wtitle">10 decisions that it truly broke</div><div class="waffle"><span class="cell w-good" data-tip="Broken decision: the judge changed from pass to fail" tabindex="0"></span><span class="cell w-good" data-tip="Broken decision: the judge changed from pass to fail" tabindex="0"></span><span class="cell w-good" data-tip="Broken decision: the judge changed from pass to fail" tabindex="0"></span><span class="cell w-good" data-tip="Broken decision: the judge changed from pass to fail" tabindex="0"></span><span class="cell w-good" data-tip="Broken decision: the judge changed from pass to fail" tabindex="0"></span><span class="cell w-good" data-tip="Broken decision: the judge changed from pass to fail" tabindex="0"></span><span class="cell w-good" data-tip="Broken decision: the judge changed from pass to fail" tabindex="0"></span><span class="cell w-pp" data-tip="Broken decision: the judge passed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Broken decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Broken decision: the judge failed before and after" tabindex="0"></span></div><div class="wcounts">7 changed from pass to fail · 1 passed before and after · 2 failed before and after</div></div></div><figcaption><b>Fig 5</b> The lenient judge, run 1, round 2. Each square is a train or validation decision that the change truly fixed or broke. The color shows what the judge did. For the fixed decisions, the judge changed 4 from fail to pass and 4 from pass to fail. Thus the fixes gave no net increase. Most of the fixed decisions that the judge failed before and after are correct escalations, which this judge fails.</figcaption></figure>
-<p>The repeat runs gave the same result. In all six lenient rounds of the three runs, the change applied the $500 limit
-to the out-of-stock refund. Each time, the over-$500 out-of-stock tickets alone increased the holdout pass rate by 2.5
-points. The calibrated judge kept the same fix in round 1 of all three of its runs. In all six lenient rounds, J on
-fixes was between −0.08 and 0.00. The judge showed a validation decrease of 2.5 to 4.6 points, and each interval
-excluded zero. The loop reverted each change. All six changes truly fixed more decisions than they broke. If you
-apply the same keep rule to answer-key grades, it keeps five of them. Each run had one best reverted round. The trial versions of these
-rounds had a true holdout pass rate higher than the baseline by 5.0, 3.8 and 9.1 points.</p>
-<p>Each run then stopped in the same way. The analyzer read the history. It saw two rounds that tried to apply the $500
-limit, and the judge showed both rounds as losses. Thus the analyzer proposed no change. Run 1's analyzer described
-the over-limit refunds as a behavior "that two artifact rounds already failed to move." Run 3's analyzer said that the
-same behavior "has already resisted both in-scope levers." But on the over-$500 out-of-stock tickets, the fix worked
-each time. The judge's error became the analyzer's conclusion about the agent.</p>
-<p>Two different problems hid the fixes, and each problem needs a different repair. First, a low TNR on the old
-incorrect decisions means that the judge already passed them. Thus a fix gives no increase. Second, a low TPR on the
-new correct decisions means that the judge fails them. Thus a fix can even decrease the pass rate. The judge's average
-does not show these problems. You cannot measure the second problem on the baseline, because the baseline agent never
-gave the correct escalation. To detect it, grade a correct answer for each type of ticket.</p>
-<h2 id="calibrated"><span class="num">5.</span> The climb moves mistakes to where the judge does not detect them</h2>
-<p>The calibrated judge is a good judge, with J = 0.88 on the baseline. Its first climb reported a gain of +4.6 points on
-validation. The true gain was +4.2 points on validation and +5.0 points on holdout.</p>
-<p>In that run, its J on breaks was much lower than its overall J: 0.50, 0.41 and 0.10 in the three rounds. Most of the
-breaks that it did not detect were on one type of ticket. On this type, a customer reports damage. The order is Lost,
-or it shipped more than 14 days ago and did not arrive. The policy text does not say which rule applies. The answer
-key says reply. The calibrated judge passes the rule 3 action on all 13 tickets of this type. This action is reship,
-or refund or escalate when the item is out of stock. The judge passes reply on only 1 of them. I call these tickets
-the open tickets.</p>
-<p>In round 3, the analyzer read the judge's verdicts. Then it wrote the judge's reading into the agent's
-instructions. The new instructions said: "Rule 3 applies to every ticket on it, including damaged or wrong-item
-reports and tickets that only ask for a status update: reship if stock is above 0, otherwise refund." The change broke
-20 decisions. For the 11 ordinary breaks, the judge's verdict changed from pass to fail. For the 9 breaks on the open
-tickets, it changed from fail to pass, as for a fix. Round 2 did the same with more tickets. Of its 46 breaks, 10 were
-on the open tickets, and the judge's verdict on them changed from fail to pass.</p>
-<p>The repeat runs gave the same result. Each run kept the $500 fix in round 1. Then each run kept a change that applied
-rule 3 to the open tickets. Run 2's instructions had a new rule for shipped orders more than 14 days old.
-The rule said: "rule 3, whatever the ticket reports, including damage, a wrong item or only a request for an update."
-Run 3's instructions said: "reship if stock is above 0, otherwise refund, even when the ticket reports a damaged or
-wrong item." In the seven calibrated rounds of the three runs, changes broke 43 decisions on the open tickets. For all
-43, the judge's verdict changed from fail to pass, as for a fix. For 105 of the other 127 breaks, it changed from pass
-to fail.</p>
-<figure class="fig fig-breaks" id="figure-6"><div class="legend"><span class="k"><span aria-hidden="true" class="sw w-good"></span>pass to fail</span><span class="k"><span aria-hidden="true" class="sw w-ff"></span>no change in the verdict</span><span class="k"><span aria-hidden="true" class="sw w-bad2"></span>fail to pass, other tickets</span><span class="k"><span aria-hidden="true" class="sw w-bad"></span>fail to pass, open tickets</span></div><div class="chart"><svg aria-label="Broken decisions per calibrated round, by what the judge did" role="img" viewbox="0 0 680 280"><line class="axis" x1="176.0" x2="176.0" y1="6" y2="244"></line><text class="tick" text-anchor="middle" x="176.0" y="260.0">0</text><line class="grid" x1="262.8" x2="262.8" y1="6" y2="244"></line><text class="tick" text-anchor="middle" x="262.8" y="260.0">10</text><line class="grid" x1="349.6" x2="349.6" y1="6" y2="244"></line><text class="tick" text-anchor="middle" x="349.6" y="260.0">20</text><line class="grid" x1="436.4" x2="436.4" y1="6" y2="244"></line><text class="tick" text-anchor="middle" x="436.4" y="260.0">30</text><line class="grid" x1="523.2" x2="523.2" y1="6" y2="244"></line><text class="tick" text-anchor="middle" x="523.2" y="260.0">40</text><line class="grid" x1="610.0" x2="610.0" y1="6" y2="244"></line><text class="tick" text-anchor="middle" x="610.0" y="260.0">50</text><text class="lab m" text-anchor="middle" x="393.0" y="276.0">Train and validation decisions that the change truly broke</text><text class="lab" text-anchor="end" x="164.0" y="25.0">Run 1, round 1 (kept)</text><rect class="seg w-good" data-tip="Run 1, round 1
-8 broken decisions: the judge changed it from pass to fail" height="18" tabindex="0" width="67.4" x="176.0" y="12.0"></rect><rect class="seg w-ff" data-tip="Run 1, round 1
-2 broken decisions: the verdict of the judge did not change" height="18" tabindex="0" width="15.4" x="245.4" y="12.0"></rect><rect class="seg w-bad" data-tip="Run 1, round 1
-2 broken decisions: the judge changed it from fail to pass (open tickets)" height="18" tabindex="0" width="15.4" x="262.8" y="12.0"></rect><text class="lab m" text-anchor="start" x="286.2" y="25.0">12</text><text class="lab" text-anchor="end" x="164.0" y="55.0">Run 1, round 2 (reverted)</text><rect class="seg w-good" data-tip="Run 1, round 2
-30 broken decisions: the judge changed it from pass to fail" height="18" tabindex="0" width="258.4" x="176.0" y="42.0"></rect><rect class="seg w-ff" data-tip="Run 1, round 2
-5 broken decisions: the verdict of the judge did not change" height="18" tabindex="0" width="41.4" x="436.4" y="42.0"></rect><rect class="seg w-bad2" data-tip="Run 1, round 2
-1 broken decisions: the judge changed it from fail to pass (other tickets)" height="18" tabindex="0" width="6.7" x="479.8" y="42.0"></rect><rect class="seg w-bad" data-tip="Run 1, round 2
-10 broken decisions: the judge changed it from fail to pass (open tickets)" height="18" tabindex="0" width="84.8" x="488.5" y="42.0"></rect><text class="inlab" text-anchor="middle" x="530.9" y="55.5">10</text><text class="lab m" text-anchor="start" x="581.3" y="55.0">46</text><text class="lab" text-anchor="end" x="164.0" y="85.0">Run 1, round 3 (kept)</text><rect class="seg w-good" data-tip="Run 1, round 3
-11 broken decisions: the judge changed it from pass to fail" height="18" tabindex="0" width="93.5" x="176.0" y="72.0"></rect><rect class="seg w-bad" data-tip="Run 1, round 3
-9 broken decisions: the judge changed it from fail to pass (open tickets)" height="18" tabindex="0" width="76.1" x="271.5" y="72.0"></rect><text class="inlab" text-anchor="middle" x="309.5" y="85.5">9</text><text class="lab m" text-anchor="start" x="355.6" y="85.0">20</text><text class="lab" text-anchor="end" x="164.0" y="127.0">Run 2, round 1 (kept)</text><rect class="seg w-good" data-tip="Run 2, round 1
-11 broken decisions: the judge changed it from pass to fail" height="18" tabindex="0" width="93.5" x="176.0" y="114.0"></rect><rect class="seg w-ff" data-tip="Run 2, round 1
-3 broken decisions: the verdict of the judge did not change" height="18" tabindex="0" width="24.0" x="271.5" y="114.0"></rect><rect class="seg w-bad" data-tip="Run 2, round 1
-2 broken decisions: the judge changed it from fail to pass (open tickets)" height="18" tabindex="0" width="15.4" x="297.5" y="114.0"></rect><text class="lab m" text-anchor="start" x="320.9" y="127.0">16</text><text class="lab" text-anchor="end" x="164.0" y="157.0">Run 2, round 2 (kept)</text><rect class="seg w-good" data-tip="Run 2, round 2
-21 broken decisions: the judge changed it from pass to fail" height="18" tabindex="0" width="180.3" x="176.0" y="144.0"></rect><rect class="seg w-ff" data-tip="Run 2, round 2
-2 broken decisions: the verdict of the judge did not change" height="18" tabindex="0" width="15.4" x="358.3" y="144.0"></rect><rect class="seg w-bad2" data-tip="Run 2, round 2
-4 broken decisions: the judge changed it from fail to pass (other tickets)" height="18" tabindex="0" width="32.7" x="375.6" y="144.0"></rect><rect class="seg w-bad" data-tip="Run 2, round 2
-10 broken decisions: the judge changed it from fail to pass (open tickets)" height="18" tabindex="0" width="84.8" x="410.4" y="144.0"></rect><text class="inlab" text-anchor="middle" x="452.8" y="157.5">10</text><text class="lab m" text-anchor="start" x="503.2" y="157.0">37</text><text class="lab" text-anchor="end" x="164.0" y="199.0">Run 3, round 1 (kept)</text><rect class="seg w-good" data-tip="Run 3, round 1
-10 broken decisions: the judge changed it from pass to fail" height="18" tabindex="0" width="84.8" x="176.0" y="186.0"></rect><rect class="seg w-ff" data-tip="Run 3, round 1
-1 broken decisions: the verdict of the judge did not change" height="18" tabindex="0" width="6.7" x="262.8" y="186.0"></rect><rect class="seg w-bad" data-tip="Run 3, round 1
-1 broken decisions: the judge changed it from fail to pass (open tickets)" height="18" tabindex="0" width="6.7" x="271.5" y="186.0"></rect><text class="lab m" text-anchor="start" x="286.2" y="199.0">12</text><text class="lab" text-anchor="end" x="164.0" y="229.0">Run 3, round 2 (kept)</text><rect class="seg w-good" data-tip="Run 3, round 2
-14 broken decisions: the judge changed it from pass to fail" height="18" tabindex="0" width="119.5" x="176.0" y="216.0"></rect><rect class="seg w-ff" data-tip="Run 3, round 2
-2 broken decisions: the verdict of the judge did not change" height="18" tabindex="0" width="15.4" x="297.5" y="216.0"></rect><rect class="seg w-bad2" data-tip="Run 3, round 2
-2 broken decisions: the judge changed it from fail to pass (other tickets)" height="18" tabindex="0" width="15.4" x="314.9" y="216.0"></rect><rect class="seg w-bad" data-tip="Run 3, round 2
-9 broken decisions: the judge changed it from fail to pass (open tickets)" height="18" tabindex="0" width="76.1" x="332.2" y="216.0"></rect><text class="inlab" text-anchor="middle" x="370.3" y="229.5">9</text><text class="lab m" text-anchor="start" x="416.4" y="229.0">27</text></svg></div><figcaption><b>Fig 6</b> Each decision that a change in the calibrated climbs truly broke, for each round of the three runs. The judge changed most ordinary breaks from pass to fail. It changed each break on the open tickets from fail to pass, as if it were a fix.</figcaption><details class="data"><summary>Show the data</summary><div class="table-wrap"><table><thead><tr><th>Run</th><th>Round</th><th>Loop's choice</th><th>Broken</th><th>Pass to fail</th><th>No change</th><th>Fail to pass, other</th><th>Fail to pass, open tickets</th></tr></thead><tbody><tr><td>Run 1</td><td>round 1</td><td>kept</td><td class="n">12</td><td class="n">8</td><td class="n">2</td><td class="n">0</td><td class="n">2</td></tr><tr><td>Run 1</td><td>round 2</td><td>reverted</td><td class="n">46</td><td class="n">30</td><td class="n">5</td><td class="n">1</td><td class="n">10</td></tr><tr><td>Run 1</td><td>round 3</td><td>kept</td><td class="n">20</td><td class="n">11</td><td class="n">0</td><td class="n">0</td><td class="n">9</td></tr><tr><td>Run 2</td><td>round 1</td><td>kept</td><td class="n">16</td><td class="n">11</td><td class="n">3</td><td class="n">0</td><td class="n">2</td></tr><tr><td>Run 2</td><td>round 2</td><td>kept</td><td class="n">37</td><td class="n">21</td><td class="n">2</td><td class="n">4</td><td class="n">10</td></tr><tr><td>Run 3</td><td>round 1</td><td>kept</td><td class="n">12</td><td class="n">10</td><td class="n">1</td><td class="n">0</td><td class="n">1</td></tr><tr><td>Run 3</td><td>round 2</td><td>kept</td><td class="n">27</td><td class="n">14</td><td class="n">2</td><td class="n">2</td><td class="n">9</td></tr></tbody></table></div></details></figure>
-<p>Two related effects occur here.</p>
-<p>The first effect is selection. The loop keeps the changes that the judge gives a higher pass rate. Thus the loop can move
-the agent toward the judge's reading where the judge and the answer key disagree. This is
-Goodhart's law (Wikipedia): when the judge's pass rate becomes the target, the loop optimizes the judge's opinion
-together with the agent's quality.</p>
-<p>The second effect is a change in where the judge makes its mistakes. This effect is the empirical result. The
-climb changed which mistakes the agent makes. Thus the judge's error rates on the baseline no longer describe the
-judge. On validation and holdout, the answer key graded 2 decisions on the open tickets as incorrect at the baseline.
-At the final versions of runs 1, 2 and 3, it graded 14, 16 and 12 as incorrect. The judge passed each of them. At each
-final version, most of the judge's false passes were on this type of ticket. The counts were 14 of 14, 16 of 22 and
-12 of 12. Its TNR on the
-agent's decisions decreased from 0.94 at baseline to 0.84, 0.74 and 0.84. At baseline, it failed 109 of 116 incorrect
-decisions. At the final versions, it failed 76 of 90, 62 of 84 and 62 of 74.</p>
-<p>The two repetitions of a ticket are not independent. Thus I also counted only one repetition for each ticket. The
-judge failed 53 of 57 incorrect decisions at baseline. At the three final versions, it failed 38 of 45, 32 of 43 and
-33 of 39. When you examine each run separately, only the decrease in run 2 is unlikely to be chance. The p-values are
-0.02 for run 2, and 0.2 and 0.3 for runs 1 and 3. Three runs with the same baseline do not prove the result.
-But the decrease has the same direction and the same cause in each run.</p>
-<figure class="fig fig-drift" id="figure-7"><div class="chart"><svg aria-label="Incorrect decisions on the open tickets, and the fraction that the judge passed" role="img" viewbox="0 0 700 260"><text class="lab" text-anchor="start" x="36.0" y="14.0">Incorrect decisions on the open tickets</text><line class="axis" x1="44" x2="244" y1="226.0" y2="226.0"></line><text class="tick" text-anchor="end" x="38.0" y="230.0">0</text><line class="grid" x1="44" x2="244" y1="177.0" y2="177.0"></line><text class="tick" text-anchor="end" x="38.0" y="181.0">5</text><line class="grid" x1="44" x2="244" y1="128.0" y2="128.0"></line><text class="tick" text-anchor="end" x="38.0" y="132.0">10</text><line class="grid" x1="44" x2="244" y1="79.0" y2="79.0"></line><text class="tick" text-anchor="end" x="38.0" y="83.0">15</text><line class="grid" x1="44" x2="244" y1="30.0" y2="30.0"></line><text class="tick" text-anchor="end" x="38.0" y="34.0">20</text><text class="tick" text-anchor="middle" x="74.0" y="244.0">baseline</text><text class="tick" text-anchor="middle" x="224.0" y="244.0">final version</text><g class="g-cal"><line class="line" x1="74" x2="224" y1="206.4" y2="88.8"></line><g class="pt" data-tip="Calibrated, run 1
-Incorrect decisions on the open tickets: 2 at baseline, 14 at the final version" tabindex="0"><circle class="hit" cx="224" cy="88.8" r="12"></circle><circle class="mark filled" cx="224" cy="88.8" r="4.5"></circle></g></g><g class="g-cal"><line class="line" x1="74" x2="224" y1="206.4" y2="69.2"></line><g class="pt" data-tip="Calibrated, run 2
-Incorrect decisions on the open tickets: 2 at baseline, 16 at the final version" tabindex="0"><circle class="hit" cx="224" cy="69.2" r="12"></circle><circle class="mark filled" cx="224" cy="69.2" r="4.5"></circle></g></g><g class="g-cal"><line class="line" x1="74" x2="224" y1="206.4" y2="108.4"></line><g class="pt" data-tip="Calibrated, run 3
-Incorrect decisions on the open tickets: 2 at baseline, 12 at the final version" tabindex="0"><circle class="hit" cx="224" cy="108.4" r="12"></circle><circle class="mark filled" cx="224" cy="108.4" r="4.5"></circle></g></g><g class="g-cal"><circle class="mark filled" cx="74" cy="206.4" r="4.5"></circle></g><text class="lab m" text-anchor="end" x="64.0" y="210.4">2</text><text class="lab em" text-anchor="start" x="236.0" y="74.2">16 (run 2)</text><text class="lab em" text-anchor="start" x="236.0" y="93.8">14 (run 1)</text><text class="lab em" text-anchor="start" x="236.0" y="113.4">12 (run 3)</text><text class="lab" text-anchor="start" x="376.0" y="14.0">Incorrect decisions that the judge passed</text><line class="axis" x1="384" x2="584" y1="226.0" y2="226.0"></line><text class="tick" text-anchor="end" x="378.0" y="230.0">0%</text><line class="grid" x1="384" x2="584" y1="160.7" y2="160.7"></line><text class="tick" text-anchor="end" x="378.0" y="164.7">10%</text><line class="grid" x1="384" x2="584" y1="95.3" y2="95.3"></line><text class="tick" text-anchor="end" x="378.0" y="99.3">20%</text><line class="grid" x1="384" x2="584" y1="30.0" y2="30.0"></line><text class="tick" text-anchor="end" x="378.0" y="34.0">30%</text><text class="tick" text-anchor="middle" x="414.0" y="244.0">baseline</text><text class="tick" text-anchor="middle" x="564.0" y="244.0">final version</text><g class="g-cal"><line class="line" x1="414" x2="564" y1="186.6" y2="124.4"></line><g class="pt" data-tip="Calibrated, run 1
-Incorrect decisions that the judge passed: 6% at baseline, 16% at the final version" tabindex="0"><circle class="hit" cx="564" cy="124.4" r="12"></circle><circle class="mark filled" cx="564" cy="124.4" r="4.5"></circle></g></g><g class="g-cal"><line class="line" x1="414" x2="564" y1="186.6" y2="54.9"></line><g class="pt" data-tip="Calibrated, run 2
-Incorrect decisions that the judge passed: 6% at baseline, 26% at the final version" tabindex="0"><circle class="hit" cx="564" cy="54.9" r="12"></circle><circle class="mark filled" cx="564" cy="54.9" r="4.5"></circle></g></g><g class="g-cal"><line class="line" x1="414" x2="564" y1="186.6" y2="120.1"></line><g class="pt" data-tip="Calibrated, run 3
-Incorrect decisions that the judge passed: 6% at baseline, 16% at the final version" tabindex="0"><circle class="hit" cx="564" cy="120.1" r="12"></circle><circle class="mark filled" cx="564" cy="120.1" r="4.5"></circle></g></g><g class="g-cal"><circle class="mark filled" cx="414" cy="186.6" r="4.5"></circle></g><text class="lab m" text-anchor="end" x="404.0" y="190.6">6%</text><text class="lab em" text-anchor="start" x="576.0" y="59.9">26% (run 2)</text><text class="lab em" text-anchor="start" x="576.0" y="125.1">16% (runs 1 and 3)</text></svg></div><figcaption><b>Fig 7</b> Each calibrated climb changed the types of the agent's incorrect decisions, not only their number. The total decreased, from 116 to 90, 84 and 74. But more of them were on the open tickets, where this judge passes them. The data is the validation and holdout decisions. The fraction of all incorrect decisions that the judge passed (1 − TNR) increased in each run.</figcaption><details class="data"><summary>Show the data</summary><div class="table-wrap"><table><thead><tr><th>Measure</th><th>Baseline</th><th>Run 1</th><th>Run 2</th><th>Run 3</th></tr></thead><tbody><tr><td>Incorrect decisions on the open tickets</td><td class="n">2</td><td class="n">14</td><td class="n">16</td><td class="n">12</td></tr><tr><td>Incorrect decisions that the judge passed</td><td class="n">6%</td><td class="n">16%</td><td class="n">26%</td><td class="n">16%</td></tr></tbody></table></div></details></figure>
-<p>This argument does not depend on which reading is correct. The loop decided an unclear part of the policy. It used
-the judge's reading, and it did not show this decision to a person. No number from the loop shows that it decided a
-policy question.</p>
-<h2 id="weak"><span class="num">6.</span> A judge with J near zero gives the agent incorrect rules</h2>
-<p>The weak judge's J on the baseline was 0.00. Thus its verdicts gave almost no information about whether a decision was
-correct. The analyzer could not know this. It read the verdicts, found patterns, and wrote the patterns into the
-agent.</p>
-<p>In round 1, the analyzer made the agent escalate in two cases. One case is a customer request for a
-supervisor. The other case is a ticket that does not agree with the order record. The policy escalates in only two cases, and a customer's request is not one of them. In
-round 2, the analyzer made the agent refund each ticket that does not agree with the record. The instruction said
-"whatever the order total." This skips the $500 limit. Both changes also decided two types of ticket that the policy does not decide, and
-both decided them differently from the answer key. One type is the damage reports from Section 5. The other type is
-"never came" on an order that the record shows as Delivered.</p>
-<p>Both changes decreased the weak judge's own pass rate. Thus the loop reverted both changes, and no harmful change
-stayed. The answer key shows that the round 1 version had a holdout pass rate 8.1 points lower than the
-baseline. Of this, 5.9 points were on these two types of ticket. The other 2.2 points were on tickets that the
-numbered rules decide. The round 2 version was 4.4 points lower, all on these two types of ticket. Thus that loss
-depends on the answer key's reading.</p>
-<p>After two rounds with no kept change, the loop's stall step asked the correct question. It sorted the remaining train
-failures by cause. It put 34 of the weak judge's 57 failures in a "grader disagreement" group. By the answer key, all 34
-were judge errors. The step recommended a measurement of the judge's TPR and TNR before more tuning. The climb needed that step
-first, but it came last.</p>
-<h2 id="procedure"><span class="num">7.</span> How to use TPR and TNR in a hill climb</h2>
-<p>The climbs suggest a procedure. This study shows some of the steps. For other steps, the study gives support but not
-proof. I identify each type of step.</p>
-<figure class="fig fig-procedure" id="figure-8"><div class="proc"><div class="ph"><h4>Before the climb</h4><div class="step">Measure TPR, TNR and J<br/><span class="badge solid">Shown in this study</span></div><div class="step">Measure the judge for each type of output<br/><span class="badge solid">Shown in this study</span></div></div><div class="ph"><h4>During the climb</h4><div class="step">Label a sample of the changed outputs<br/><span class="badge outline">Supported by a check after the climbs, not tested in a loop</span></div><div class="step">If a change breaks the specification, examine the judge<br/><span class="badge dashed">A hypothesis from a small number of examples</span></div></div><div class="ph"><h4>After the climb</h4><div class="step">Measure the judge again on the final version<br/><span class="badge outline">The same result in three runs. Significant in only one</span></div></div></div><figcaption><b>Fig 8</b> The procedure in this section. Each tag shows how strongly this study supports the step.</figcaption></figure>
-<p><strong>Before the climb: measure TPR, TNR and J.</strong> <em>Shown in this study.</em> Label decisions from the baseline. Include at
-least approximately 30 incorrect decisions. Measure TPR and TNR with intervals. If J is not clearly more than zero,
-improve the judge or replace it. More cases or runs do not help, because the judge's pass rate changes very little when
-the true quality changes. If J is clearly more than zero, divide the noise of a paired comparison by J. The result is
-approximately the smallest true gain that the loop can detect. Compare it with the improvement that you expect.
-<em>This value is an approximate rule</em> from the uniform-error model. It is not a guarantee, because the J that is
-important is the J on the outputs that a change affects.</p>
-<p>Two usual checks did not show the difference between these judges. The first check reads the cases with the lowest
-judge scores. This check detects false fails, where the judge fails correct outputs. The calibrated and lenient judges
-make false fails at approximately the same rate. They are different in what they pass. The second check measures
-agreement on a random sample of 40 decisions. Such a sample from production traffic has approximately 8
-incorrect decisions. Thus agreement on it measures mostly TPR:</p>
+<p>Section 5 examines the results for each rule.</p>
+<h2 id="by-rule"><span class="num">5.</span> Results for each rule</h2>
+<h3 id="rule-1">Rule 1 holds: measure TPR and TNR, not one agreement number</h3>
+<p>Two usual checks did not show the difference between the lenient judge and the calibrated judge. The first check reads
+the 10 cases with the lowest judge scores. This check detects false fails, where the judge fails correct outputs. The
+calibrated and lenient judges make false fails at approximately the same rate. They are different in what they pass.
+The guide says to fix the grader if more than 1 case in 10 is a grader error. Thus this check flagged both judges in
+most samples: the lenient judge in 79% and the calibrated judge in 69%. It did not show which judge was worse.</p>
+<p>The second check measures agreement on a random sample of 40 decisions. Such a sample from production traffic has
+approximately 8 incorrect decisions. Thus agreement on it measures mostly TPR:</p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -855,26 +837,63 @@ incorrect decisions. Thus agreement on it measures mostly TPR:</p>
 </table></div>
 <p>Most of the cases with the lowest judge scores have the same score, 0. Thus the selection of the ten cases is
 arbitrary. If you read them in the order of the lenient judge's own score, its ten lowest cases have no grader errors.</p>
-<p><strong>Before the climb: measure the judge for each type of output.</strong> <em>Shown in this study.</em> A judge can be good on
-average and have J near zero on one type of output. Often you cannot measure this on the baseline, because the app never
-gives the correct output there. Grade a correct output for each main branch of the specification. The lenient judge
-fails the correct escalation on 17 of 18 tickets. This check needs only a small number of labels, and it detects that
-problem. In this study, the loop used two rounds in each of three runs on a fix that the judge almost never passed.</p>
-<p><strong>During the climb: label a sample of the changed outputs.</strong> <em>Supported by a check after the climbs, not tested in a
-loop.</em> A round changes a small number of outputs. Here, each round changed 44 to 97 of its 480 train and validation
-decisions. Each keep or revert choice depends only on these decisions. If you label a small random sample of them,
-you get an estimate of the true change without the judge.</p>
+<p>TNR showed the difference clearly: 0.65 for the lenient judge and 0.93 for the calibrated judge. This result agrees
+with the primer.</p>
+<h3 id="rule-2">Rule 2 holds: a judge with J near zero cannot control the loop</h3>
+<p>The weak judge's J on the baseline was 0.00. Thus its verdicts gave almost no information about whether a decision was
+correct. The analyzer could not know this. It read the verdicts, found patterns, and wrote the patterns into the
+agent.</p>
+<p>In round 1, the analyzer made the agent escalate in two cases. One case is a customer request for a supervisor. The
+other case is a ticket that does not agree with the order record. The policy escalates in only two cases, and a
+customer's request is not one of them. In round 2, the analyzer made the agent refund each ticket that does not agree
+with the record. The instruction said "whatever the order total." This skips the $500 limit. Both changes also decided
+two types of ticket that the policy does not decide, and both decided them differently from the answer key. One type
+is a damage report on an order that did not arrive. The rule 3 section below calls these the open tickets. The other type is
+"never came" on an order that the record shows as Delivered.</p>
+<p>Both changes decreased the weak judge's own pass rate. Thus the loop reverted both changes, and no harmful change
+stayed. The answer key shows that the round 1 version had a holdout pass rate 8.1 points lower than the baseline. Of
+this, 5.9 points were on these two types of ticket. The other 2.2 points were on tickets that the numbered policy rules
+decide. The round 2 version was 4.4 points lower, all on these two types of ticket. Thus that loss depends on the
+answer key's reading.</p>
+<p>After two rounds with no kept change, the loop's stall step asked the correct question. It sorted the remaining train
+failures by cause. It put 34 of the weak judge's 57 failures in a "grader disagreement" group. By the answer key, all
+34 were judge errors. The step recommended a measurement of the judge's TPR and TNR before more tuning. The climb
+needed that step first, but it came last. This result agrees with the primer: the loop could not detect an
+improvement with this judge.</p>
+<h3 id="rule-3">Rule 3 holds only if the rates are the same for each kind of output</h3>
+<p>The primer says that TPR and TNR do not depend on the mix of good and bad outputs. That is correct. But the rates do
+depend on the kind of output. A change in a hill climb affects only a small number of kinds of output. Thus the
+judge's accuracy on the outputs that a change affects can be very different from its average. Fig 4 shows this. Under
+the uniform-error model, each round would be on the diagonal. Only the rounds of the answer key are on it.</p>
+<p>Two kinds of ticket show this most clearly.</p>
+<ul>
+<li><strong>The lenient judge and the correct escalation.</strong> Some tickets have an out-of-stock order over $500, and the policy
+  requires the agent to escalate them. On these tickets, the lenient judge passes the correct escalation on only
+  1 of 18. Its TPR on this type of decision is almost zero. You cannot measure this on the baseline, because the baseline
+  agent never gave the correct escalation.</li>
+<li><strong>The calibrated judge and the open tickets.</strong> On this type of ticket, a customer reports damage. The order is Lost,
+  or it shipped more than 14 days ago and did not arrive. The policy text does not say which rule applies. The answer
+  key says reply. The calibrated judge passes the action of policy rule 3 on all 13 tickets of this type. This action is reship,
+  or refund or escalate when the item is out of stock. The judge passes reply on only 1 of them. I call these tickets
+  the open tickets. On them, the judge's "errors" are disagreements with the answer key's reading of an unclear case.</li>
+</ul>
+<p><strong>Extension to the primer (rule 3):</strong> measure the judge for each kind of output. Include correct outputs that the app
+does not produce yet. A small number of labels is sufficient. The lenient judge fails the correct escalation on 17 of
+18 tickets, so a few graded escalations show the problem before the climb.</p>
+<h3 id="rule-4">Rule 4 holds, and a climb needs it in each round</h3>
+<p>The primer says: when the outputs change, label a new sample and measure the judge again. A hill climb changes the
+outputs in each round. Each round changed 44 to 97 of its 480 train and validation decisions. Each keep or revert
+choice depends only on these changed decisions. If you label a small random sample of them, you get an estimate of the
+true change without the judge.</p>
 <p>To learn how small the sample can be, I calculated an exact probability for each round. The probability is for a
 sample of k changed decisions, selected at random without replacement and labelled with the answer key. It is the
-probability that fixes minus breaks in the sample has the same sign as fixes minus breaks in all the changed decisions. The 18 rounds of all the runs gave these results with k = 20. The
-probability was at least 81% in 17 rounds, and 98% or more in 9 rounds. The exception was round 2 of the calibrated judge's run 2. It fixed 45 decisions and broke
-37. For a net change of +8 in 86 changed decisions, it is difficult to get the correct sign from a sample. With 20 labels, the sign is correct
-64% of the time. With 30 labels, it is correct 70% of the time. With k = 30, each other round was 91% or more.</p>
-<p>These rounds come from one task. Thus they show that the method can work, not that 20 labels are sufficient in
-general. For this task, a review of 20 decisions takes a few minutes. The same labels show where J on fixes and J on
-breaks are different. With these labels, you can detect the incorrect reverts of the lenient judge. You can also detect that
-the calibrated judge showed only a small decrease in round 2 of run 1.</p>
-<figure class="fig fig-labels" id="figure-9"><div class="legend"><span class="k"><svg aria-hidden="true" class="sw-svg g-key" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>Answer key (J = 1)</span><span class="k"><svg aria-hidden="true" class="sw-svg g-cal" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>Calibrated</span><span class="k"><svg aria-hidden="true" class="sw-svg g-len" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>Lenient</span><span class="k"><svg aria-hidden="true" class="sw-svg g-weak" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>Weak</span></div><div class="chart"><svg aria-label="Chance that k labelled changed decisions get the direction right, per round" role="img" viewbox="0 0 680 282"><line class="grid" x1="70.0" x2="70.0" y1="14" y2="246"></line><text class="tick" text-anchor="middle" x="70.0" y="262.0">50%</text><line class="grid" x1="188.0" x2="188.0" y1="14" y2="246"></line><text class="tick" text-anchor="middle" x="188.0" y="262.0">60%</text><line class="grid" x1="306.0" x2="306.0" y1="14" y2="246"></line><text class="tick" text-anchor="middle" x="306.0" y="262.0">70%</text><line class="grid" x1="424.0" x2="424.0" y1="14" y2="246"></line><text class="tick" text-anchor="middle" x="424.0" y="262.0">80%</text><line class="grid" x1="542.0" x2="542.0" y1="14" y2="246"></line><text class="tick" text-anchor="middle" x="542.0" y="262.0">90%</text><line class="grid" x1="660.0" x2="660.0" y1="14" y2="246"></line><text class="tick" text-anchor="middle" x="660.0" y="262.0">100%</text><text class="lab m" text-anchor="middle" x="365.0" y="278.0">Probability that k labelled decisions give the correct direction</text><line class="grid" x1="70" x2="660" y1="52.0" y2="52.0"></line><text class="lab" text-anchor="end" x="58.0" y="56.0">k = 10</text><g class="pt g-cal" data-tip="Calibrated, run 2, round 2
+probability that fixes minus breaks in the sample has the same sign as fixes minus breaks in all the changed
+decisions. The 18 rounds of all the runs gave these results with k = 20. The probability was at least 81% in 17
+rounds, and 98% or more in 9 rounds. The exception was round 2 of the calibrated judge's run 2. It fixed 45 decisions
+and broke 37. For a net change of +8 in 86 changed decisions, it is difficult to get the correct sign from a sample.
+With 20 labels, the sign is correct 64% of the time. With 30 labels, it is correct 70% of the time. With k = 30, each
+other round was 91% or more.</p>
+<figure class="fig fig-labels" id="figure-5"><div class="legend"><span class="k"><svg aria-hidden="true" class="sw-svg g-key" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>Answer key (J = 1)</span><span class="k"><svg aria-hidden="true" class="sw-svg g-cal" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>Calibrated</span><span class="k"><svg aria-hidden="true" class="sw-svg g-len" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>Lenient</span><span class="k"><svg aria-hidden="true" class="sw-svg g-weak" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>Weak</span></div><div class="chart"><svg aria-label="Chance that k labelled changed decisions get the direction right, per round" role="img" viewbox="0 0 680 282"><line class="grid" x1="70.0" x2="70.0" y1="14" y2="246"></line><text class="tick" text-anchor="middle" x="70.0" y="262.0">50%</text><line class="grid" x1="188.0" x2="188.0" y1="14" y2="246"></line><text class="tick" text-anchor="middle" x="188.0" y="262.0">60%</text><line class="grid" x1="306.0" x2="306.0" y1="14" y2="246"></line><text class="tick" text-anchor="middle" x="306.0" y="262.0">70%</text><line class="grid" x1="424.0" x2="424.0" y1="14" y2="246"></line><text class="tick" text-anchor="middle" x="424.0" y="262.0">80%</text><line class="grid" x1="542.0" x2="542.0" y1="14" y2="246"></line><text class="tick" text-anchor="middle" x="542.0" y="262.0">90%</text><line class="grid" x1="660.0" x2="660.0" y1="14" y2="246"></line><text class="tick" text-anchor="middle" x="660.0" y="262.0">100%</text><text class="lab m" text-anchor="middle" x="365.0" y="278.0">Probability that k labelled decisions give the correct direction</text><line class="grid" x1="70" x2="660" y1="52.0" y2="52.0"></line><text class="lab" text-anchor="end" x="58.0" y="56.0">k = 10</text><g class="pt g-cal" data-tip="Calibrated, run 2, round 2
 54.0% with k = 10
 true net change +8 in 86 changed decisions" tabindex="0"><circle class="hit" cx="117.4" cy="52.0" r="11"></circle><circle class="mark filled" cx="117.4" cy="52.0" r="5"></circle></g><g class="pt g-cal" data-tip="Calibrated, run 1, round 3
 64.5% with k = 10
@@ -982,47 +1001,206 @@ true net change −58 in 94 changed decisions" tabindex="0"><circle class="hit" 
 100.0% with k = 30
 true net change +40 in 44 changed decisions" tabindex="0"><circle class="hit" cx="660.0" cy="231.0" r="11"></circle><circle class="mark filled" cx="660.0" cy="231.0" r="5"></circle></g><g class="pt g-weak" data-tip="Weak, round 2
 100.0% with k = 30
-true net change −32 in 57 changed decisions" tabindex="0"><circle class="hit" cx="660.0" cy="231.0" r="11"></circle><circle class="mark filled" cx="660.0" cy="231.0" r="5"></circle></g></svg></div><figcaption><b>Fig 9</b> For each of the 18 rounds: the probability that k changed decisions, selected at random and labelled by a person, give the same direction as the true net change. These are exact probabilities. The one difficult round had a net change near zero.</figcaption><details class="data"><summary>Show the data</summary><div class="table-wrap"><table><thead><tr><th>Climb</th><th>Round</th><th>Changed decisions</th><th>True net change</th><th>k = 10</th><th>k = 20</th><th>k = 30</th></tr></thead><tbody><tr><td>Answer key</td><td>round 1</td><td class="n">63</td><td class="n">+23</td><td class="n">89.6%</td><td class="n">98.4%</td><td class="n">99.9%</td></tr><tr><td>Answer key</td><td>round 2</td><td class="n">97</td><td class="n">+27</td><td class="n">73.7%</td><td class="n">88.3%</td><td class="n">95.3%</td></tr><tr><td>Answer key</td><td>round 3</td><td class="n">44</td><td class="n">+40</td><td class="n">100.0%</td><td class="n">100.0%</td><td class="n">100.0%</td></tr><tr><td>Calibrated, run 1</td><td>round 1</td><td class="n">54</td><td class="n">+20</td><td class="n">90.8%</td><td class="n">99.0%</td><td class="n">100.0%</td></tr><tr><td>Calibrated, run 1</td><td>round 2</td><td class="n">69</td><td class="n">−26</td><td class="n">87.7%</td><td class="n">97.8%</td><td class="n">99.8%</td></tr><tr><td>Calibrated, run 1</td><td>round 3</td><td class="n">50</td><td class="n">+10</td><td class="n">64.5%</td><td class="n">81.2%</td><td class="n">93.1%</td></tr><tr><td>Calibrated, run 2</td><td>round 1</td><td class="n">61</td><td class="n">+19</td><td class="n">85.0%</td><td class="n">96.3%</td><td class="n">99.6%</td></tr><tr><td>Calibrated, run 2</td><td>round 2</td><td class="n">86</td><td class="n">+8</td><td class="n">54.0%</td><td class="n">63.7%</td><td class="n">70.2%</td></tr><tr><td>Calibrated, run 3</td><td>round 1</td><td class="n">58</td><td class="n">+24</td><td class="n">93.4%</td><td class="n">99.5%</td><td class="n">100.0%</td></tr><tr><td>Calibrated, run 3</td><td>round 2</td><td class="n">71</td><td class="n">+17</td><td class="n">69.3%</td><td class="n">84.8%</td><td class="n">93.7%</td></tr><tr><td>Lenient, run 1</td><td>round 1</td><td class="n">69</td><td class="n">+13</td><td class="n">70.0%</td><td class="n">82.9%</td><td class="n">91.5%</td></tr><tr><td>Lenient, run 1</td><td>round 2</td><td class="n">56</td><td class="n">+26</td><td class="n">96.2%</td><td class="n">99.9%</td><td class="n">100.0%</td></tr><tr><td>Lenient, run 2</td><td>round 1</td><td class="n">64</td><td class="n">+12</td><td class="n">70.1%</td><td class="n">83.3%</td><td class="n">92.2%</td></tr><tr><td>Lenient, run 2</td><td>round 2</td><td class="n">59</td><td class="n">+29</td><td class="n">97.1%</td><td class="n">99.9%</td><td class="n">100.0%</td></tr><tr><td>Lenient, run 3</td><td>round 1</td><td class="n">66</td><td class="n">+18</td><td class="n">80.5%</td><td class="n">93.2%</td><td class="n">98.4%</td></tr><tr><td>Lenient, run 3</td><td>round 2</td><td class="n">76</td><td class="n">+34</td><td class="n">94.7%</td><td class="n">99.6%</td><td class="n">100.0%</td></tr><tr><td>Weak</td><td>round 1</td><td class="n">94</td><td class="n">−58</td><td class="n">99.5%</td><td class="n">100.0%</td><td class="n">100.0%</td></tr><tr><td>Weak</td><td>round 2</td><td class="n">57</td><td class="n">−32</td><td class="n">99.5%</td><td class="n">100.0%</td><td class="n">100.0%</td></tr></tbody></table></div></details></figure>
+true net change −32 in 57 changed decisions" tabindex="0"><circle class="hit" cx="660.0" cy="231.0" r="11"></circle><circle class="mark filled" cx="660.0" cy="231.0" r="5"></circle></g></svg></div><figcaption><b>Fig 5</b> For each of the 18 rounds: the probability that k changed decisions, selected at random and labelled by a person, give the same direction as the true net change. These are exact probabilities. The one difficult round had a net change near zero.</figcaption><details class="data"><summary>Show the data</summary><div class="table-wrap"><table><thead><tr><th>Climb</th><th>Round</th><th>Changed decisions</th><th>True net change</th><th>k = 10</th><th>k = 20</th><th>k = 30</th></tr></thead><tbody><tr><td>Answer key</td><td>round 1</td><td class="n">63</td><td class="n">+23</td><td class="n">89.6%</td><td class="n">98.4%</td><td class="n">99.9%</td></tr><tr><td>Answer key</td><td>round 2</td><td class="n">97</td><td class="n">+27</td><td class="n">73.7%</td><td class="n">88.3%</td><td class="n">95.3%</td></tr><tr><td>Answer key</td><td>round 3</td><td class="n">44</td><td class="n">+40</td><td class="n">100.0%</td><td class="n">100.0%</td><td class="n">100.0%</td></tr><tr><td>Calibrated, run 1</td><td>round 1</td><td class="n">54</td><td class="n">+20</td><td class="n">90.8%</td><td class="n">99.0%</td><td class="n">100.0%</td></tr><tr><td>Calibrated, run 1</td><td>round 2</td><td class="n">69</td><td class="n">−26</td><td class="n">87.7%</td><td class="n">97.8%</td><td class="n">99.8%</td></tr><tr><td>Calibrated, run 1</td><td>round 3</td><td class="n">50</td><td class="n">+10</td><td class="n">64.5%</td><td class="n">81.2%</td><td class="n">93.1%</td></tr><tr><td>Calibrated, run 2</td><td>round 1</td><td class="n">61</td><td class="n">+19</td><td class="n">85.0%</td><td class="n">96.3%</td><td class="n">99.6%</td></tr><tr><td>Calibrated, run 2</td><td>round 2</td><td class="n">86</td><td class="n">+8</td><td class="n">54.0%</td><td class="n">63.7%</td><td class="n">70.2%</td></tr><tr><td>Calibrated, run 3</td><td>round 1</td><td class="n">58</td><td class="n">+24</td><td class="n">93.4%</td><td class="n">99.5%</td><td class="n">100.0%</td></tr><tr><td>Calibrated, run 3</td><td>round 2</td><td class="n">71</td><td class="n">+17</td><td class="n">69.3%</td><td class="n">84.8%</td><td class="n">93.7%</td></tr><tr><td>Lenient, run 1</td><td>round 1</td><td class="n">69</td><td class="n">+13</td><td class="n">70.0%</td><td class="n">82.9%</td><td class="n">91.5%</td></tr><tr><td>Lenient, run 1</td><td>round 2</td><td class="n">56</td><td class="n">+26</td><td class="n">96.2%</td><td class="n">99.9%</td><td class="n">100.0%</td></tr><tr><td>Lenient, run 2</td><td>round 1</td><td class="n">64</td><td class="n">+12</td><td class="n">70.1%</td><td class="n">83.3%</td><td class="n">92.2%</td></tr><tr><td>Lenient, run 2</td><td>round 2</td><td class="n">59</td><td class="n">+29</td><td class="n">97.1%</td><td class="n">99.9%</td><td class="n">100.0%</td></tr><tr><td>Lenient, run 3</td><td>round 1</td><td class="n">66</td><td class="n">+18</td><td class="n">80.5%</td><td class="n">93.2%</td><td class="n">98.4%</td></tr><tr><td>Lenient, run 3</td><td>round 2</td><td class="n">76</td><td class="n">+34</td><td class="n">94.7%</td><td class="n">99.6%</td><td class="n">100.0%</td></tr><tr><td>Weak</td><td>round 1</td><td class="n">94</td><td class="n">−58</td><td class="n">99.5%</td><td class="n">100.0%</td><td class="n">100.0%</td></tr><tr><td>Weak</td><td>round 2</td><td class="n">57</td><td class="n">−32</td><td class="n">99.5%</td><td class="n">100.0%</td><td class="n">100.0%</td></tr></tbody></table></div></details></figure>
+<p>These rounds come from one task. Thus they show that the method can work, not that 20 labels are sufficient in
+general. For this task, a review of 20 decisions takes a few minutes. The same labels show where J on fixes and J on
+breaks are different. With these labels, you can detect the incorrect reverts of the lenient judge. You can also
+detect that the calibrated judge showed only a small decrease in round 2 of run 1.</p>
+<p><strong>Extension to the primer (rule 4):</strong> in a hill climb, label a small sample of the changed outputs in each round. This
+is retrospective evidence from the completed climbs. It is not yet a tested procedure for a running loop.</p>
+<h3 id="rule-5">Rule 5 holds only if the change does not alter the kind of output</h3>
+<p>The primer says that a comparison of two versions with the same judge, on the same kind of data, is more reliable
+than one pass rate. The reason is that the judge's errors affect both versions in almost the same way. Each keep or
+revert choice is such a comparison.</p>
+<p>But a change in a hill climb usually changes the kind of data. It changes which kinds of output the agent gives, on
+the same tickets. Thus the condition of the rule is not true, and the judge's errors do not affect both versions in
+the same way. The two judges show this in opposite directions.</p>
+<p><strong>The lenient judge did not detect a true improvement.</strong> On the decisions that the two rounds of its first run fixed,
+its J was 0.00. Round 2 applied the $500 refund limit to every refund, as the policy requires. The change fixed 36
+decisions and broke 10. For 7 of the 10 broken decisions, the judge's verdict changed from pass to fail. But for the
+36 fixed decisions, the number of passes did not increase:</p>
+<ul>
+<li>4 changed from fail to pass.</li>
+<li>4 changed from pass to fail.</li>
+<li>5 passed before and after, because the judge already passed the old incorrect decision.</li>
+<li>23 failed before and after.</li>
+</ul>
+<p>The last group is the main cause. Most of these decisions are the correct escalations that the rule 3 section
+describes. After the change, the judge failed 27 of the fixed decisions. Of these 27, 26 are those escalations.</p>
+<p>Thus the change was a true improvement, but the judge showed it as a loss. The loop reverted it, which is correct by
+the loop's rule. Round 1 tried the same fix. In round 1 also, the number of passes did not increase for the 36 fixed
+decisions.</p>
+<figure class="fig fig-waffle" id="figure-6"><div class="legend"><span class="k"><span aria-hidden="true" class="sw w-good"></span>judge changed in the correct direction</span><span class="k"><span aria-hidden="true" class="sw w-pp"></span>judge passed it before and after</span><span class="k"><span aria-hidden="true" class="sw w-ff"></span>judge failed it before and after</span><span class="k"><span aria-hidden="true" class="sw w-bad"></span>judge changed in the incorrect direction</span></div><div class="wpanels"><div class="wpanel"><div class="wtitle">36 decisions that the change truly fixed</div><div class="waffle"><span class="cell w-good" data-tip="Fixed decision: the judge changed from fail to pass" tabindex="0"></span><span class="cell w-good" data-tip="Fixed decision: the judge changed from fail to pass" tabindex="0"></span><span class="cell w-good" data-tip="Fixed decision: the judge changed from fail to pass" tabindex="0"></span><span class="cell w-good" data-tip="Fixed decision: the judge changed from fail to pass" tabindex="0"></span><span class="cell w-pp" data-tip="Fixed decision: the judge passed before and after" tabindex="0"></span><span class="cell w-pp" data-tip="Fixed decision: the judge passed before and after" tabindex="0"></span><span class="cell w-pp" data-tip="Fixed decision: the judge passed before and after" tabindex="0"></span><span class="cell w-pp" data-tip="Fixed decision: the judge passed before and after" tabindex="0"></span><span class="cell w-pp" data-tip="Fixed decision: the judge passed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Fixed decision: the judge failed before and after" tabindex="0"></span><span class="cell w-bad" data-tip="Fixed decision: the judge changed from pass to fail" tabindex="0"></span><span class="cell w-bad" data-tip="Fixed decision: the judge changed from pass to fail" tabindex="0"></span><span class="cell w-bad" data-tip="Fixed decision: the judge changed from pass to fail" tabindex="0"></span><span class="cell w-bad" data-tip="Fixed decision: the judge changed from pass to fail" tabindex="0"></span></div><div class="wcounts">4 changed from fail to pass · 5 passed before and after · 23 failed before and after · 4 changed from pass to fail</div></div><div class="wpanel"><div class="wtitle">10 decisions that it truly broke</div><div class="waffle"><span class="cell w-good" data-tip="Broken decision: the judge changed from pass to fail" tabindex="0"></span><span class="cell w-good" data-tip="Broken decision: the judge changed from pass to fail" tabindex="0"></span><span class="cell w-good" data-tip="Broken decision: the judge changed from pass to fail" tabindex="0"></span><span class="cell w-good" data-tip="Broken decision: the judge changed from pass to fail" tabindex="0"></span><span class="cell w-good" data-tip="Broken decision: the judge changed from pass to fail" tabindex="0"></span><span class="cell w-good" data-tip="Broken decision: the judge changed from pass to fail" tabindex="0"></span><span class="cell w-good" data-tip="Broken decision: the judge changed from pass to fail" tabindex="0"></span><span class="cell w-pp" data-tip="Broken decision: the judge passed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Broken decision: the judge failed before and after" tabindex="0"></span><span class="cell w-ff" data-tip="Broken decision: the judge failed before and after" tabindex="0"></span></div><div class="wcounts">7 changed from pass to fail · 1 passed before and after · 2 failed before and after</div></div></div><figcaption><b>Fig 6</b> The lenient judge, run 1, round 2. Each square is a train or validation decision that the change truly fixed or broke. The color shows what the judge did. For the fixed decisions, the judge changed 4 from fail to pass and 4 from pass to fail. Thus the fixes gave no net increase. Most of the fixed decisions that the judge failed before and after are correct escalations, which this judge fails.</figcaption></figure>
+<p>The repeat runs gave the same result. In all six lenient rounds of the three runs, the change applied the $500 limit
+to the out-of-stock refund. Each time, the over-$500 out-of-stock tickets alone increased the holdout pass rate by 2.5
+points. The calibrated judge kept the same fix in round 1 of all three of its runs. In all six lenient rounds, J on
+fixes was between −0.08 and 0.00. The judge showed a validation decrease of 2.5 to 4.6 points, and each interval
+excluded zero. The loop reverted each change. All six changes truly fixed more decisions than they broke. If you
+apply the same keep rule to answer-key grades, it keeps five of them. Each run had one best reverted round. The trial
+versions of these rounds had a true holdout pass rate higher than the baseline by 5.0, 3.8 and 9.1 points.</p>
+<p>Each run then stopped in the same way. The analyzer read the history. It saw two rounds that tried to apply the $500
+limit, and the judge showed both rounds as losses. Thus the analyzer proposed no change. Run 1's analyzer described
+the over-limit refunds as a behavior "that two artifact rounds already failed to move." Run 3's analyzer said that the
+same behavior "has already resisted both in-scope levers." But on the over-$500 out-of-stock tickets, the fix worked
+each time. The judge's error became the analyzer's conclusion about the agent. In this study, the analyzer did not see
+the transcripts of the reverted rounds. This possibly contributed to its conclusion.</p>
+<p>Two different problems hid the fixes, and each problem needs a different repair. First, a low TNR on the old
+incorrect decisions means that the judge already passed them. Thus a fix gives no increase. Second, a low TPR on the
+new correct decisions means that the judge fails them. Thus a fix can even decrease the pass rate. The judge's average
+does not show these problems.</p>
+<p><strong>The calibrated judge counted breaks as fixes.</strong> Its first climb reported a gain of +4.6 points on validation. The
+true gain was +4.2 points on validation and +5.0 points on holdout. In that run, its J on breaks was much lower than
+its overall J: 0.50, 0.41 and 0.10 in the three rounds. Most of the breaks that it did not detect were on the open
+tickets.</p>
+<p>In round 3, the analyzer read the judge's verdicts. Then it wrote the judge's reading into the agent's instructions.
+The instructions use the numbers of the policy rules.
+The new instructions said: "Rule 3 applies to every ticket on it, including damaged or wrong-item reports and tickets
+that only ask for a status update: reship if stock is above 0, otherwise refund." The change broke 20 decisions. For
+the 11 ordinary breaks, the judge's verdict changed from pass to fail. For the 9 breaks on the open tickets, it changed
+from fail to pass, as for a fix. Round 2 did the same with more tickets. Of its 46 breaks, 10 were on the open
+tickets, and the judge's verdict on them changed from fail to pass.</p>
+<p>The repeat runs gave the same result. Each run kept the $500 fix in round 1. Then each run kept a change that applied
+policy rule 3 to the open tickets. Run 2's instructions had a new rule for shipped orders more than 14 days old. The rule
+said: "rule 3, whatever the ticket reports, including damage, a wrong item or only a request for an update." Run 3's
+instructions said: "reship if stock is above 0, otherwise refund, even when the ticket reports a damaged or wrong
+item." In the seven calibrated rounds of the three runs, changes broke 43 decisions on the open tickets. For all 43,
+the judge's verdict changed from fail to pass, as for a fix. For 105 of the other 127 breaks, it changed from pass to
+fail.</p>
+<figure class="fig fig-breaks" id="figure-7"><div class="legend"><span class="k"><span aria-hidden="true" class="sw w-good"></span>pass to fail</span><span class="k"><span aria-hidden="true" class="sw w-ff"></span>no change in the verdict</span><span class="k"><span aria-hidden="true" class="sw w-bad2"></span>fail to pass, other tickets</span><span class="k"><span aria-hidden="true" class="sw w-bad"></span>fail to pass, open tickets</span></div><div class="chart"><svg aria-label="Broken decisions per calibrated round, by what the judge did" role="img" viewbox="0 0 680 280"><line class="axis" x1="176.0" x2="176.0" y1="6" y2="244"></line><text class="tick" text-anchor="middle" x="176.0" y="260.0">0</text><line class="grid" x1="262.8" x2="262.8" y1="6" y2="244"></line><text class="tick" text-anchor="middle" x="262.8" y="260.0">10</text><line class="grid" x1="349.6" x2="349.6" y1="6" y2="244"></line><text class="tick" text-anchor="middle" x="349.6" y="260.0">20</text><line class="grid" x1="436.4" x2="436.4" y1="6" y2="244"></line><text class="tick" text-anchor="middle" x="436.4" y="260.0">30</text><line class="grid" x1="523.2" x2="523.2" y1="6" y2="244"></line><text class="tick" text-anchor="middle" x="523.2" y="260.0">40</text><line class="grid" x1="610.0" x2="610.0" y1="6" y2="244"></line><text class="tick" text-anchor="middle" x="610.0" y="260.0">50</text><text class="lab m" text-anchor="middle" x="393.0" y="276.0">Train and validation decisions that the change truly broke</text><text class="lab" text-anchor="end" x="164.0" y="25.0">Run 1, round 1 (kept)</text><rect class="seg w-good" data-tip="Run 1, round 1
+8 broken decisions: the judge changed it from pass to fail" height="18" tabindex="0" width="67.4" x="176.0" y="12.0"></rect><rect class="seg w-ff" data-tip="Run 1, round 1
+2 broken decisions: the verdict of the judge did not change" height="18" tabindex="0" width="15.4" x="245.4" y="12.0"></rect><rect class="seg w-bad" data-tip="Run 1, round 1
+2 broken decisions: the judge changed it from fail to pass (open tickets)" height="18" tabindex="0" width="15.4" x="262.8" y="12.0"></rect><text class="lab m" text-anchor="start" x="286.2" y="25.0">12</text><text class="lab" text-anchor="end" x="164.0" y="55.0">Run 1, round 2 (reverted)</text><rect class="seg w-good" data-tip="Run 1, round 2
+30 broken decisions: the judge changed it from pass to fail" height="18" tabindex="0" width="258.4" x="176.0" y="42.0"></rect><rect class="seg w-ff" data-tip="Run 1, round 2
+5 broken decisions: the verdict of the judge did not change" height="18" tabindex="0" width="41.4" x="436.4" y="42.0"></rect><rect class="seg w-bad2" data-tip="Run 1, round 2
+1 broken decisions: the judge changed it from fail to pass (other tickets)" height="18" tabindex="0" width="6.7" x="479.8" y="42.0"></rect><rect class="seg w-bad" data-tip="Run 1, round 2
+10 broken decisions: the judge changed it from fail to pass (open tickets)" height="18" tabindex="0" width="84.8" x="488.5" y="42.0"></rect><text class="inlab" text-anchor="middle" x="530.9" y="55.5">10</text><text class="lab m" text-anchor="start" x="581.3" y="55.0">46</text><text class="lab" text-anchor="end" x="164.0" y="85.0">Run 1, round 3 (kept)</text><rect class="seg w-good" data-tip="Run 1, round 3
+11 broken decisions: the judge changed it from pass to fail" height="18" tabindex="0" width="93.5" x="176.0" y="72.0"></rect><rect class="seg w-bad" data-tip="Run 1, round 3
+9 broken decisions: the judge changed it from fail to pass (open tickets)" height="18" tabindex="0" width="76.1" x="271.5" y="72.0"></rect><text class="inlab" text-anchor="middle" x="309.5" y="85.5">9</text><text class="lab m" text-anchor="start" x="355.6" y="85.0">20</text><text class="lab" text-anchor="end" x="164.0" y="127.0">Run 2, round 1 (kept)</text><rect class="seg w-good" data-tip="Run 2, round 1
+11 broken decisions: the judge changed it from pass to fail" height="18" tabindex="0" width="93.5" x="176.0" y="114.0"></rect><rect class="seg w-ff" data-tip="Run 2, round 1
+3 broken decisions: the verdict of the judge did not change" height="18" tabindex="0" width="24.0" x="271.5" y="114.0"></rect><rect class="seg w-bad" data-tip="Run 2, round 1
+2 broken decisions: the judge changed it from fail to pass (open tickets)" height="18" tabindex="0" width="15.4" x="297.5" y="114.0"></rect><text class="lab m" text-anchor="start" x="320.9" y="127.0">16</text><text class="lab" text-anchor="end" x="164.0" y="157.0">Run 2, round 2 (kept)</text><rect class="seg w-good" data-tip="Run 2, round 2
+21 broken decisions: the judge changed it from pass to fail" height="18" tabindex="0" width="180.3" x="176.0" y="144.0"></rect><rect class="seg w-ff" data-tip="Run 2, round 2
+2 broken decisions: the verdict of the judge did not change" height="18" tabindex="0" width="15.4" x="358.3" y="144.0"></rect><rect class="seg w-bad2" data-tip="Run 2, round 2
+4 broken decisions: the judge changed it from fail to pass (other tickets)" height="18" tabindex="0" width="32.7" x="375.6" y="144.0"></rect><rect class="seg w-bad" data-tip="Run 2, round 2
+10 broken decisions: the judge changed it from fail to pass (open tickets)" height="18" tabindex="0" width="84.8" x="410.4" y="144.0"></rect><text class="inlab" text-anchor="middle" x="452.8" y="157.5">10</text><text class="lab m" text-anchor="start" x="503.2" y="157.0">37</text><text class="lab" text-anchor="end" x="164.0" y="199.0">Run 3, round 1 (kept)</text><rect class="seg w-good" data-tip="Run 3, round 1
+10 broken decisions: the judge changed it from pass to fail" height="18" tabindex="0" width="84.8" x="176.0" y="186.0"></rect><rect class="seg w-ff" data-tip="Run 3, round 1
+1 broken decisions: the verdict of the judge did not change" height="18" tabindex="0" width="6.7" x="262.8" y="186.0"></rect><rect class="seg w-bad" data-tip="Run 3, round 1
+1 broken decisions: the judge changed it from fail to pass (open tickets)" height="18" tabindex="0" width="6.7" x="271.5" y="186.0"></rect><text class="lab m" text-anchor="start" x="286.2" y="199.0">12</text><text class="lab" text-anchor="end" x="164.0" y="229.0">Run 3, round 2 (kept)</text><rect class="seg w-good" data-tip="Run 3, round 2
+14 broken decisions: the judge changed it from pass to fail" height="18" tabindex="0" width="119.5" x="176.0" y="216.0"></rect><rect class="seg w-ff" data-tip="Run 3, round 2
+2 broken decisions: the verdict of the judge did not change" height="18" tabindex="0" width="15.4" x="297.5" y="216.0"></rect><rect class="seg w-bad2" data-tip="Run 3, round 2
+2 broken decisions: the judge changed it from fail to pass (other tickets)" height="18" tabindex="0" width="15.4" x="314.9" y="216.0"></rect><rect class="seg w-bad" data-tip="Run 3, round 2
+9 broken decisions: the judge changed it from fail to pass (open tickets)" height="18" tabindex="0" width="76.1" x="332.2" y="216.0"></rect><text class="inlab" text-anchor="middle" x="370.3" y="229.5">9</text><text class="lab m" text-anchor="start" x="416.4" y="229.0">27</text></svg></div><figcaption><b>Fig 7</b> Each decision that a change in the calibrated climbs truly broke, for each round of the three runs. The judge changed most ordinary breaks from pass to fail. It changed each break on the open tickets from fail to pass, as if it were a fix.</figcaption><details class="data"><summary>Show the data</summary><div class="table-wrap"><table><thead><tr><th>Run</th><th>Round</th><th>Loop's choice</th><th>Broken</th><th>Pass to fail</th><th>No change</th><th>Fail to pass, other</th><th>Fail to pass, open tickets</th></tr></thead><tbody><tr><td>Run 1</td><td>round 1</td><td>kept</td><td class="n">12</td><td class="n">8</td><td class="n">2</td><td class="n">0</td><td class="n">2</td></tr><tr><td>Run 1</td><td>round 2</td><td>reverted</td><td class="n">46</td><td class="n">30</td><td class="n">5</td><td class="n">1</td><td class="n">10</td></tr><tr><td>Run 1</td><td>round 3</td><td>kept</td><td class="n">20</td><td class="n">11</td><td class="n">0</td><td class="n">0</td><td class="n">9</td></tr><tr><td>Run 2</td><td>round 1</td><td>kept</td><td class="n">16</td><td class="n">11</td><td class="n">3</td><td class="n">0</td><td class="n">2</td></tr><tr><td>Run 2</td><td>round 2</td><td>kept</td><td class="n">37</td><td class="n">21</td><td class="n">2</td><td class="n">4</td><td class="n">10</td></tr><tr><td>Run 3</td><td>round 1</td><td>kept</td><td class="n">12</td><td class="n">10</td><td class="n">1</td><td class="n">0</td><td class="n">1</td></tr><tr><td>Run 3</td><td>round 2</td><td>kept</td><td class="n">27</td><td class="n">14</td><td class="n">2</td><td class="n">2</td><td class="n">9</td></tr></tbody></table></div></details></figure>
+<p>This is selection. The loop keeps the changes that the judge gives a higher pass rate. Thus the loop can move the
+agent toward the judge's reading where the judge and the answer key disagree. This is Goodhart's law (Wikipedia): when
+the judge's pass rate becomes the target, the loop optimizes the judge's opinion together with the agent's quality.</p>
+<p>This argument does not depend on which reading is correct. The loop decided an unclear part of the policy. It used
+the judge's reading, and it did not show this decision to a person. No number from the loop shows that it decided a
+policy question.</p>
+<p>This is the main finding of the study. <strong>A judge can be accurate on the baseline and still make incorrect keep or
+revert choices.</strong> The cause is the judge's accuracy on the outputs that each change affects, not its average accuracy.</p>
+<h3 id="rule-6">Rule 6 holds only with rates measured on the final version</h3>
+<p>The climb changed which mistakes the agent makes. Thus the judge's error rates on the baseline no longer describe the
+judge on the final version. On validation and holdout, the total number of incorrect decisions decreased, from 116 at
+baseline to 90, 84 and 74 at the final versions of runs 1, 2 and 3. But the answer key graded 2 decisions on the open
+tickets as incorrect at the baseline, and 14, 16 and 12 at the final versions. The judge passed each of them. At each
+final version, most of the judge's false passes were on this type of ticket. The counts were 14 of 14, 16 of 22 and
+12 of 12. Its TNR on the agent's decisions decreased from 0.94 at baseline to 0.84, 0.74 and 0.84. At baseline, it
+failed 109 of 116 incorrect decisions. At the final versions, it failed 76 of 90, 62 of 84 and 62 of 74.</p>
+<p>The two repetitions of a ticket are not independent. Thus I also counted only one repetition for each ticket. The
+judge failed 53 of 57 incorrect decisions at baseline. At the three final versions, it failed 38 of 45, 32 of 43 and
+33 of 39. When you examine each run separately, only the decrease in run 2 is unlikely to be chance. The p-values are
+0.02 for run 2, and 0.2 and 0.3 for runs 1 and 3. Three runs with the same baseline do not prove the result. But the
+decrease has the same direction and the same cause in each run.</p>
+<figure class="fig fig-drift" id="figure-8"><div class="chart"><svg aria-label="Incorrect decisions on the open tickets, and the fraction that the judge passed" role="img" viewbox="0 0 700 260"><text class="lab" text-anchor="start" x="36.0" y="14.0">Incorrect decisions on the open tickets</text><line class="axis" x1="44" x2="244" y1="226.0" y2="226.0"></line><text class="tick" text-anchor="end" x="38.0" y="230.0">0</text><line class="grid" x1="44" x2="244" y1="177.0" y2="177.0"></line><text class="tick" text-anchor="end" x="38.0" y="181.0">5</text><line class="grid" x1="44" x2="244" y1="128.0" y2="128.0"></line><text class="tick" text-anchor="end" x="38.0" y="132.0">10</text><line class="grid" x1="44" x2="244" y1="79.0" y2="79.0"></line><text class="tick" text-anchor="end" x="38.0" y="83.0">15</text><line class="grid" x1="44" x2="244" y1="30.0" y2="30.0"></line><text class="tick" text-anchor="end" x="38.0" y="34.0">20</text><text class="tick" text-anchor="middle" x="74.0" y="244.0">baseline</text><text class="tick" text-anchor="middle" x="224.0" y="244.0">final version</text><g class="g-cal"><line class="line" x1="74" x2="224" y1="206.4" y2="88.8"></line><g class="pt" data-tip="Calibrated, run 1
+Incorrect decisions on the open tickets: 2 at baseline, 14 at the final version" tabindex="0"><circle class="hit" cx="224" cy="88.8" r="12"></circle><circle class="mark filled" cx="224" cy="88.8" r="4.5"></circle></g></g><g class="g-cal"><line class="line" x1="74" x2="224" y1="206.4" y2="69.2"></line><g class="pt" data-tip="Calibrated, run 2
+Incorrect decisions on the open tickets: 2 at baseline, 16 at the final version" tabindex="0"><circle class="hit" cx="224" cy="69.2" r="12"></circle><circle class="mark filled" cx="224" cy="69.2" r="4.5"></circle></g></g><g class="g-cal"><line class="line" x1="74" x2="224" y1="206.4" y2="108.4"></line><g class="pt" data-tip="Calibrated, run 3
+Incorrect decisions on the open tickets: 2 at baseline, 12 at the final version" tabindex="0"><circle class="hit" cx="224" cy="108.4" r="12"></circle><circle class="mark filled" cx="224" cy="108.4" r="4.5"></circle></g></g><g class="g-cal"><circle class="mark filled" cx="74" cy="206.4" r="4.5"></circle></g><text class="lab m" text-anchor="end" x="64.0" y="210.4">2</text><text class="lab em" text-anchor="start" x="236.0" y="74.2">16 (run 2)</text><text class="lab em" text-anchor="start" x="236.0" y="93.8">14 (run 1)</text><text class="lab em" text-anchor="start" x="236.0" y="113.4">12 (run 3)</text><text class="lab" text-anchor="start" x="376.0" y="14.0">Incorrect decisions that the judge passed</text><line class="axis" x1="384" x2="584" y1="226.0" y2="226.0"></line><text class="tick" text-anchor="end" x="378.0" y="230.0">0%</text><line class="grid" x1="384" x2="584" y1="160.7" y2="160.7"></line><text class="tick" text-anchor="end" x="378.0" y="164.7">10%</text><line class="grid" x1="384" x2="584" y1="95.3" y2="95.3"></line><text class="tick" text-anchor="end" x="378.0" y="99.3">20%</text><line class="grid" x1="384" x2="584" y1="30.0" y2="30.0"></line><text class="tick" text-anchor="end" x="378.0" y="34.0">30%</text><text class="tick" text-anchor="middle" x="414.0" y="244.0">baseline</text><text class="tick" text-anchor="middle" x="564.0" y="244.0">final version</text><g class="g-cal"><line class="line" x1="414" x2="564" y1="186.6" y2="124.4"></line><g class="pt" data-tip="Calibrated, run 1
+Incorrect decisions that the judge passed: 6% at baseline, 16% at the final version" tabindex="0"><circle class="hit" cx="564" cy="124.4" r="12"></circle><circle class="mark filled" cx="564" cy="124.4" r="4.5"></circle></g></g><g class="g-cal"><line class="line" x1="414" x2="564" y1="186.6" y2="54.9"></line><g class="pt" data-tip="Calibrated, run 2
+Incorrect decisions that the judge passed: 6% at baseline, 26% at the final version" tabindex="0"><circle class="hit" cx="564" cy="54.9" r="12"></circle><circle class="mark filled" cx="564" cy="54.9" r="4.5"></circle></g></g><g class="g-cal"><line class="line" x1="414" x2="564" y1="186.6" y2="120.1"></line><g class="pt" data-tip="Calibrated, run 3
+Incorrect decisions that the judge passed: 6% at baseline, 16% at the final version" tabindex="0"><circle class="hit" cx="564" cy="120.1" r="12"></circle><circle class="mark filled" cx="564" cy="120.1" r="4.5"></circle></g></g><g class="g-cal"><circle class="mark filled" cx="414" cy="186.6" r="4.5"></circle></g><text class="lab m" text-anchor="end" x="404.0" y="190.6">6%</text><text class="lab em" text-anchor="start" x="576.0" y="59.9">26% (run 2)</text><text class="lab em" text-anchor="start" x="576.0" y="125.1">16% (runs 1 and 3)</text></svg></div><figcaption><b>Fig 8</b> Each calibrated climb changed the types of the agent's incorrect decisions, not only their number. The total decreased, from 116 to 90, 84 and 74. But more of them were on the open tickets, where this judge passes them. The data is the validation and holdout decisions. The fraction of all incorrect decisions that the judge passed (1 − TNR) increased in each run.</figcaption><details class="data"><summary>Show the data</summary><div class="table-wrap"><table><thead><tr><th>Measure</th><th>Baseline</th><th>Run 1</th><th>Run 2</th><th>Run 3</th></tr></thead><tbody><tr><td>Incorrect decisions on the open tickets</td><td class="n">2</td><td class="n">14</td><td class="n">16</td><td class="n">12</td></tr><tr><td>Incorrect decisions that the judge passed</td><td class="n">6%</td><td class="n">16%</td><td class="n">26%</td><td class="n">16%</td></tr></tbody></table></div></details></figure>
+<p>When I corrected the final pass rates with the baseline rates, the result was too high in all three runs. On holdout,
+the three calibrated final versions correct to 86.7%, 92.4% and 89.9%. The true values were 84.4%, 86.2% and 87.2%.
+The raw pass rates, 83.1%, 88.1% and 85.9%, were nearer to the true values each time.</p>
+<p>The primer already warns that the correction needs rates that are correct for the new outputs. A hill climb is a case
+where the rates change because of the optimization itself. The selection under rule 5 causes this change.</p>
+<p><strong>Extension to the primer (rules 4 and 6):</strong> after an optimization, measure TPR and TNR again on the final version
+before you correct or report its pass rate.</p>
+<h3 id="where-the-effects-come-from">Where the effects come from</h3>
+<p>The results show three sources of the effects. Each source has a different size.</p>
+<ul>
+<li><strong>The judge's error rates on the baseline.</strong> The order of the graders by J predicted the order of the outcomes. The
+  answer key improved the agent the most, the calibrated judge improved it less, and the lenient and weak judges kept
+  no change.</li>
+<li><strong>The decisions that each change affects.</strong> J on fixes and J on breaks were very different from the baseline J
+  (Fig 4). This source explains the specific incorrect choices: the lenient judge's reverts, and the calibrated
+  judge's larger reported gains.</li>
+<li><strong>The analyzer's proposals.</strong> The three runs of each judge had different proposals in different words. But each run
+  made the same kind of change. Each lenient round tried the $500 fix. Each calibrated run kept the $500 fix, and then
+  a change that applied policy rule 3 to the open tickets. Thus the analyzer changed the size of the results, but not their
+  direction.</li>
+</ul>
+<h2 id="procedure"><span class="num">6.</span> How to use TPR and TNR in a hill climb</h2>
+<p>The rules from Section 5 give a procedure with checks at three times. This study shows some of the steps. For other
+steps, the study gives support but not proof. I identify each type of step.</p>
+<figure class="fig fig-procedure" id="figure-9"><div class="proc"><div class="ph"><h4>Before the climb</h4><div class="step">Measure TPR, TNR and J<br/><span class="badge solid">Shown in this study</span></div><div class="step">Measure the judge for each type of output<br/><span class="badge solid">Shown in this study</span></div></div><div class="ph"><h4>During the climb</h4><div class="step">Label a sample of the changed outputs<br/><span class="badge outline">Supported by a check after the climbs, not tested in a loop</span></div><div class="step">If a change breaks the specification, examine the judge<br/><span class="badge dashed">A hypothesis from a small number of examples</span></div></div><div class="ph"><h4>After the climb</h4><div class="step">Measure the judge again on the final version<br/><span class="badge outline">The same result in three runs. Significant in only one</span></div></div></div><figcaption><b>Fig 9</b> The procedure in this section. Each tag shows how strongly this study supports the step.</figcaption></figure>
+<p><strong>Before the climb: measure TPR, TNR and J.</strong> <em>Shown in this study.</em> Label decisions from the baseline. Include at
+least approximately 30 incorrect decisions. Measure TPR and TNR with intervals. Do not use only an agreement check on a
+random sample, because it measures mostly TPR (rule 1). If J is not clearly more than zero, improve the judge or
+replace it (rule 2). More cases or runs do not help, because the judge's pass rate changes very little when the true
+quality changes. If J is clearly more than zero, divide the noise of a paired comparison by J. The result is
+approximately the smallest true gain that the loop can detect. Compare it with the improvement that you expect. <em>This
+value is an approximate rule</em> from the uniform-error model. It is not a guarantee, because the J that is important is
+the J on the outputs that a change affects.</p>
+<p><strong>Before the climb: measure the judge for each type of output.</strong> <em>Shown in this study.</em> A judge can be good on average
+and have J near zero on one type of output (rule 3). Often you cannot measure this on the baseline, because the app
+never gives the correct output there. Grade a correct output for each main branch of the specification. The lenient
+judge fails the correct escalation on 17 of 18 tickets. This check needs only a small number of labels, and it detects
+that problem. In this study, the loop used two rounds in each of three runs on a fix that the judge almost never
+passed.</p>
+<p><strong>During the climb: label a sample of the changed outputs.</strong> <em>Supported by a check after the climbs, not tested in a
+loop.</em> Each keep or revert choice depends only on the outputs that the change affects (rules 4 and 5). With 20
+labelled changed decisions, the probability of the correct direction was at least 81% in 17 of 18 rounds. Use these
+labels as well as the judge's pass rate when you keep or revert a change.</p>
 <p><strong>During the climb: if a change breaks the specification, examine the judge.</strong> <em>A hypothesis from a small number of
 examples.</em> The analyzer can propose a change that the specification does not allow. It can also decide a case that the
 specification leaves open. If the analyzer proposes such a change because of the grader's verdicts, examine the
-grader. This occurred at
-the start of both rounds of the weak judge. It also occurred in the rounds of each calibrated run that applied rule 3
-to the open tickets.</p>
+grader. This occurred at the start of both rounds of the weak judge. It also occurred in the rounds of each calibrated
+run that applied policy rule 3 to the open tickets.</p>
 <p><strong>After the climb: measure the judge again on the final version.</strong> <em>The same result in three runs. Significant in
-only one.</em> The judge's rates on the outputs of the final version can be different from its rates on the baseline. The cause is that
-the climb changed which mistakes the agent makes. The calibrated judge's TNR decreased in all three runs (Section 5). Measure TPR and TNR again
-on a labelled sample of the outputs of the final version. Include outputs that the judge passed. Report these rates
-with the gain.</p>
-<p>Do not correct the pass rate of the final version with the rates from the baseline. With those rates, the three
-calibrated final versions correct to 86.7%, 92.4% and 89.9% on holdout. The true values were 84.4%, 86.2% and 87.2%.
-The raw pass rates, 83.1%, 88.1% and 85.9%, were nearer to the true values each time. A correction needs rates that
-are correct for the data that it corrects.</p>
-<h2 id="limitations"><span class="num">8.</span> Limitations</h2>
+only one.</em> The judge's rates on the outputs of the final version can be different from its rates on the baseline
+(rule 6). The cause is that the climb changed which mistakes the agent makes. Measure TPR and TNR again on a labelled
+sample of the outputs of the final version. Include outputs that the judge passed. Report these rates with the gain.
+Do not correct the pass rate of the final version with the rates from the baseline.</p>
+<h2 id="limitations"><span class="num">7.</span> Limitations</h2>
 <ul>
 <li>I used one task, one agent and a policy written as code. This task is easy for a good grader. The answer-key climb
-  finished in three rounds.</li>
+  finished in three rounds. The study shows how these problems occur. It does not show how frequently they occur in
+  other tasks.</li>
 <li>The calibrated and lenient climbs ran three times each. The answer-key and weak climbs ran one time. The repeat runs
   have the same baseline, sets and judge verdicts. Thus only the analyzer's proposals, and the changes that the loop
   kept, can be different. Three runs show which results repeat, not how frequently they repeat.</li>
 <li>I calculated the judge verdicts one time for each ticket and action. Thus the judges had no run-to-run noise in the
   loop. Climbs in production have this noise in addition to the effects here.</li>
+<li>The judges graded each output alone, with pass or fail. The article recommends that, for a comparison with the
+  baseline, a judge sees both outputs in random order. This study did not test that setup.</li>
 <li>The lenient judge is an earlier judge from the refinement of the calibrated judge. I selected its threshold to make
   it lenient.</li>
 <li>The analyzer was a Claude Opus 5.5 subagent that followed the text of the guide. It was not the guide in Claude Code.
   In each round, it saw the transcripts of the current version. After a reverted round, the text of the guide gives
   the analyzer the transcripts of the reverted version. My analyzer did not get them. These transcripts possibly help
-  the analyzer detect that the lenient judge fails the correct escalations. Without them, all three lenient runs ended with the analyzer's conclusion that
-  the fix did not work.</li>
+  the analyzer detect that the lenient judge fails the correct escalations. Without them, all three lenient runs ended
+  with the analyzer's conclusion that the fix did not work.</li>
 <li>The analyzer for the answer-key climb saw the expected action for each case. No judge gives this information. Thus
   this climb shows an upper limit, and it is not directly comparable with the other climbs.</li>
-<li>The answer key gives one reading of the unclear part of the policy. The argument in Section 5 does not depend on which
-  reading is correct. The size of the TNR decrease in Section 5 does depend on it, because most of the new false passes
-  are on the open tickets. The loss in round 2 of the weak judge also depends on it.</li>
-<li>I measured J on fixes and J on breaks with the answer key. A climb in production does not have an answer key. The labelling
-  step in Section 7 estimates these values without it. I tested that step only after the climbs.</li>
+<li>The loop used the same validation set in each round. Thus a gain on validation is not an independent measure after
+  many rounds. The holdout set is, because the loop did not use it.</li>
+<li>The answer key gives one reading of the unclear part of the policy. The argument under rule 5 does not depend on
+  which reading is correct. The size of the TNR decrease under rule 6 does depend on it, because most of the new false
+  passes are on the open tickets. The loss in round 2 of the weak judge also depends on it.</li>
+<li>I measured J on fixes and J on breaks with the answer key. A climb in production does not have an answer key. The
+  labelling step in Section 6 estimates these values without it. I tested that step only after the climbs.</li>
 </ul>
-<h2 id="practice"><span class="num">9.</span> In practice</h2>
+<h2 id="practice"><span class="num">8.</span> In practice</h2>
 <ul>
 <li>Before a climb, measure the judge's TPR and TNR on labelled incorrect outputs. Do not use only a few dozen cases from
   production traffic. Grade a correct output for each type of case. If J = TPR + TNR − 1 is not clearly more than zero,
@@ -1032,19 +1210,23 @@ are correct for the data that it corrects.</p>
 <li>Measure the judge again on the final version before you report its gain.</li>
 <li>Measure the evaluator on the decisions that the optimization makes, not only on a fixed dataset.</li>
 </ul>
-<h2 id="next-study">Next study</h2>
-<p>The next study will test the steps in Section 7 in a running loop. It will run the same climbs again with these
-steps, and with the same agent, tickets and judges. It will examine three questions. Does a measurement before the
-climb find the lenient judge's problem? With labels in each round, does the loop keep a true improvement that the
-judge does not detect? Can the loop stop a change that decides a case that the specification leaves open?</p>
+<h2 id="next">Next study</h2>
+<p>The next study will test the steps in Section 6 in a running loop. It will run the same climbs again with these
+steps, and with the same agent, tickets and judges. It will examine these questions:</p>
+<ul>
+<li>Does a measurement before the climb find the lenient judge's problem?</li>
+<li>With labels in each round, does the loop keep a true improvement that the judge does not detect?</li>
+<li>Can the loop stop a change that decides a case that the specification leaves open?</li>
+<li>How many labels does each round need?</li>
+</ul>
 <h2 id="how-made">How this was made</h2>
 <p>I selected the question and the four graders. Claude (Opus 5.5) built the harness, ran the loop, wrote the analysis
 scripts and wrote the draft of this paper from their output. A separate Claude agent then checked each number in the
 findings against the raw data, and the paper includes its corrections. An external reviewer read the first draft, and
 the second draft follows that review. The reviewer recommended repeat runs as the most useful addition. I added them
 after the review, and a separate Claude agent checked their numbers in the same way. The fourth draft rewrites the
-text in ASD-STE100 Simplified Technical English. The judges, agent runs and analysis are in the repo. The <code>data</code>
-branch has the data for each run.</p>
+text in ASD-STE100 Simplified Technical English. The fifth draft sorts the results by the six rules of the primer. The
+judges, agent runs and analysis are in the repo. The <code>data</code> branch has the data for each run.</p>
 <h2 id="references">References</h2>
 <ul>
 <li>Anthropic. <code>claude-api</code> skill, <a href="https://github.com/anthropics/skills/tree/main/skills/claude-api"><code>shared/evals/eval-hillclimb.md</code></a>, commit <code>dbd4588</code>. 2026.</li>

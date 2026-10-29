@@ -46,6 +46,8 @@ or accepts, and why.
 
 **Terms.** On this page, a *grader* is anything that grades the agent's decisions. A *judge* is a grader that is an
 LLM. The *answer key* is a grader that is code. The article also uses the word *grader*, and in one place *evaluator*.
+On this page, "rule 1" to "rule 6" are the rules of the primer. The support policy also has numbered rules, and this
+page calls them "policy rule 1" to "policy rule 5".
 
 ## 2. Goals
 
@@ -187,7 +189,7 @@ Two examples show this. Each example occurred in all three runs.
   contributed to its conclusion.
 - **The calibrated judge disagreed with the answer key on one kind of ticket.** Its J on the baseline was 0.88. On
   this kind of ticket, a customer reports damage on an order that did not arrive. The policy text does not decide the
-  correct action. The judge passes the action of rule 3, and the answer key says reply. Thus this is a disagreement on
+  correct action. The judge passes the action of policy rule 3, and the answer key says reply. Thus this is a disagreement on
   an unclear case, not a clear judge error. The climbs broke 43 decisions on these tickets by the answer key's reading,
   and the judge counted all 43 as fixes.
 
@@ -269,7 +271,7 @@ The results show three sources of the effects. Each source has a different size.
   judge's larger reported gains.
 - **The analyzer's proposals.** The three runs of each judge had different proposals in different words. But each run
   made the same kind of change. Each lenient round tried the $500 fix. Each calibrated run kept the $500 fix, and then
-  a change that applied rule 3 to the open kind of ticket. Thus the analyzer changed the size of the results, but not
+  a change that applied policy rule 3 to the open kind of ticket. Thus the analyzer changed the size of the results, but not
   their direction.
 
 ## 6. What a team must measure

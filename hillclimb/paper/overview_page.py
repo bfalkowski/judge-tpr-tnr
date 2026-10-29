@@ -17,14 +17,7 @@ import build_page as bp  # noqa: E402
 SRC = (HERE / "overview.md").read_text()
 OUT = HERE / "overview.html"
 
-EXTRA_CSS = """
-  .chip { display: inline-block; font-size: 12.5px; font-weight: 600; line-height: 1.4; padding: 2px 8px;
-          border-radius: 6px; border: 1.5px solid; max-width: 100%; }
-  .chip.ok { color: var(--good); border-color: var(--good); background: color-mix(in srgb, var(--good) 12%, var(--bg)); }
-  .chip.mod { color: var(--accent); border-color: var(--accent); border-style: dashed; }
-  .chip.cond { color: var(--bad); border-color: var(--bad); }
-  h3 { font-size: 19px; font-weight: 700; margin: 30px 0 10px; text-wrap: balance; }
-"""
+EXTRA_CSS = ""  # the chip and h3 styles are in page.css
 
 
 def main():

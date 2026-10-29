@@ -441,7 +441,7 @@ def fig_drift():
 
 
 def fig_procedure():
-    sec = SRC.split("## 7.")[1].split("## 8.")[0]
+    sec = re.split(r"\n## \d+\. How to use TPR and TNR", SRC)[1].split("\n## ")[0]
     steps = re.findall(r"\*\*(Before|During|After) the climb: (.+?)\.\*\* \*(.+?)\*", sec, re.S)
     cols = {}
     for phase, step, ev in steps:
@@ -544,9 +544,9 @@ def build_body():
     return head, body
 
 
-SLUGS = {"The question": "question", "Setup": "setup", "Results of the climbs": "climbs", "A judge that passes": "lenient",
-         "The climb moves": "calibrated", "A judge with J near zero": "weak", "How to use TPR and TNR": "procedure",
-         "Limitations": "limitations", "In practice": "practice", "How this was made": "how-made", "References": "references"}
+SLUGS = {"The question": "question", "The six rules": "rules", "Setup": "setup", "Results of the climbs": "climbs",
+         "Results for each rule": "by-rule", "How to use TPR and TNR": "procedure", "Limitations": "limitations",
+         "In practice": "practice", "Next study": "next", "How this was made": "how-made", "References": "references"}
 
 
 def polish(body):
@@ -562,6 +562,9 @@ def polish(body):
             s.string = num + "."
             h.append(s)
         h.append((" " if num else "") + name)
+    for h in soup.find_all("h3"):  # "Rule 3 holds ..." gets the anchor #rule-3
+        m = re.match(r"Rule (\d)", h.get_text())
+        h["id"] = f"rule-{m.group(1)}" if m else re.sub(r"\W+", "-", h.get_text().lower()).strip("-")
     for p in soup.find_all("p"):  # formulas on their own line become equation blocks
         t = p.get_text().strip()
         only_strong = len(p.contents) == 1 and getattr(p.contents[0], "name", None) == "strong"
