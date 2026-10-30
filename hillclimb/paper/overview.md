@@ -6,7 +6,7 @@ Bryan Falkowski · October 2026 · Code and data: [github.com/bfalkowski/judge-t
 
 **Summary.** My primer, [Can You Trust Your Judge's Score?](https://bfalkowski.github.io/writing/judge-score.html),
 shows how to calibrate an LLM judge. You label a set of outputs, run the judge on them, and measure TPR and TNR. This
-study asks a second question: if a judge calibrates well, can it also control a hill climb?
+study asks a second question: if a judge has good TPR and TNR, can it also control a hill climb?
 
 Anthropic's article [Automating eval design and hillclimbing with
 Claude](https://claude.dev/blog/automating-eval-design-and-hillclimbing/) describes a hill-climbing loop. In each
@@ -16,13 +16,13 @@ sets of cases. When an LLM judge gives the pass rates, the judge decides which c
 I ran this loop on a support agent with three judges of known TPR and TNR. An answer key gave the correct output for
 every ticket. Thus I could see each mistake of each judge, in each round.
 
-**The result:** a judge can calibrate well on the baseline and still make bad choices in the loop. Each change
+**The result:** a judge can have good TPR and TNR on the baseline and still make bad choices in the loop. Each change
 affects only a small number of outputs. On those outputs, the judge can be much less accurate than its overall TPR and
 TNR show. One judge reverted a real fix six times. Another judge kept changes that moved the agent's mistakes to
 tickets where the judge does not see them.
 
 The six rules in Section 9 of the primer stay correct. But one calibration before the climb is not sufficient.
-Check the judge with labeled outputs three times: before the climb, in each round, and after the climb.
+Check the judge with labeled outputs at three points: before the climb, in each round, and after the climb.
 
 ## 1. Why I ran this study
 
@@ -30,12 +30,13 @@ The article says that grading errors are a common cause of a bad eval. It tells 
 you trust the grader. In its own example, one phase of the work was "fixing graders."
 
 My primer calibrates a judge on a fixed set of outputs. A hill climb is different. The outputs change in each round,
-and the judge's scores decide which changes stay. I wanted to know two things. Do the primer's rules still hold in
+and the judge's verdicts decide which changes stay. I wanted to know two things. Do the primer's rules still hold in
 this loop? And what more must you measure?
 
-**Terms.** I use the primer's terms where I can. A *judge* is an LLM that scores an output as pass or fail. The
-*answer key* is code that gives the correct output. To *calibrate* a judge is to label outputs, run the judge on them,
-and measure TPR and TNR. The article uses the word *grader* for a judge and for code that scores. The support policy
+**Terms.** I use the primer's terms where I can. A *judge* is an LLM that gives each output a *verdict*: pass or
+fail. The *answer key* is code that gives the correct output. In the tables, the answer key is listed with the judges,
+as a perfect judge. To *calibrate* a judge is to label outputs, run the judge on them, and measure TPR and TNR. The
+*baseline* is the agent before any change. The article uses the word *grader* for a judge and for code that scores. The support policy
 also has numbered rules. I call them "policy rule 1" to "policy rule 5." Plain "rule 1" to "rule 6" are the primer's
 rules.
 
@@ -52,7 +53,7 @@ the primer. The section numbers in the table refer to the primer.
 | **3.** TPR and TNR do not depend on the mix of good and bad outputs. Thus you can use them on new data. (Section 5) | The baseline TPR and TNR apply to each new version | <span class="chip cond">Holds, if TPR and TNR are the same for each kind of output</span> |
 | **4.** When the outputs change, label a new sample and check the judge again. (Section 8) | The outputs change in each round | <span class="chip mod">Holds; a climb needs it in each round</span> |
 | **5.** Compare two versions with the same judge, on the same kind of data. The judge's mistakes then affect both versions in almost the same way. (Section 7) | Each keep or revert choice compares two versions | <span class="chip cond">Holds, if the change keeps the same kinds of output</span> |
-| **6.** Correct the pass rate with TPR and TNR. If the judge's rates on new outputs drift, the corrected number is wrong. (Sections 5 and 8) | Correct the final pass rate with the baseline rates | <span class="chip cond">Holds; the climb itself moved the rates</span> |
+| **6.** Correct the pass rate with TPR and TNR. If the judge's rates on new outputs drift, the corrected number is off. (Sections 5 and 8) | Correct the final pass rate with the baseline rates | <span class="chip cond">Holds; the climb itself moved the rates</span> |
 
 ## 3. How the study worked
 
@@ -72,42 +73,41 @@ The agent ran each ticket two times. Thus each set has two outputs for each tick
 
 **The loop.** Each round has four steps:
 
-1. A new analyzer reads the train results. The analyzer is a Claude agent (Claude Opus 5.5) with file and shell
-   tools.
+1. A new analyzer reads the train results. The analyzer is a Claude Opus 5.5 subagent.
 2. It proposes one change.
-3. The agent runs all the tickets again, and the judge scores each output.
+3. The agent runs all the tickets again, and the judge gives each output a verdict.
 4. If the pass rate increases on train and on validation, the loop keeps the change. If not, it reverts the change.
 
 <!-- figure:loop -->
 
-**The judges.** I calibrated each judge on the 240 train outputs of the baseline, as in the primer. Of these outputs,
-46 were wrong.
+**The judges.** I calibrated each judge on the 240 baseline outputs of the train set, as in the primer. This is the
+agent's train set. The judges did not learn from it. Of these outputs, 46 were wrong.
 
 | Judge | What it is | TPR | TNR | J |
 |---|---|---|---|---|
 | answer key | the policy as code | 1.00 | 1.00 | 1.00 |
 | strong | Claude Haiku 4.5, with a prompt that I refined on labeled tickets | 0.95 | 0.93 | 0.88 |
-| lenient | an earlier version of the same judge, on Jev, with a low threshold | 0.95 | 0.65 | 0.61 |
+| lenient | an earlier version of the same judge, on Jev (a small decision model), with a low pass threshold | 0.95 | 0.65 | 0.61 |
 | weak | the judge from my run-validity paper, on Jev | 0.76 | 0.24 | 0.00 |
 
 A team can calibrate a judge before a climb. I calculated these numbers after the climbs, from the answer key, so the
 loop could not use them. Before the climbs, I had numbers only from my earlier judge study, on different tickets. For
-the strong and lenient judges, those numbers were similar to the numbers above. For the weak judge, J was 0.32 there.
+the strong and lenient judges, those numbers were similar to the numbers above. For the weak judge, J was 0.32 there. I call the J in the table the judge's *overall J*.
 
-**The climbs.** A climb is one full run of the loop. There were eight climbs, with 18 rounds in total. The strong and
+**The climbs.** A climb is one complete use of the loop, from the baseline to the final version. There were eight climbs, with 18 rounds in total. The strong and
 lenient judges each ran three climbs, because the analyzer can propose different changes each time. The answer key and
 the weak judge each ran one climb.
 
 **Where I am different from the article.** I kept the article's loop and its keep rule. I changed some details, so that
 the judge's mistakes are the only thing that changes between climbs:
 
-- The loop could change only the agent's instructions. The article also lets the loop change the model, the tools,
+- The loop could change only the agent's instructions and its descriptions of the four actions. The article also lets the loop change the model, the tools,
   the API settings and the code.
 - Each judge scored one output at a time, as pass or fail. When there is a baseline, the article recommends a judge
   that compares two outputs in random order.
 - I calculated the article's checks of the grader, but the loop did not fix the judge. The purpose was to see what the
   judge's mistakes do.
-- I scored each ticket and action one time, before the climbs. Thus the judges had no run-to-run noise.
+- I scored each ticket and action one time, before the climbs. Thus a judge always gave the same verdict to the same output.
 - After a reverted round, the analyzer did not see the transcripts of that round.
 - I added the holdout set, and the answer key scored every output of every version.
 
@@ -139,18 +139,19 @@ TNR showed the difference clearly: 0.93 for the strong judge and 0.65 for the le
 
 ### Rule 2 holds: a judge with J near zero cannot control the loop
 
-The weak judge had J = 0.00. Thus its scores gave almost no information about which outputs were correct. The analyzer
-could not know this. It found patterns in the scores and wrote them into the agent. For example, it told the agent to
-escalate when a customer asks for a supervisor. The policy does not allow that. Both of its changes made the agent
-worse. The loop reverted both, because the judge's own pass rate also decreased.
+The weak judge had J = 0.00. Thus its verdicts gave almost no information about which outputs were correct. The
+analyzer could not know this. It found patterns in the verdicts and wrote them into the agent. For example, it told the agent to
+escalate when a customer asks for a supervisor. The policy does not allow that. By the answer key, both of the
+analyzer's changes made the agent worse. Part of that loss is on tickets that the policy leaves unclear, so it
+depends on the answer key's reading. The loop reverted both changes, because the judge's own pass rate also decreased.
 
 ### Rule 3 holds only if TPR and TNR are the same for each kind of output
 
 TPR and TNR do not depend on the mix of good and bad outputs. That is still true. But they do depend on the kind of
 output, and a change affects only a few kinds. Thus the judge's accuracy on the outputs that a change affects can be
 far from its overall accuracy. Fig 2 shows J on fixes and J on breaks for each round. If TPR and TNR were the same for
-each kind of output, each round of a judge would be at one point on the diagonal: the judge's overall J. Only the
-answer key's rounds are at that point.
+each kind of output, each round of a judge would be at one point. That point is on the diagonal, at the judge's
+overall J. Only the answer key's rounds are at that point.
 
 <!-- figure:jscatter -->
 
@@ -185,7 +186,8 @@ this only on completed climbs, not in a running loop.
 
 ### Rule 5 holds only if the change keeps the same kinds of output
 
-The primer says that a comparison of two versions with the same judge is more reliable than one pass rate. The reason
+The primer says that a comparison of two versions with the same judge, on the same kind of data, is more reliable
+than one pass rate. The reason
 is that the judge's mistakes affect both versions in almost the same way. Each keep or revert choice is such a
 comparison.
 
@@ -193,28 +195,30 @@ But a change usually changes which kinds of output the agent gives on the same t
 not affect both versions in the same way:
 
 - **The lenient judge reverted a real fix.** Each lenient round tried the same fix: apply the $500 limit to
-  out-of-stock refunds. The fix changed wrong refunds into correct escalations. The judge fails the correct
-  escalation, so most fixes got no credit. The breaks still decreased the pass rate. The judge showed a decrease of 2.5
-  to 4.6 points in all six rounds. But each change fixed more outputs than it broke.
+  out-of-stock refunds. The fix changed wrong refunds into correct escalations. The judge's overall J was 0.61, but
+  on the outputs that the fix corrected, its J was 0 or less. The judge fails the correct escalation, so most fixes got
+  no credit. The breaks still decreased the pass rate. The judge showed a validation decrease of 2.5 to 4.6 points in
+  all six rounds. But each change fixed more outputs than it broke.
 - **The strong judge scored breaks as fixes.** In the seven rounds of its three climbs, changes broke 43 outputs on the unclear damage
-  tickets, by the answer key. The judge scored all 43 as fixes. Each strong climb kept such a change. Thus the
-  judge's gain on holdout was larger than the real gain in all three climbs: +6.6, +11.6 and +9.4 points, against a
+  tickets, by the answer key. The judge scored all 43 as fixes. Each strong climb kept such a change. In all three
+  climbs, the judge's gain on holdout was larger than the real gain: +6.6, +11.6 and +9.4 points, against a
   real +5.0, +6.9 and +7.8 points.
 
 <!-- figure:outcomes -->
 
-This is the main finding. **A judge can calibrate well on the baseline and still make wrong keep or revert choices.**
+This is the main finding. **A judge can have good TPR and TNR on the baseline and still make wrong keep or revert choices.**
 The judge's accuracy on the outputs that each change affects decides the choice. Its overall accuracy does not.
 
-**Added to the primer (rule 5):** a comparison with the same judge is reliable only if the change keeps the same kinds
+**Added to the primer (rule 5):** a comparison with the same judge is more reliable only if the change keeps the same kinds
 of output. If it does not, label a sample of the outputs that changed.
 
 ### Rule 6 holds, but the climb itself moved the rates
 
-The climb changed which mistakes the agent makes. On validation and holdout, the number of wrong outputs decreased
-from 116 to 90, 84 and 74. But on the unclear damage tickets, wrong outputs increased from 2 to 14, 16 and 12, and the
-judge passes them. Thus the judge's TNR decreased from 0.94 to 0.84, 0.74 and 0.84. The decrease has the same
-direction in all three climbs, but it is statistically significant only in the second climb.
+Each climb changed which mistakes the agent makes. In the three strong climbs, on validation and holdout, the number
+of wrong outputs decreased from 116 to 90, 84 and 74. But on the unclear damage tickets, wrong outputs increased from
+2 to 14, 16 and 12, and the strong judge passes them. Thus its TNR on validation and holdout decreased from 0.94 to
+0.84, 0.74 and 0.84. The decrease has the same direction in all three climbs, but it is statistically significant only
+in climb 2.
 
 <!-- figure:drift -->
 
@@ -222,8 +226,8 @@ I corrected the final pass rates with the baseline TPR and TNR. The result was t
 92.4% and 89.9%, against a real 84.4%, 86.2% and 87.2%. The raw pass rates were nearer to the real values.
 
 The primer already warns that the correction is wrong when the judge's rates drift. In a hill climb, the climb itself
-causes the drift. This is a form of Goodhart's law: when the judge's pass rate becomes the target, the loop moves the
-agent toward the judge's blind spots.
+causes the drift. This is a form of Goodhart's law: when the judge's pass rate becomes the target, the loop can move
+the agent toward the judge's blind spots.
 
 **Added to the primer (rule 4):** after a climb, calibrate the judge again on the final version. Do this before you
 correct or report its pass rate.
@@ -231,7 +235,7 @@ correct or report its pass rate.
 ### Where the effects come from
 
 - **The judge's overall J.** The order of the judges by J predicted the order of the results. The answer key improved
-  the agent the most, the strong judge less, and the lenient and weak judges kept no change.
+  the agent the most (holdout 79% to 100%), the strong judge less, and the lenient and weak judges kept no change.
 - **The outputs that each change affects.** J on fixes and J on breaks explain the specific wrong choices: the lenient
   judge's reverts, and the strong judge's gains that were too large.
 - **The analyzer.** The three climbs with each judge used different words, but they made the same kinds of change.
@@ -242,7 +246,7 @@ correct or report its pass rate.
 | When | What to do | Why |
 |---|---|---|
 | Before the climb | Calibrate the judge, as in the primer. Include at least 30 wrong outputs | A random sample is mostly correct outputs. It measures TPR, but not TNR |
-| Before the climb | Include a correct output for each important kind of case, also kinds that the app does not give yet | A judge can have J near zero on one kind of output |
+| Before the climb | Include a correct output for each important kind of output, also kinds that the app does not give yet | A judge can have J near zero on one kind of output |
 | In each round | Label a small sample of the outputs that the change affected | The keep or revert choice depends only on these outputs |
 | In each round | Examine each change that breaks the policy, or that decides a case the policy leaves open | The loop can move the app toward the judge's blind spots |
 | After the climb | Calibrate the judge again on the final version | The climb can change the judge's TPR and TNR |

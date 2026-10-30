@@ -48,7 +48,7 @@ def pct(x, d=0):
 
 
 def run_name(g, n):
-    return GNAME[g] + (f", run {n}" if g in REPEATED else "")
+    return GNAME[g] + (f", climb {n}" if g in REPEATED else "")
 
 
 def round_name(r):
@@ -133,7 +133,7 @@ def fig_glance():
     good_reverts = sum(1 for v in vis if v["decision"] == "revert" and v["true_change_rows"] > 0)
     tiles = [
         (f"{good_reverts} of {len(vis)}", "lenient rounds that the loop reverted, although each round fixed more outputs than it broke"),
-        (f"{oc} of {ob}", "outputs that the strong-judge climbs broke on unclear damage tickets, which the judge scored as fixes"),
+        (f"{oc} of {ob}", "outputs that the strong climbs broke on unclear damage tickets, which the judge scored as fixes"),
         (f"{pct(fp0)} → {100 * min(fpw):.0f}–{pct(max(fpw))}",
          "wrong outputs that the strong judge passed, before and after each climb"),
         (f"+{min(gains):.0f} to +{max(gains):.0f} points", "real gain on holdout in each of the three climbs with the strong judge"),
@@ -174,7 +174,7 @@ def fig_shrink():
         g.append(text(x(10) + 12, ly + 5, s, "lab em"))
     body = svg(W, H, "".join(g), "Lines of slope J for each judge: the change a judge shows against the real change")
     cap = ("If the TPR and TNR of a judge are the same for every kind of output, the judge shows each change at J times "
-           "its real size. Each line uses the J of one judge on the train outputs of the baseline. The climbs show where "
+           "its real size. Each line uses the overall J of one judge, or of the answer key. The climbs show where "
            "this simple picture is not correct.")
     return body, cap, table(["Judge", "TPR", "TNR", "J", "A real +10 points shows as"], rows)
 
@@ -186,7 +186,7 @@ def fig_loop():
              '<span class="ho" style="flex:160">Holdout · 160</span></div>')
     steps = [("Read", "A new analyzer reads the train transcripts and scores of the current version.", "Train"),
              ("Change", "It proposes one change to the decision instructions or to the action descriptions.", ""),
-             ("Run", "The agent runs each ticket two times. The judge of the climb scores each output.", ""),
+             ("Run", "The agent runs each ticket two times. The judge of the climb gives each output a verdict.", ""),
              ("Decide", "If the train and validation pass rates both increase, keep the change. If not, revert it.",
               "Train and validation")]
     flow = '<ol class="flow">' + "".join(
@@ -316,7 +316,7 @@ def fig_waffle():
     assert t["round"] == "v2"
     fx, bk = t["fixed"], t["broken"]
     cats = [("w-good", "judge changed in the correct direction"), ("w-pp", "judge passed it before and after"),
-            ("w-ff", "judge failed it before and after"), ("w-bad", "judge changed in the incorrect direction")]
+            ("w-ff", "judge failed it before and after"), ("w-bad", "judge changed in the wrong direction")]
     fixed = [("w-good", fx.get("0->1", 0)), ("w-pp", fx.get("1->1", 0)), ("w-ff", fx.get("0->0", 0)), ("w-bad", fx.get("1->0", 0))]
     broken = [("w-good", bk.get("1->0", 0)), ("w-pp", bk.get("1->1", 0)), ("w-ff", bk.get("0->0", 0)), ("w-bad", bk.get("0->1", 0))]
     what = {"w-good": ("changed from fail to pass", "changed from pass to fail"), "w-pp": ("passed before and after",) * 2,
@@ -334,7 +334,7 @@ def fig_waffle():
     body = (legend([(box_sw(c), l) for c, l in cats]) + '<div class="wpanels">'
             + panel("N outputs that the change really fixed", fixed, 0)
             + panel("N outputs that it really broke", broken, 1) + "</div>")
-    cap = ("The lenient judge, run 1, round 2. Each square is a train or validation output that the change really fixed "
+    cap = ("The lenient judge, climb 1, round 2. Each square is a train or validation output that the change really fixed "
            "or broke. The color shows what the judge did. For the fixed outputs, the judge changed 4 from fail to pass "
            "and 4 from pass to fail. Thus the fixes gave no net increase. Most of the fixed outputs that the judge "
            "failed before and after are correct escalations, which this judge fails.")
@@ -367,27 +367,27 @@ def fig_breaks():
     for i, (n, rnd, dec, segs, tot) in enumerate(rows):
         if i and n != rows[i - 1][0]:
             yy += gap
-        g.append(text(L - 12, yy + 4, f"Run {n}, {round_name(rnd)} ({'kept' if dec == 'keep' else 'reverted'})", "lab", "end"))
+        g.append(text(L - 12, yy + 4, f"Climb {n}, {round_name(rnd)} ({'kept' if dec == 'keep' else 'reverted'})", "lab", "end"))
         x0 = 0
         for c, k in segs:
             if not k:
                 continue
             xa, xb = x(x0), x(x0 + k) - 2
             g.append(f'<rect x="{xa:.1f}" y="{yy - bh / 2:.1f}" width="{max(xb - xa, 1):.1f}" height="{bh}" class="seg {c}"'
-                     f'{tip(f"Run {n}, {round_name(rnd)}", f"{k} broken outputs: {what[c]}")}/>')
+                     f'{tip(f"Climb {n}, {round_name(rnd)}", f"{k} broken outputs: {what[c]}")}/>')
             if c == "w-bad" and xb - xa >= 18:
                 g.append(text((xa + xb) / 2, yy + 4.5, str(k), "inlab", "middle"))
             x0 += k
         g.append(text(x(tot) + 6, yy + 4, f"{tot}", "lab m"))
-        data.append([f"Run {n}", round_name(rnd), "kept" if dec == "keep" else "reverted", tot] + [k for _, k in segs])
+        data.append([f"Climb {n}", round_name(rnd), "kept" if dec == "keep" else "reverted", tot] + [k for _, k in segs])
         yy += pitch
     lg = legend([(box_sw("w-good"), "pass to fail"), (box_sw("w-ff"), "no change in the verdict"),
                  (box_sw("w-bad2"), "fail to pass, other tickets"), (box_sw("w-bad"), "fail to pass, unclear damage tickets")])
-    body = lg + svg(W, H, "".join(g), "Broken outputs per strong-judge round, by what the judge did")
-    cap = ("Each output that a change in the strong-judge climbs really broke, for each round of the three climbs. The "
+    body = lg + svg(W, H, "".join(g), "Broken outputs per strong round, by what the judge did")
+    cap = ("Each output that a change in the strong climbs really broke, for each round of the three climbs. The "
            "judge changed most ordinary breaks from pass to fail. It changed each break on the unclear damage tickets "
            "from fail to pass, as for a fix.")
-    return body, cap, table(["Run", "Round", "Loop's choice", "Broken", "Pass to fail", "No change",
+    return body, cap, table(["Climb", "Round", "Loop's choice", "Broken", "Pass to fail", "No change",
                              "Fail to pass, other", "Fail to pass, unclear damage tickets"], data, num_from=3)
 
 
@@ -412,7 +412,7 @@ def fig_drift():
         g.append(text(xb, H - B + 18, "final version", "tick", "middle"))
         for i, w in enumerate(ws):
             g.append(f'<g class="g-cal"><line x1="{xa}" y1="{y(b):.1f}" x2="{xb}" y2="{y(w):.1f}" class="line"/>'
-                     f'<g class="pt"{tip(f"Strong, run {i + 1}", f"{title}: {fmt(b)} at baseline, {fmt(w)} at the final version")}>'
+                     f'<g class="pt"{tip(f"Strong, climb {i + 1}", f"{title}: {fmt(b)} at baseline, {fmt(w)} at the final version")}>'
                      f'<circle cx="{xb}" cy="{y(w):.1f}" r="12" class="hit"/>'
                      f'<circle cx="{xb}" cy="{y(w):.1f}" r="4.5" class="mark filled"/></g></g>')
         g.append(f'<g class="g-cal"><circle cx="{xa}" cy="{y(b):.1f}" r="4.5" class="mark filled"/></g>')
@@ -427,18 +427,18 @@ def fig_drift():
         for i in range(1, len(merged)):
             merged[i][0] = max(merged[i][0], merged[i - 1][0] + 15)
         for ly, s, runs in merged:
-            who = "run " + str(runs[0]) if len(runs) == 1 else "runs " + " and ".join(map(str, sorted(runs)))
+            who = "climb " + str(runs[0]) if len(runs) == 1 else "climbs " + " and ".join(map(str, sorted(runs)))
             g.append(text(xb + 12, ly + 5, f"{s} ({who})", "lab em"))
         data.append([title, fmt(b)] + [fmt(w) for w in ws])
     body = svg(W, H, "".join(g), "Wrong outputs on the unclear damage tickets, and the share that the judge passed")
     totals = [sum(c["mistakes"] for c in R["drift_by_category"][a][R["replicates"]["c3"][i]["winner"]].values())
               for i, a in enumerate(CAL_RUNS)]
     base_total = sum(c["mistakes"] for c in R["drift_by_category"]["c3"]["baseline"].values())
-    cap = (f"Each strong-judge climb changed the kinds of wrong output that the agent gave, not only their number. The "
+    cap = (f"Each strong climb changed the kinds of wrong output that the agent gave, not only their number. The "
            f"total decreased, from {base_total} to {', '.join(map(str, totals[:-1]))} and {totals[-1]}. But more of them "
            f"were on the unclear damage tickets, where this judge passes them. The data is the validation and holdout "
            f"outputs. The share of all wrong outputs that the judge passed (1 − TNR) increased in each climb.")
-    return body, cap, table(["Measure", "Baseline", "Run 1", "Run 2", "Run 3"], data)
+    return body, cap, table(["Measure", "Baseline", "Climb 1", "Climb 2", "Climb 3"], data)
 
 
 def fig_procedure():
