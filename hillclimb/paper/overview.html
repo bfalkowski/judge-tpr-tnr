@@ -1,6 +1,6 @@
 <title>Hill-Climb Study Overview</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="The hill-climbing loop from Anthropic&#x27;s claude.dev article, run with LLM judges and measured with the TPR and TNR primer">
+<meta name="description" content="Anthropic&#x27;s hill-climbing loop, run with LLM judges of known TPR and TNR">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -205,69 +205,48 @@
 </div></div>
 
 <main class="container"><article>
-<h1>Hill-Climb Study Overview</h1><p class="subtitle">The hill-climbing loop from Anthropic&#x27;s claude.dev article, run with LLM judges and measured with the TPR and TNR primer</p><p class="byline">Bryan Falkowski · October 2026 · Code and data: <a href="https://github.com/bfalkowski/judge-tpr-tnr">github.com/bfalkowski/judge-tpr-tnr</a> (<code>hillclimb/</code>)</p><div class="abstract"><p><strong>Summary.</strong> A measurement of an LLM judge on a fixed set of outputs does not show that the judge can control an
-optimization loop. In the loop, each change alters the outputs that the judge grades. The loop also keeps the changes
-that the judge scores well. Thus the judge's errors affect more than the reported pass rate. They also decide which
-version of the app stays.</p>
+<h1>Hill-Climb Study Overview</h1><p class="subtitle">Anthropic&#x27;s hill-climbing loop, run with LLM judges of known TPR and TNR</p><p class="byline">Bryan Falkowski · October 2026 · Code and data: <a href="https://github.com/bfalkowski/judge-tpr-tnr">github.com/bfalkowski/judge-tpr-tnr</a> (<code>hillclimb/</code>)</p><div class="abstract"><p><strong>Summary.</strong> My primer, <a href="https://bfalkowski.github.io/writing/judge-score.html">Can You Trust Your Judge's Score?</a>,
+shows how to calibrate an LLM judge. You label a set of outputs, run the judge on them, and measure TPR and TNR. This
+study asks a second question: if a judge calibrates well, can it also control a hill climb?</p>
 <p>Anthropic's article <a href="https://claude.dev/blog/automating-eval-design-and-hillclimbing/">Automating eval design and hillclimbing with
-Claude</a> describes such a loop. In each round, an
-analyzer proposes one change. The loop keeps the change only if the pass rates on a train set and a test set both
-increase. My primer, <a href="https://bfalkowski.github.io/writing/judge-score.html">Can You Trust Your Judge's Score?</a>, shows
-how to measure a judge with TPR and TNR. It also shows how to correct the pass rate that the judge reports.</p>
-<p>This study implements the loop from the article, adapted to isolate grader errors. It uses three LLM judges of
-measured quality and an answer key, and it tests the six rules in Section 9 of the primer. <strong>All six rules stay
-correct.</strong> But a hill climb breaks the
-conditions of some rules, and it needs more measurement than one calibration before the climb. The main finding is this: <strong>a judge can be accurate on
-the baseline and still make incorrect keep or revert choices</strong>, because each choice depends on how the judge grades
-the small number of outputs that the change affects. The practical result is a check of the judge at three times:
-before the climb, on the decisions that each change affects, and after the climb.</p></div>
-<h2 id="where-the-study-started"><span class="num">1.</span> Where the study started</h2>
-<p>Two documents started this study.</p>
-<ul>
-<li><strong>Anthropic's article on hill climbing with Claude</strong> (Lance Martin, September 28, 2026) and the <code>claude-api</code> skill
-  that it describes. In
-  this loop, an analyzer reads the failures on the train set and proposes one change. The loop keeps the change only if
-  the pass rates on the train set and the test set both increase. The two sets protect the loop from overfitting to
-  the cases that the analyzer reads.</li>
-<li><strong>The primer</strong> (Falkowski 2026). It teaches four things. A judge makes two types of mistakes. TPR and TNR measure
-  each type. You can correct the judge's pass rate with these rates. The correction works only while the judge acts as
-  it did when you measured it. Section 9 of the primer lists these points as rules.</li>
-</ul>
-<p>The article already warns that grading errors are a common cause of a bad eval. It says that it is important to read a
-sample of graded transcripts before you trust the grader. Its account of the work also includes a phase of "fixing graders."</p>
-<p>This study examines a related question: what occurs when a grader does more than measure performance? In a hill
-climb, the grader's verdicts decide which changes stay. I use the measurements from my primer and an answer key to
-examine how grader errors affect these choices. The answer key also shows which changes the grader incorrectly rejects
-or accepts, and why.</p>
-<p><strong>Terms.</strong> On this page, a <em>grader</em> is anything that grades the agent's decisions. A <em>judge</em> is a grader that is an
-LLM. The <em>answer key</em> is a grader that is code. The article also uses the word <em>grader</em>, and in one place <em>evaluator</em>.
-On this page, "rule 1" to "rule 6" are the rules of the primer. The support policy also has numbered rules, and this
-page calls them "policy rule 1" to "policy rule 5".</p>
-<h2 id="goals"><span class="num">2.</span> Goals</h2>
-<ol>
-<li>Run the loop from the article with LLM judges of known quality, and see how the judge's mistakes affect each keep
-   or revert choice.</li>
-<li>Test the rules of the primer in this loop, and find where their conditions fail.</li>
-<li>Find what a team must measure before, during and after a climb, to trust the result.</li>
-</ol>
-<p>The study does not try to show that hill climbing does not work. With the answer key as the grader, the same loop
-increased the pass rate on the holdout tickets from 79% to 100%.</p>
-<h2 id="rules"><span class="num">3.</span> The six rules and the results</h2>
-<p>Each rule below stays correct. The rules have the same numbers as in Section 9 of the primer. The table gives each
-rule as the primer stated it before this study, in its earlier sections. The results show the conditions under which each rule holds in a hill climb, and
-what a climb needs in addition.</p>
+Claude</a> describes a hill-climbing loop. In each
+round, an analyzer proposes one change to the app. The loop keeps the change only if the pass rate increases on two
+sets of cases. When an LLM judge gives the pass rates, the judge decides which changes stay.</p>
+<p>I ran this loop on a support agent with three judges of known TPR and TNR. An answer key gave the correct output for
+every ticket. Thus I could see each mistake of each judge, in each round.</p>
+<p><strong>The result:</strong> a judge can calibrate well on the baseline and still make bad choices in the loop. Each change
+affects only a small number of outputs. On those outputs, the judge can be much less accurate than its overall TPR and
+TNR show. One judge reverted a real fix six times. Another judge kept changes that moved the agent's mistakes to
+tickets where the judge does not see them.</p>
+<p>The six rules in Section 9 of the primer stay correct. But one calibration before the climb is not sufficient.
+Check the judge with labeled outputs three times: before the climb, in each round, and after the climb.</p></div>
+<h2 id="why-i-ran-this-study"><span class="num">1.</span> Why I ran this study</h2>
+<p>The article says that grading errors are a common cause of a bad eval. It tells you to read graded transcripts before
+you trust the grader. In its own example, one phase of the work was "fixing graders."</p>
+<p>My primer calibrates a judge on a fixed set of outputs. A hill climb is different. The outputs change in each round,
+and the judge's scores decide which changes stay. I wanted to know two things. Do the primer's rules still hold in
+this loop? And what more must you measure?</p>
+<p><strong>Terms.</strong> I use the primer's terms where I can. A <em>judge</em> is an LLM that scores an output as pass or fail. The
+<em>answer key</em> is code that gives the correct output. To <em>calibrate</em> a judge is to label outputs, run the judge on them,
+and measure TPR and TNR. The article uses the word <em>grader</em> for a judge and for code that scores. The support policy
+also has numbered rules. I call them "policy rule 1" to "policy rule 5." Plain "rule 1" to "rule 6" are the primer's
+rules.</p>
+<h2 id="rules"><span class="num">2.</span> The six rules and the results</h2>
+<p>Section 9 of the primer lists six rules. Each rule comes from a point in the primer's earlier sections. The table gives
+each point as the primer stated it before this study. After the study, I added what it found to rules 3, 4 and 5 of
+the primer. The section numbers in the table refer to the primer.</p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Rule, as the primer stated it before this study</th>
-<th>What the rule means in a hill climb</th>
+<th>In a hill climb</th>
 <th>Result</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><strong>1.</strong> Measure TPR and TNR separately. One accuracy number hides which kind of mistake the judge makes. (Section 3)</td>
-<td>Before the climb, measure the judge with TPR and TNR</td>
+<td>Calibrate the judge before the climb</td>
 <td><span class="chip ok">Holds</span></td>
 </tr>
 <tr>
@@ -277,104 +256,73 @@ what a climb needs in addition.</p>
 </tr>
 <tr>
 <td><strong>3.</strong> TPR and TNR do not depend on the mix of good and bad outputs. Thus you can use them on new data. (Section 5)</td>
-<td>The rates from the baseline apply to each new version of the app</td>
-<td><span class="chip cond">Holds, if the rates are the same for each kind of output</span></td>
+<td>The baseline TPR and TNR apply to each new version</td>
+<td><span class="chip cond">Holds, if TPR and TNR are the same for each kind of output</span></td>
 </tr>
 <tr>
-<td><strong>4.</strong> When the outputs change, label a new sample and measure the judge again. (Section 8)</td>
-<td>A hill climb changes the outputs in each round</td>
+<td><strong>4.</strong> When the outputs change, label a new sample and check the judge again. (Section 8)</td>
+<td>The outputs change in each round</td>
 <td><span class="chip mod">Holds; a climb needs it in each round</span></td>
 </tr>
 <tr>
-<td><strong>5.</strong> Compare two versions with the same judge, on the same kind of data. The judge's errors then affect both versions in almost the same way. (Section 7)</td>
-<td>Each keep or revert choice compares two versions with the same judge</td>
-<td><span class="chip cond">Holds, if the change does not alter the kind of output</span></td>
+<td><strong>5.</strong> Compare two versions with the same judge, on the same kind of data. The judge's mistakes then affect both versions in almost the same way. (Section 7)</td>
+<td>Each keep or revert choice compares two versions</td>
+<td><span class="chip cond">Holds, if the change keeps the same kinds of output</span></td>
 </tr>
 <tr>
-<td><strong>6.</strong> Correct the judge's pass rate with TPR and TNR. If the judge's rates on new outputs drift, the corrected number is off. (Sections 5 and 8)</td>
-<td>Correct the pass rate of the final version with the rates from the baseline</td>
+<td><strong>6.</strong> Correct the pass rate with TPR and TNR. If the judge's rates on new outputs drift, the corrected number is wrong. (Sections 5 and 8)</td>
+<td>Correct the final pass rate with the baseline rates</td>
 <td><span class="chip cond">Holds; the climb itself moved the rates</span></td>
 </tr>
 </tbody>
 </table></div>
-<p>The section numbers refer to the primer.</p>
-<h2 id="the-experiment"><span class="num">4.</span> The experiment</h2>
-<p><strong>The app.</strong> A support agent from my earlier work reads a ticket and selects one of four actions: refund, reship,
-escalate or reply. A written policy with five rules decides the correct action. An answer key, written as code, gives
-the correct action for each ticket. The loop could change only the agent's decision instructions and the descriptions of the four
-actions.</p>
-<p><strong>The tickets.</strong> There were 400 new tickets in three sets. Fig 1 shows the sets and one round of the loop. The analyzer
-read the train set. The loop used the train and validation sets for each keep or revert choice. The loop did not use
-the holdout set. I scored the holdout set only after the climbs.</p>
-<figure class="fig fig-loop" id="figure-1"><div aria-label="The 400 tickets: 120 train, 120 validation, 160 holdout" class="split"><span class="tr" style="flex:120">Train · 120</span><span class="va" style="flex:120">Validation · 120</span><span class="ho" style="flex:160">Holdout · 160</span></div><ol class="flow"><li><b>Read</b>A new analyzer reads the train transcripts and grades of the current version.<span class="uses">uses: Train</span></li><li><b>Change</b>It proposes one change to the decision instructions or to the action descriptions.</li><li><b>Run</b>The agent runs each ticket two times. The grader of the climb grades each decision.</li><li><b>Decide</b>If the train and validation pass rates both increase, keep the change. If not, revert it.<span class="uses">uses: Train and validation</span></li></ol><p class="flow-note">The next round starts from the last kept version. The loop does not use the holdout tickets. The answer key grades them, and all other decisions, only after the climbs.</p><figcaption><b>Fig 1</b> The 400 tickets, and one round of the loop with the sets that each step uses.</figcaption></figure>
-<p><strong>What follows the article, and what I changed.</strong> The study follows the method of the article, with changes that
-isolate the grader's errors:</p>
+<h2 id="how-the-study-worked"><span class="num">3.</span> How the study worked</h2>
+<p><strong>The agent.</strong> A support agent from my earlier work reads a ticket and selects one of four actions: refund, reship,
+escalate or reply. A written policy with five rules gives the correct action. The answer key is that policy, written
+as code. The loop could change only the agent's instructions and its descriptions of the four actions.</p>
+<p><strong>The tickets.</strong> I made 400 new tickets and divided them into three sets:</p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
-<th>Part of the method</th>
-<th>In the article</th>
-<th>In this study</th>
+<th>Set</th>
+<th>Tickets</th>
+<th>Use</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>What the loop can change</td>
-<td>The system prompt, skills or instruction files, tool descriptions, model choice and API parameters, and harness code</td>
-<td>Only the agent's decision instructions and its descriptions of the four actions</td>
+<td>Train</td>
+<td>120</td>
+<td>The analyzer reads these results to propose a change</td>
 </tr>
 <tr>
-<td>Grader</td>
-<td>Programmatic checks, or an LLM judge with a rubric. If there is a baseline, the judge compares two outputs in random order</td>
-<td>One fixed grader for each climb: the answer key or one of three LLM judges. A judge grades each decision alone, with pass or fail</td>
+<td>Validation</td>
+<td>120</td>
+<td>The loop scores this set in each round to make its choice. The article calls it the test set. It has the role of the primer's dev set</td>
 </tr>
 <tr>
-<td>Keep or revert rule</td>
-<td>Keep a change if the train and test scores both increase</td>
-<td>The same rule, as the skill writes it. The skill adds a second run when only the test score increases. That case did not occur. This page calls the test set "validation"</td>
-</tr>
-<tr>
-<td>Validation of the grader</td>
-<td>Check the grader before the first round, fix it if necessary, and check it again when the score stalls</td>
-<td>The same checks were calculated, but the loop did not fix the grader. This was the design: the study measures what the grader's errors do</td>
-</tr>
-<tr>
-<td>Judge noise</td>
-<td>Run the grader two times on the same output, and check that the verdict does not change</td>
-<td>Each verdict was calculated one time before the climbs, for each ticket and action. Thus each judge had no run-to-run noise</td>
-</tr>
-<tr>
-<td>What the analyzer reads</td>
-<td>The previous round's train transcripts</td>
-<td>The train transcripts of the last kept version. After a revert, the analyzer did not see the transcripts of the reverted round</td>
-</tr>
-<tr>
-<td>Final assessment</td>
-<td>The version with the best test result, compared with the baseline, with confidence intervals</td>
-<td>The same comparison on the validation set. In addition, a separate holdout set that the loop did not use</td>
-</tr>
-<tr>
-<td>Analysis of the grader</td>
-<td>Validate the grader and examine grading failures</td>
-<td>TPR and TNR on the baseline and on the final version, J on fixes and J on breaks in each round, and an answer key for every decision</td>
+<td>Holdout</td>
+<td>160</td>
+<td>The loop does not use this set. I scored it one time, after the climbs. It has the role of the primer's test set</td>
 </tr>
 </tbody>
 </table></div>
-<p>Thus the study is an implementation of the article's method, adapted to isolate grader errors. It is not an exact copy.
-The findings apply most directly to a judge that grades each output alone.</p>
-<p><strong>Validation and holdout answer different questions.</strong> The loop used the validation set in every round. Thus the
-selection of changes depends on it, and a gain on validation is partly a result of that selection. The holdout set
-was not used during the climb, so it gives an independent measure of the final version. This page uses validation to
-explain the loop's choices, and holdout for the true gains.</p>
-<p><strong>The graders.</strong> I ran the same loop with four graders. Each grader stayed the same for all rounds of its climb. I
-measured each judge with TPR and TNR on the train decisions of the baseline, as the primer teaches. A team can make this
-measurement before a climb. In this study, I calculated it from the answer key after the climbs, so that the loop
-could not use it. Before the climbs, I had only the values from my earlier judge study, on different tickets. For the
-calibrated and lenient judges, those values were similar to the values below. For the weak judge, J was 0.32 there.</p>
+<p>The agent ran each ticket two times. Thus each set has two outputs for each ticket.</p>
+<p><strong>The loop.</strong> Each round has four steps:</p>
+<ol>
+<li>A new analyzer reads the train results. The analyzer is a Claude agent (Claude Opus 5.5) with file and shell
+   tools.</li>
+<li>It proposes one change.</li>
+<li>The agent runs all the tickets again, and the judge scores each output.</li>
+<li>If the pass rate increases on train and on validation, the loop keeps the change. If not, it reverts the change.</li>
+</ol>
+<figure class="fig fig-loop" id="figure-1"><div aria-label="The 400 tickets: 120 train, 120 validation, 160 holdout" class="split"><span class="tr" style="flex:120">Train · 120</span><span class="va" style="flex:120">Validation · 120</span><span class="ho" style="flex:160">Holdout · 160</span></div><ol class="flow"><li><b>Read</b>A new analyzer reads the train transcripts and scores of the current version.<span class="uses">uses: Train</span></li><li><b>Change</b>It proposes one change to the decision instructions or to the action descriptions.</li><li><b>Run</b>The agent runs each ticket two times. The judge of the climb scores each output.</li><li><b>Decide</b>If the train and validation pass rates both increase, keep the change. If not, revert it.<span class="uses">uses: Train and validation</span></li></ol><p class="flow-note">The next round starts from the last kept version. The loop does not use the holdout tickets. The answer key scores them, and all other outputs, only after the climbs.</p><figcaption><b>Fig 1</b> The 400 tickets, and one round of the loop with the sets that each step uses.</figcaption></figure>
+<p><strong>The judges.</strong> I calibrated each judge on the 240 train outputs of the baseline, as in the primer. Of these outputs,
+46 were wrong.</p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
-<th>Grader</th>
+<th>Judge</th>
 <th>What it is</th>
 <th>TPR</th>
 <th>TNR</th>
@@ -390,395 +338,371 @@ calibrated and lenient judges, those values were similar to the values below. Fo
 <td class="n barcell">1.00<span aria-hidden="true" class="bt"><span class="b" style="width:100%"></span></span></td>
 </tr>
 <tr>
-<td>calibrated</td>
-<td>a judge (Claude Haiku 4.5). I refined its prompt with labelled tickets from earlier batches</td>
+<td>strong</td>
+<td>Claude Haiku 4.5, with a prompt that I refined on labeled tickets</td>
 <td class="n barcell">0.95<span aria-hidden="true" class="bt"><span class="b" style="width:95%"></span></span></td>
 <td class="n barcell">0.93<span aria-hidden="true" class="bt"><span class="b" style="width:93%"></span></span></td>
 <td class="n barcell">0.88<span aria-hidden="true" class="bt"><span class="b" style="width:88%"></span></span></td>
 </tr>
 <tr>
 <td>lenient</td>
-<td>an earlier step of the same judge design, run on Jev, with a low threshold</td>
+<td>an earlier version of the same judge, on Jev, with a low threshold</td>
 <td class="n barcell">0.95<span aria-hidden="true" class="bt"><span class="b" style="width:95%"></span></span></td>
 <td class="n barcell">0.65<span aria-hidden="true" class="bt"><span class="b" style="width:65%"></span></span></td>
 <td class="n barcell">0.61<span aria-hidden="true" class="bt"><span class="b" style="width:61%"></span></span></td>
 </tr>
 <tr>
 <td>weak</td>
-<td>the judge from my run-validity paper (Jev)</td>
+<td>the judge from my run-validity paper, on Jev</td>
 <td class="n barcell">0.76<span aria-hidden="true" class="bt"><span class="b" style="width:76%"></span></span></td>
 <td class="n barcell">0.24<span aria-hidden="true" class="bt"><span class="b" style="width:24%"></span></span></td>
 <td class="n barcell">0.00<span aria-hidden="true" class="bt"><span class="b" style="width:0%"></span></span></td>
 </tr>
 </tbody>
 </table></div>
-<p>The name "calibrated" describes how I made the judge. It does not mean that the judge is reliable in a loop. The
-results show that a refinement on baseline outputs is not sufficient for that.</p>
-<p><strong>The climbs.</strong> There were eight climbs and 18 rounds. The calibrated and lenient climbs ran three times each, because
-the analyzer can propose different changes in each run. The answer-key and weak climbs ran one time.</p>
-<p><strong>What makes this study possible.</strong> After the climbs, the answer key graded every decision of every version. Thus the
-study can see each mistake of each judge, in each round. A normal climb does not have an answer key, and it cannot do
-this.</p>
-<p><strong>Two new values: J on fixes and J on breaks.</strong> A change corrects some decisions and breaks some other decisions. The
-important question is not only how often the judge is correct in general. It is also how well the judge detects the
-corrections and the breaks of this specific change. Two values measure this for each round:</p>
+<p>A team can calibrate a judge before a climb. I calculated these numbers after the climbs, from the answer key, so the
+loop could not use them. Before the climbs, I had numbers only from my earlier judge study, on different tickets. For
+the strong and lenient judges, those numbers were similar to the numbers above. For the weak judge, J was 0.32 there.</p>
+<p><strong>The climbs.</strong> A climb is one full run of the loop. There were eight climbs, with 18 rounds in total. The strong and
+lenient judges each ran three climbs, because the analyzer can propose different changes each time. The answer key and
+the weak judge each ran one climb.</p>
+<p><strong>Where I am different from the article.</strong> I kept the article's loop and its keep rule. I changed some details, so that
+the judge's mistakes are the only thing that changes between climbs:</p>
 <ul>
-<li><strong>J on fixes</strong> is TPR + TNR − 1, measured only on the decisions that the change fixed. Here, TPR is the judge's pass
-  rate on their new correct outputs, and TNR is its fail rate on their old incorrect outputs. A value of 1 means that
-  the judge detects all of the fixes. A value of 0 means that it detects none of them.</li>
-<li><strong>J on breaks</strong> is TPR + TNR − 1, measured only on the decisions that the change broke. Here, TPR is measured on their
-  old correct outputs, and TNR on their new incorrect outputs.</li>
+<li>The loop could change only the agent's instructions. The article also lets the loop change the model, the tools,
+  the API settings and the code.</li>
+<li>Each judge scored one output at a time, as pass or fail. When there is a baseline, the article recommends a judge
+  that compares two outputs in random order.</li>
+<li>I calculated the article's checks of the grader, but the loop did not fix the judge. The purpose was to see what the
+  judge's mistakes do.</li>
+<li>I scored each ticket and action one time, before the climbs. Thus the judges had no run-to-run noise.</li>
+<li>After a reverted round, the analyzer did not see the transcripts of that round.</li>
+<li>I added the holdout set, and the answer key scored every output of every version.</li>
 </ul>
-<p>The change in the judge's count of passes is then approximately (J on fixes × fixes) − (J on breaks × breaks). A small
-term comes from decisions that changed but stayed correct or stayed incorrect. If TPR and TNR are the same for all
-outputs, J on fixes and J on breaks are both equal to the primer's J. The paper calls this case the uniform-error
-model.</p>
-<h2 id="what-we-found"><span class="num">5.</span> What we found</h2>
-<h3 id="rule-1">Rule 1 holds: measure TPR and TNR, not one agreement number</h3>
-<p>Two usual checks did not show the difference between the lenient judge and the calibrated judge. The first check reads
-the 10 cases with the lowest judge scores. It found approximately 2 grader errors for each judge. The skill's rule
-says to fix the grader if more than 1 case in 10 is a grader error. Thus this check flagged both judges in most
-samples: the lenient judge in 79% and the calibrated judge in 69%. It did not show which judge was worse. The second check
-measures agreement on 40 random decisions. Most of these decisions are correct, so the check measures mostly TPR. The
-lenient judge reached 90% agreement in 60% of random samples. The calibrated judge reached it in 95%.</p>
-<p>TNR showed the difference clearly: 0.65 for the lenient judge and 0.93 for the calibrated judge. This result agrees
-with the primer.</p>
+<p><strong>Two new numbers: J on fixes and J on breaks.</strong> A change fixes some outputs and breaks some others. I calibrated the
+judge on only those outputs:</p>
+<ul>
+<li><strong>J on fixes</strong> is the judge's J on the outputs that the change fixed. TPR is how often it passes the new correct
+  output. TNR is how often it failed the old wrong output.</li>
+<li><strong>J on breaks</strong> is the judge's J on the outputs that the change broke. TPR is how often it passed the old correct
+  output. TNR is how often it fails the new wrong output.</li>
+</ul>
+<p>If J on fixes is near zero, the judge gives no credit for real fixes. If J on breaks is near zero, it gives no penalty
+for real breaks. If TPR and TNR were the same for each kind of output, both numbers would be equal to the judge's
+overall J.</p>
+<h2 id="what-i-found-rule-by-rule"><span class="num">4.</span> What I found, rule by rule</h2>
+<h3 id="rule-1">Rule 1 holds: measure TPR and TNR separately</h3>
+<p>The usual checks did not separate the lenient judge from the strong judge:</p>
+<ul>
+<li>The <code>claude-api</code> skill, which the article describes, says to read the lowest-scoring cases. If more than about 1 in
+  10 is a grader error, fix the grader. Both judges had about 2 errors in their 10 lowest cases. This check flagged the
+  lenient judge in 79% of samples and the strong judge in 69%. It did not show which judge was worse.</li>
+<li>On 40 random outputs, the lenient judge reached 90% agreement in 60% of samples. The strong judge reached it in 95%.
+  Most random outputs are correct, so this check mostly measures TPR. Both judges had TPR 0.95.</li>
+</ul>
+<p>TNR showed the difference clearly: 0.93 for the strong judge and 0.65 for the lenient judge.</p>
 <h3 id="rule-2">Rule 2 holds: a judge with J near zero cannot control the loop</h3>
-<p>The weak judge had J = 0.00. Its verdicts gave almost no information about correct decisions. The analyzer could not
-know this. It found patterns in the verdicts and wrote them into the agent. In round 1, it told the agent to escalate
-when a customer asks for a supervisor, which the policy does not allow. The loop reverted both rounds, because the
-weak judge's own pass rate decreased. This result agrees with the primer. With J near zero, the verdicts carried almost
-no information, and the analyzer turned them into incorrect rules for the agent.</p>
-<h3 id="rule-3">Rule 3 holds only if the rates are the same for each kind of output</h3>
-<p>The primer says that TPR and TNR do not depend on the mix of good and bad outputs. That is correct. But the rates do
-depend on the kind of output. A change in a hill climb affects only a small number of kinds of output. Thus the
-judge's accuracy on the outputs that a change affects can be very different from its average. Fig 2 shows J on fixes
-and J on breaks for each round. Under the primer's assumption, each round of a judge would be at one point on the diagonal: the judge's J on the
-baseline.</p>
-<figure class="fig fig-jscatter" id="figure-2"><div class="legend"><span class="k"><svg aria-hidden="true" class="sw-svg g-key" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>Answer key (J = 1)</span><span class="k"><svg aria-hidden="true" class="sw-svg g-cal" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>Calibrated</span><span class="k"><svg aria-hidden="true" class="sw-svg g-len" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>Lenient</span><span class="k"><svg aria-hidden="true" class="sw-svg g-weak" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>Weak</span><span class="k"><svg aria-hidden="true" class="sw-svg g-ink" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>kept</span><span class="k"><svg aria-hidden="true" class="sw-svg g-ink" viewbox="0 0 14 14"><circle class="mark hollow" cx="7" cy="7" r="5"></circle></svg>reverted</span></div><div class="chart square"><svg aria-label="J on fixes against J on breaks for every round" role="img" viewbox="0 0 560 552"><line class="axis" x1="58" x2="546" y1="391.6" y2="391.6"></line><line class="axis" x1="166.4" x2="166.4" y1="500" y2="505"></line><text class="tick" text-anchor="middle" x="166.4" y="520.0">0.00</text><text class="tick" text-anchor="end" x="50.0" y="395.6">0.00</text><line class="grid" x1="58" x2="546" y1="301.2" y2="301.2"></line><line class="axis" x1="256.8" x2="256.8" y1="500" y2="505"></line><text class="tick" text-anchor="middle" x="256.8" y="520.0">0.25</text><text class="tick" text-anchor="end" x="50.0" y="305.2">0.25</text><line class="grid" x1="58" x2="546" y1="210.8" y2="210.8"></line><line class="axis" x1="347.2" x2="347.2" y1="500" y2="505"></line><text class="tick" text-anchor="middle" x="347.2" y="520.0">0.50</text><text class="tick" text-anchor="end" x="50.0" y="214.8">0.50</text><line class="grid" x1="58" x2="546" y1="120.4" y2="120.4"></line><line class="axis" x1="437.6" x2="437.6" y1="500" y2="505"></line><text class="tick" text-anchor="middle" x="437.6" y="520.0">0.75</text><text class="tick" text-anchor="end" x="50.0" y="124.4">0.75</text><line class="grid" x1="58" x2="546" y1="30.1" y2="30.1"></line><line class="axis" x1="527.9" x2="527.9" y1="500" y2="505"></line><text class="tick" text-anchor="middle" x="527.9" y="520.0">1.00</text><text class="tick" text-anchor="end" x="50.0" y="34.1">1.00</text><line class="axis" x1="166.4" x2="166.4" y1="12" y2="500"></line><line class="axis" x1="58" x2="546" y1="500" y2="500"></line><line class="ref" x1="58.0" x2="546.0" y1="500.0" y2="12.0"></line><g class="callout"><circle cx="94.1" cy="30.1" r="8.5"></circle><text text-anchor="middle" x="94.1" y="33.9">1</text></g><g class="callout"><circle cx="509.9" cy="463.9" r="8.5"></circle><text text-anchor="middle" x="509.9" y="467.7">2</text></g><g class="callout"><circle cx="303.8" cy="254.2" r="8.5"></circle><text text-anchor="middle" x="303.8" y="258.0">3</text></g><text class="lab em-s" text-anchor="start" x="108.1" y="34.6">The judge shows changes as worse than they are</text><text class="lab em-s" text-anchor="end" x="495.9" y="468.4">The judge shows changes as better than they are</text><text class="lab m" text-anchor="middle" x="302.0" y="544.0">J on fixes: the part of each true fix that the judge detects</text><text class="lab m" text-anchor="middle" transform="rotate(-90 14 256.0)" x="14.0" y="256.0">J on breaks: the part of each true break that the judge detects</text><g class="pt g-key" data-tip="Answer key, all three rounds (kept)
+<p>The weak judge had J = 0.00. Thus its scores gave almost no information about which outputs were correct. The analyzer
+could not know this. It found patterns in the scores and wrote them into the agent. For example, it told the agent to
+escalate when a customer asks for a supervisor. The policy does not allow that. Both of its changes made the agent
+worse. The loop reverted both, because the judge's own pass rate also decreased.</p>
+<h3 id="rule-3">Rule 3 holds only if TPR and TNR are the same for each kind of output</h3>
+<p>TPR and TNR do not depend on the mix of good and bad outputs. That is still true. But they do depend on the kind of
+output, and a change affects only a few kinds. Thus the judge's accuracy on the outputs that a change affects can be
+far from its overall accuracy. Fig 2 shows J on fixes and J on breaks for each round. If TPR and TNR were the same for
+each kind of output, each round of a judge would be at one point on the diagonal: the judge's overall J. Only the
+answer key's rounds are at that point.</p>
+<figure class="fig fig-jscatter" id="figure-2"><div class="legend"><span class="k"><svg aria-hidden="true" class="sw-svg g-key" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>Answer key (J = 1)</span><span class="k"><svg aria-hidden="true" class="sw-svg g-cal" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>Strong</span><span class="k"><svg aria-hidden="true" class="sw-svg g-len" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>Lenient</span><span class="k"><svg aria-hidden="true" class="sw-svg g-weak" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>Weak</span><span class="k"><svg aria-hidden="true" class="sw-svg g-ink" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>kept</span><span class="k"><svg aria-hidden="true" class="sw-svg g-ink" viewbox="0 0 14 14"><circle class="mark hollow" cx="7" cy="7" r="5"></circle></svg>reverted</span></div><div class="chart square"><svg aria-label="J on fixes against J on breaks for every round" role="img" viewbox="0 0 560 552"><line class="axis" x1="58" x2="546" y1="391.6" y2="391.6"></line><line class="axis" x1="166.4" x2="166.4" y1="500" y2="505"></line><text class="tick" text-anchor="middle" x="166.4" y="520.0">0.00</text><text class="tick" text-anchor="end" x="50.0" y="395.6">0.00</text><line class="grid" x1="58" x2="546" y1="301.2" y2="301.2"></line><line class="axis" x1="256.8" x2="256.8" y1="500" y2="505"></line><text class="tick" text-anchor="middle" x="256.8" y="520.0">0.25</text><text class="tick" text-anchor="end" x="50.0" y="305.2">0.25</text><line class="grid" x1="58" x2="546" y1="210.8" y2="210.8"></line><line class="axis" x1="347.2" x2="347.2" y1="500" y2="505"></line><text class="tick" text-anchor="middle" x="347.2" y="520.0">0.50</text><text class="tick" text-anchor="end" x="50.0" y="214.8">0.50</text><line class="grid" x1="58" x2="546" y1="120.4" y2="120.4"></line><line class="axis" x1="437.6" x2="437.6" y1="500" y2="505"></line><text class="tick" text-anchor="middle" x="437.6" y="520.0">0.75</text><text class="tick" text-anchor="end" x="50.0" y="124.4">0.75</text><line class="grid" x1="58" x2="546" y1="30.1" y2="30.1"></line><line class="axis" x1="527.9" x2="527.9" y1="500" y2="505"></line><text class="tick" text-anchor="middle" x="527.9" y="520.0">1.00</text><text class="tick" text-anchor="end" x="50.0" y="34.1">1.00</text><line class="axis" x1="166.4" x2="166.4" y1="12" y2="500"></line><line class="axis" x1="58" x2="546" y1="500" y2="500"></line><line class="ref" x1="58.0" x2="546.0" y1="500.0" y2="12.0"></line><g class="callout"><circle cx="94.1" cy="30.1" r="8.5"></circle><text text-anchor="middle" x="94.1" y="33.9">1</text></g><g class="callout"><circle cx="509.9" cy="463.9" r="8.5"></circle><text text-anchor="middle" x="509.9" y="467.7">2</text></g><g class="callout"><circle cx="303.8" cy="254.2" r="8.5"></circle><text text-anchor="middle" x="303.8" y="258.0">3</text></g><text class="lab em-s" text-anchor="start" x="108.1" y="34.6">The judge shows changes as worse than they are</text><text class="lab em-s" text-anchor="end" x="495.9" y="468.4">The judge shows changes as better than they are</text><text class="lab m" text-anchor="middle" x="302.0" y="544.0">J on fixes: the part of each real fix that the judge detects</text><text class="lab m" text-anchor="middle" transform="rotate(-90 14 256.0)" x="14.0" y="256.0">J on breaks: the part of each real break that the judge detects</text><g class="pt g-key" data-tip="Answer key, all three rounds (kept)
 J on fixes 1.00, J on breaks 1.00
-true change +23 decisions, the judge saw +23" tabindex="0"><circle class="hit" cx="527.9" cy="30.1" r="12"></circle><circle class="mark filled" cx="527.9" cy="30.1" r="5.5"></circle></g><g class="pt g-cal" data-tip="Calibrated, run 1, round 1 (kept)
+real change +23 outputs, the judge saw +23" tabindex="0"><circle class="hit" cx="527.9" cy="30.1" r="12"></circle><circle class="mark filled" cx="527.9" cy="30.1" r="5.5"></circle></g><g class="pt g-cal" data-tip="Strong, run 1, round 1 (kept)
 J on fixes 0.97, J on breaks 0.50
-true change +20 decisions, the judge saw +25" tabindex="0"><circle class="hit" cx="516.6" cy="210.8" r="12"></circle><circle class="mark filled" cx="516.6" cy="210.8" r="5.5"></circle></g><g class="pt g-cal" data-tip="Calibrated, run 1, round 2 (reverted)
+real change +20 outputs, the judge saw +25" tabindex="0"><circle class="hit" cx="516.6" cy="210.8" r="12"></circle><circle class="mark filled" cx="516.6" cy="210.8" r="5.5"></circle></g><g class="pt g-cal" data-tip="Strong, run 1, round 2 (reverted)
 J on fixes 0.75, J on breaks 0.41
-true change −26 decisions, the judge saw −1" tabindex="0"><circle class="hit" cx="437.6" cy="242.2" r="12"></circle><circle class="mark hollow" cx="437.6" cy="242.2" r="5.5"></circle></g><g class="pt g-cal" data-tip="Calibrated, run 1, round 3 (kept)
+real change −26 outputs, the judge saw −1" tabindex="0"><circle class="hit" cx="437.6" cy="242.2" r="12"></circle><circle class="mark hollow" cx="437.6" cy="242.2" r="5.5"></circle></g><g class="pt g-cal" data-tip="Strong, run 1, round 3 (kept)
 J on fixes 0.57, J on breaks 0.10
-true change +10 decisions, the judge saw +15" tabindex="0"><circle class="hit" cx="371.3" cy="355.4" r="12"></circle><circle class="mark filled" cx="371.3" cy="355.4" r="5.5"></circle></g><g class="pt g-cal" data-tip="Calibrated, run 2, round 1 (kept)
+real change +10 outputs, the judge saw +15" tabindex="0"><circle class="hit" cx="371.3" cy="355.4" r="12"></circle><circle class="mark filled" cx="371.3" cy="355.4" r="5.5"></circle></g><g class="pt g-cal" data-tip="Strong, run 2, round 1 (kept)
 J on fixes 0.91, J on breaks 0.56
-true change +19 decisions, the judge saw +23" tabindex="0"><circle class="hit" cx="496.9" cy="188.2" r="12"></circle><circle class="mark filled" cx="496.9" cy="188.2" r="5.5"></circle></g><g class="pt g-cal" data-tip="Calibrated, run 2, round 2 (kept)
+real change +19 outputs, the judge saw +23" tabindex="0"><circle class="hit" cx="496.9" cy="188.2" r="12"></circle><circle class="mark filled" cx="496.9" cy="188.2" r="5.5"></circle></g><g class="pt g-cal" data-tip="Strong, run 2, round 2 (kept)
 J on fixes 0.89, J on breaks 0.19
-true change +8 decisions, the judge saw +36" tabindex="0"><circle class="hit" cx="487.8" cy="323.2" r="12"></circle><circle class="mark filled" cx="487.8" cy="323.2" r="5.5"></circle></g><g class="pt g-cal" data-tip="Calibrated, run 3, round 1 (kept)
+real change +8 outputs, the judge saw +36" tabindex="0"><circle class="hit" cx="487.8" cy="323.2" r="12"></circle><circle class="mark filled" cx="487.8" cy="323.2" r="5.5"></circle></g><g class="pt g-cal" data-tip="Strong, run 3, round 1 (kept)
 J on fixes 0.86, J on breaks 0.75
-true change +24 decisions, the judge saw +22" tabindex="0"><circle class="hit" cx="477.7" cy="120.4" r="12"></circle><circle class="mark filled" cx="477.7" cy="120.4" r="5.5"></circle></g><g class="pt g-cal" data-tip="Calibrated, run 3, round 2 (kept)
+real change +24 outputs, the judge saw +22" tabindex="0"><circle class="hit" cx="477.7" cy="120.4" r="12"></circle><circle class="mark filled" cx="477.7" cy="120.4" r="5.5"></circle></g><g class="pt g-cal" data-tip="Strong, run 3, round 2 (kept)
 J on fixes 0.77, J on breaks 0.11
-true change +17 decisions, the judge saw +31" tabindex="0"><circle class="hit" cx="445.8" cy="351.4" r="12"></circle><circle class="mark filled" cx="445.8" cy="351.4" r="5.5"></circle></g><g class="pt g-len" data-tip="Lenient, run 1, round 1 (reverted)
+real change +17 outputs, the judge saw +31" tabindex="0"><circle class="hit" cx="445.8" cy="351.4" r="12"></circle><circle class="mark filled" cx="445.8" cy="351.4" r="5.5"></circle></g><g class="pt g-len" data-tip="Lenient, run 1, round 1 (reverted)
 J on fixes 0.00, J on breaks 0.65
-true change +13 decisions, the judge saw −15" tabindex="0"><circle class="hit" cx="166.4" cy="155.8" r="12"></circle><circle class="mark hollow" cx="166.4" cy="155.8" r="5.5"></circle></g><g class="pt g-len" data-tip="Lenient, run 1, round 2 (reverted)
+real change +13 outputs, the judge saw −15" tabindex="0"><circle class="hit" cx="166.4" cy="155.8" r="12"></circle><circle class="mark hollow" cx="166.4" cy="155.8" r="5.5"></circle></g><g class="pt g-len" data-tip="Lenient, run 1, round 2 (reverted)
 J on fixes 0.00, J on breaks 0.70
-true change +26 decisions, the judge saw −7" tabindex="0"><circle class="hit" cx="166.4" cy="138.5" r="12"></circle><circle class="mark hollow" cx="166.4" cy="138.5" r="5.5"></circle></g><g class="pt g-len" data-tip="Lenient, run 2, round 1 (reverted)
+real change +26 outputs, the judge saw −7" tabindex="0"><circle class="hit" cx="166.4" cy="138.5" r="12"></circle><circle class="mark hollow" cx="166.4" cy="138.5" r="5.5"></circle></g><g class="pt g-len" data-tip="Lenient, run 2, round 1 (reverted)
 J on fixes −0.03, J on breaks 0.86
-true change +12 decisions, the judge saw −19" tabindex="0"><circle class="hit" cx="155.5" cy="81.7" r="12"></circle><circle class="mark hollow" cx="155.5" cy="81.7" r="5.5"></circle></g><g class="pt g-len" data-tip="Lenient, run 2, round 2 (reverted)
+real change +12 outputs, the judge saw −19" tabindex="0"><circle class="hit" cx="155.5" cy="81.7" r="12"></circle><circle class="mark hollow" cx="155.5" cy="81.7" r="5.5"></circle></g><g class="pt g-len" data-tip="Lenient, run 2, round 2 (reverted)
 J on fixes 0.00, J on breaks 0.80
-true change +29 decisions, the judge saw −8" tabindex="0"><circle class="hit" cx="166.4" cy="102.4" r="12"></circle><circle class="mark hollow" cx="166.4" cy="102.4" r="5.5"></circle></g><g class="pt g-len" data-tip="Lenient, run 3, round 1 (reverted)
+real change +29 outputs, the judge saw −8" tabindex="0"><circle class="hit" cx="166.4" cy="102.4" r="12"></circle><circle class="mark hollow" cx="166.4" cy="102.4" r="5.5"></circle></g><g class="pt g-len" data-tip="Lenient, run 3, round 1 (reverted)
 J on fixes −0.03, J on breaks 0.84
-true change +18 decisions, the judge saw −17" tabindex="0"><circle class="hit" cx="156.7" cy="87.2" r="12"></circle><circle class="mark hollow" cx="156.7" cy="87.2" r="5.5"></circle></g><g class="pt g-len" data-tip="Lenient, run 3, round 2 (reverted)
+real change +18 outputs, the judge saw −17" tabindex="0"><circle class="hit" cx="156.7" cy="87.2" r="12"></circle><circle class="mark hollow" cx="156.7" cy="87.2" r="5.5"></circle></g><g class="pt g-len" data-tip="Lenient, run 3, round 2 (reverted)
 J on fixes −0.08, J on breaks 0.53
-true change +34 decisions, the judge saw −12" tabindex="0"><circle class="hit" cx="136.9" cy="198.8" r="12"></circle><circle class="mark hollow" cx="136.9" cy="198.8" r="5.5"></circle></g><g class="pt g-weak" data-tip="Weak, round 1 (reverted)
+real change +34 outputs, the judge saw −12" tabindex="0"><circle class="hit" cx="136.9" cy="198.8" r="12"></circle><circle class="mark hollow" cx="136.9" cy="198.8" r="5.5"></circle></g><g class="pt g-weak" data-tip="Weak, round 1 (reverted)
 J on fixes −0.20, J on breaks 0.26
-true change −58 decisions, the judge saw −26" tabindex="0"><circle class="hit" cx="94.1" cy="295.9" r="12"></circle><circle class="mark hollow" cx="94.1" cy="295.9" r="5.5"></circle></g><g class="pt g-weak" data-tip="Weak, round 2 (reverted)
+real change −58 outputs, the judge saw −26" tabindex="0"><circle class="hit" cx="94.1" cy="295.9" r="12"></circle><circle class="mark hollow" cx="94.1" cy="295.9" r="5.5"></circle></g><g class="pt g-weak" data-tip="Weak, round 2 (reverted)
 J on fixes 0.20, J on breaks 0.16
-true change −32 decisions, the judge saw −8" tabindex="0"><circle class="hit" cx="238.7" cy="332.9" r="12"></circle><circle class="mark hollow" cx="238.7" cy="332.9" r="5.5"></circle></g><text class="lab em" text-anchor="end" x="509.9" y="35.1">Answer key</text><text class="lab em" text-anchor="start" x="191.7" y="143.5">Lenient</text><text class="lab em" text-anchor="middle" x="166.4" y="322.5">Weak</text><text class="lab em" text-anchor="end" x="527.9" y="288.1">Calibrated</text></svg></div><ol class="callouts"><li>Above the diagonal, the judge detects fewer of the fixes than of the breaks. Thus true gains look smaller, or look like losses.</li><li>Below the diagonal, the judge detects fewer of the breaks than of the fixes. Thus losses look smaller, or look like gains.</li><li>On the diagonal, J on fixes is equal to J on breaks. This is the uniform-error model.</li></ol><figcaption><b>Fig 2</b> Each round of each climb, placed by the part of its true fixes and true breaks that the judge detected. The data is the train and validation decisions. Each round is compared with the version that the loop tested it against. In the uniform-error model, each round of a judge is at one point on the diagonal: the judge's J on the baseline. Only the rounds of the answer key are at that point. The rounds of the lenient judge are above it, and the rounds of the calibrated judge are below it.</figcaption><details class="data"><summary>Show the data</summary><div class="table-wrap"><table><thead><tr><th>Climb</th><th>Round</th><th>Loop's choice</th><th>J on fixes</th><th>J on breaks</th><th>True change (decisions)</th><th>Judge's change</th></tr></thead><tbody><tr><td>Answer key</td><td>round 1</td><td>kept</td><td class="n">1.00</td><td class="n">1.00</td><td class="n">+23</td><td class="n">+23</td></tr><tr><td>Answer key</td><td>round 2</td><td>kept</td><td class="n">1.00</td><td class="n">1.00</td><td class="n">+27</td><td class="n">+27</td></tr><tr><td>Answer key</td><td>round 3</td><td>kept</td><td class="n">1.00</td><td class="n">1.00</td><td class="n">+40</td><td class="n">+40</td></tr><tr><td>Calibrated, run 1</td><td>round 1</td><td>kept</td><td class="n">0.97</td><td class="n">0.50</td><td class="n">+20</td><td class="n">+25</td></tr><tr><td>Calibrated, run 1</td><td>round 2</td><td>reverted</td><td class="n">0.75</td><td class="n">0.41</td><td class="n">−26</td><td class="n">−1</td></tr><tr><td>Calibrated, run 1</td><td>round 3</td><td>kept</td><td class="n">0.57</td><td class="n">0.10</td><td class="n">+10</td><td class="n">+15</td></tr><tr><td>Calibrated, run 2</td><td>round 1</td><td>kept</td><td class="n">0.91</td><td class="n">0.56</td><td class="n">+19</td><td class="n">+23</td></tr><tr><td>Calibrated, run 2</td><td>round 2</td><td>kept</td><td class="n">0.89</td><td class="n">0.19</td><td class="n">+8</td><td class="n">+36</td></tr><tr><td>Calibrated, run 3</td><td>round 1</td><td>kept</td><td class="n">0.86</td><td class="n">0.75</td><td class="n">+24</td><td class="n">+22</td></tr><tr><td>Calibrated, run 3</td><td>round 2</td><td>kept</td><td class="n">0.77</td><td class="n">0.11</td><td class="n">+17</td><td class="n">+31</td></tr><tr><td>Lenient, run 1</td><td>round 1</td><td>reverted</td><td class="n">0.00</td><td class="n">0.65</td><td class="n">+13</td><td class="n">−15</td></tr><tr><td>Lenient, run 1</td><td>round 2</td><td>reverted</td><td class="n">0.00</td><td class="n">0.70</td><td class="n">+26</td><td class="n">−7</td></tr><tr><td>Lenient, run 2</td><td>round 1</td><td>reverted</td><td class="n">−0.03</td><td class="n">0.86</td><td class="n">+12</td><td class="n">−19</td></tr><tr><td>Lenient, run 2</td><td>round 2</td><td>reverted</td><td class="n">0.00</td><td class="n">0.80</td><td class="n">+29</td><td class="n">−8</td></tr><tr><td>Lenient, run 3</td><td>round 1</td><td>reverted</td><td class="n">−0.03</td><td class="n">0.84</td><td class="n">+18</td><td class="n">−17</td></tr><tr><td>Lenient, run 3</td><td>round 2</td><td>reverted</td><td class="n">−0.08</td><td class="n">0.53</td><td class="n">+34</td><td class="n">−12</td></tr><tr><td>Weak</td><td>round 1</td><td>reverted</td><td class="n">−0.20</td><td class="n">0.26</td><td class="n">−58</td><td class="n">−26</td></tr><tr><td>Weak</td><td>round 2</td><td>reverted</td><td class="n">0.20</td><td class="n">0.16</td><td class="n">−32</td><td class="n">−8</td></tr></tbody></table></div></details></figure>
-<p>Two examples show this. Each example occurred in all three runs.</p>
+real change −32 outputs, the judge saw −8" tabindex="0"><circle class="hit" cx="238.7" cy="332.9" r="12"></circle><circle class="mark hollow" cx="238.7" cy="332.9" r="5.5"></circle></g><text class="lab em" text-anchor="end" x="509.9" y="35.1">Answer key</text><text class="lab em" text-anchor="start" x="191.7" y="143.5">Lenient</text><text class="lab em" text-anchor="middle" x="166.4" y="322.5">Weak</text><text class="lab em" text-anchor="end" x="527.9" y="288.1">Strong</text></svg></div><ol class="callouts"><li>Above the diagonal, the judge detects fewer of the fixes than of the breaks. Thus real gains look smaller, or look like losses.</li><li>Below the diagonal, the judge detects fewer of the breaks than of the fixes. Thus losses look smaller, or look like gains.</li><li>On the diagonal, J on fixes is equal to J on breaks.</li></ol><figcaption><b>Fig 2</b> Each round of each climb, placed by the part of its real fixes and real breaks that the judge detected. The data is the train and validation outputs. Each round is compared with the version that the loop tested it against. If a judge's TPR and TNR were the same for every kind of output, each of its rounds would be at one point on the diagonal: its J on the baseline. Only the rounds of the answer key are at that point. The rounds of the lenient judge are above the diagonal, and the rounds of the strong judge are below it.</figcaption><details class="data"><summary>Show the data</summary><div class="table-wrap"><table><thead><tr><th>Climb</th><th>Round</th><th>Loop's choice</th><th>J on fixes</th><th>J on breaks</th><th>Real change (outputs)</th><th>Judge's change</th></tr></thead><tbody><tr><td>Answer key</td><td>round 1</td><td>kept</td><td class="n">1.00</td><td class="n">1.00</td><td class="n">+23</td><td class="n">+23</td></tr><tr><td>Answer key</td><td>round 2</td><td>kept</td><td class="n">1.00</td><td class="n">1.00</td><td class="n">+27</td><td class="n">+27</td></tr><tr><td>Answer key</td><td>round 3</td><td>kept</td><td class="n">1.00</td><td class="n">1.00</td><td class="n">+40</td><td class="n">+40</td></tr><tr><td>Strong, run 1</td><td>round 1</td><td>kept</td><td class="n">0.97</td><td class="n">0.50</td><td class="n">+20</td><td class="n">+25</td></tr><tr><td>Strong, run 1</td><td>round 2</td><td>reverted</td><td class="n">0.75</td><td class="n">0.41</td><td class="n">−26</td><td class="n">−1</td></tr><tr><td>Strong, run 1</td><td>round 3</td><td>kept</td><td class="n">0.57</td><td class="n">0.10</td><td class="n">+10</td><td class="n">+15</td></tr><tr><td>Strong, run 2</td><td>round 1</td><td>kept</td><td class="n">0.91</td><td class="n">0.56</td><td class="n">+19</td><td class="n">+23</td></tr><tr><td>Strong, run 2</td><td>round 2</td><td>kept</td><td class="n">0.89</td><td class="n">0.19</td><td class="n">+8</td><td class="n">+36</td></tr><tr><td>Strong, run 3</td><td>round 1</td><td>kept</td><td class="n">0.86</td><td class="n">0.75</td><td class="n">+24</td><td class="n">+22</td></tr><tr><td>Strong, run 3</td><td>round 2</td><td>kept</td><td class="n">0.77</td><td class="n">0.11</td><td class="n">+17</td><td class="n">+31</td></tr><tr><td>Lenient, run 1</td><td>round 1</td><td>reverted</td><td class="n">0.00</td><td class="n">0.65</td><td class="n">+13</td><td class="n">−15</td></tr><tr><td>Lenient, run 1</td><td>round 2</td><td>reverted</td><td class="n">0.00</td><td class="n">0.70</td><td class="n">+26</td><td class="n">−7</td></tr><tr><td>Lenient, run 2</td><td>round 1</td><td>reverted</td><td class="n">−0.03</td><td class="n">0.86</td><td class="n">+12</td><td class="n">−19</td></tr><tr><td>Lenient, run 2</td><td>round 2</td><td>reverted</td><td class="n">0.00</td><td class="n">0.80</td><td class="n">+29</td><td class="n">−8</td></tr><tr><td>Lenient, run 3</td><td>round 1</td><td>reverted</td><td class="n">−0.03</td><td class="n">0.84</td><td class="n">+18</td><td class="n">−17</td></tr><tr><td>Lenient, run 3</td><td>round 2</td><td>reverted</td><td class="n">−0.08</td><td class="n">0.53</td><td class="n">+34</td><td class="n">−12</td></tr><tr><td>Weak</td><td>round 1</td><td>reverted</td><td class="n">−0.20</td><td class="n">0.26</td><td class="n">−58</td><td class="n">−26</td></tr><tr><td>Weak</td><td>round 2</td><td>reverted</td><td class="n">0.20</td><td class="n">0.16</td><td class="n">−32</td><td class="n">−8</td></tr></tbody></table></div></details></figure>
+<p>Two kinds of ticket show this:</p>
 <ul>
-<li><strong>The lenient judge did not detect a true improvement.</strong> Its J on the baseline was 0.61. Each round tried the same
-  fix: the $500 refund limit applies to out-of-stock refunds. On the decisions that this fix corrected, the judge's J
-  was 0 or less. The judge fails the correct escalation on 17 of 18 tickets of this kind. Thus the loop reverted the
-  fix in all six rounds, although each round fixed more decisions than it broke. Then the analyzer concluded that the
-  fix did not work. In this study, the analyzer did not see the transcripts of the reverted rounds. This possibly
-  contributed to its conclusion.</li>
-<li><strong>The calibrated judge disagreed with the answer key on one kind of ticket.</strong> Its J on the baseline was 0.88. On
-  this kind of ticket, a customer reports damage on an order that did not arrive. The policy text does not decide the
-  correct action. The judge passes the action of policy rule 3, and the answer key says reply. Thus this is a disagreement on
-  an unclear case, not a clear judge error. The climbs broke 43 decisions on these tickets by the answer key's reading,
-  and the judge counted all 43 as fixes.</li>
+<li><strong>The lenient judge and the correct escalation.</strong> For an out-of-stock order over $500, the policy says escalate. The
+  lenient judge passes the correct escalation on only 1 of 18 such tickets. The baseline agent never gave this output.
+  Thus a calibration on baseline outputs could not find the problem.</li>
+<li><strong>The strong judge and the unclear damage tickets.</strong> On these tickets, a customer reports damage on an order that is
+  Lost, or that shipped more than 14 days ago and did not arrive. The policy does not say which rule applies. The
+  answer key says reply. The strong judge passes the action of policy rule 3. These are disagreements on an unclear
+  case, not clear judge errors.</li>
 </ul>
-<p><strong>Extension to the primer (rule 3):</strong> measure the judge for each kind of output. Include correct outputs that the app does not
-produce yet. On the baseline, the agent never gave the correct escalation, so the lenient judge's problem was not
-visible there.</p>
+<p><strong>Added to the primer (rule 3):</strong> calibrate the judge on each kind of output that is important. Include correct outputs
+that the app does not give yet.</p>
 <h3 id="rule-4">Rule 4 holds, and a climb needs it in each round</h3>
-<p>The primer says: when the outputs change, label a new sample and measure the judge again. A hill climb changes the
-outputs in each round. Each round changed 44 to 97 of its 480 train and validation decisions. Each keep or revert
-choice depends only on these changed decisions.</p>
-<p>I tested a small sample after the climbs. For each round, I calculated the probability that 20 changed decisions give
-the correct direction of the true change. The calculation assumes that a person selects the 20 decisions at random
-without replacement, and that the person labels each one correctly. The answer key gave these labels. The probability
-was at least 81% in 17 of the 18 rounds. The one exception had a net change near zero. Fig 3 shows the result for
-samples of 10, 20 and 30.</p>
-<figure class="fig fig-labels" id="figure-3"><div class="legend"><span class="k"><svg aria-hidden="true" class="sw-svg g-key" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>Answer key (J = 1)</span><span class="k"><svg aria-hidden="true" class="sw-svg g-cal" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>Calibrated</span><span class="k"><svg aria-hidden="true" class="sw-svg g-len" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>Lenient</span><span class="k"><svg aria-hidden="true" class="sw-svg g-weak" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>Weak</span></div><div class="chart"><svg aria-label="Chance that k labelled changed decisions get the direction right, per round" role="img" viewbox="0 0 680 282"><line class="grid" x1="70.0" x2="70.0" y1="14" y2="246"></line><text class="tick" text-anchor="middle" x="70.0" y="262.0">50%</text><line class="grid" x1="188.0" x2="188.0" y1="14" y2="246"></line><text class="tick" text-anchor="middle" x="188.0" y="262.0">60%</text><line class="grid" x1="306.0" x2="306.0" y1="14" y2="246"></line><text class="tick" text-anchor="middle" x="306.0" y="262.0">70%</text><line class="grid" x1="424.0" x2="424.0" y1="14" y2="246"></line><text class="tick" text-anchor="middle" x="424.0" y="262.0">80%</text><line class="grid" x1="542.0" x2="542.0" y1="14" y2="246"></line><text class="tick" text-anchor="middle" x="542.0" y="262.0">90%</text><line class="grid" x1="660.0" x2="660.0" y1="14" y2="246"></line><text class="tick" text-anchor="middle" x="660.0" y="262.0">100%</text><text class="lab m" text-anchor="middle" x="365.0" y="278.0">Probability that k labelled decisions give the correct direction</text><line class="grid" x1="70" x2="660" y1="52.0" y2="52.0"></line><text class="lab" text-anchor="end" x="58.0" y="56.0">k = 10</text><g class="pt g-cal" data-tip="Calibrated, run 2, round 2
+<p>The primer says: when the outputs change, label a new sample and check the judge again. In a hill climb, the outputs
+change in each round. Each round changed 44 to 97 of the 480 train and validation outputs. The keep or revert choice
+depends only on these changed outputs.</p>
+<p>Thus you can label a few of them. After the climbs, I calculated how often 20 changed outputs show the correct
+direction of the real change. The 20 outputs are selected at random and labeled correctly. In 17 of 18 rounds, the
+chance was at least 81%. In the one exception, the net change was near zero. Fig 3 shows the results for 10, 20 and 30
+labels.</p>
+<figure class="fig fig-labels" id="figure-3"><div class="legend"><span class="k"><svg aria-hidden="true" class="sw-svg g-key" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>Answer key (J = 1)</span><span class="k"><svg aria-hidden="true" class="sw-svg g-cal" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>Strong</span><span class="k"><svg aria-hidden="true" class="sw-svg g-len" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>Lenient</span><span class="k"><svg aria-hidden="true" class="sw-svg g-weak" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>Weak</span></div><div class="chart"><svg aria-label="Chance that k labeled changed outputs get the direction right, per round" role="img" viewbox="0 0 680 282"><line class="grid" x1="70.0" x2="70.0" y1="14" y2="246"></line><text class="tick" text-anchor="middle" x="70.0" y="262.0">50%</text><line class="grid" x1="188.0" x2="188.0" y1="14" y2="246"></line><text class="tick" text-anchor="middle" x="188.0" y="262.0">60%</text><line class="grid" x1="306.0" x2="306.0" y1="14" y2="246"></line><text class="tick" text-anchor="middle" x="306.0" y="262.0">70%</text><line class="grid" x1="424.0" x2="424.0" y1="14" y2="246"></line><text class="tick" text-anchor="middle" x="424.0" y="262.0">80%</text><line class="grid" x1="542.0" x2="542.0" y1="14" y2="246"></line><text class="tick" text-anchor="middle" x="542.0" y="262.0">90%</text><line class="grid" x1="660.0" x2="660.0" y1="14" y2="246"></line><text class="tick" text-anchor="middle" x="660.0" y="262.0">100%</text><text class="lab m" text-anchor="middle" x="365.0" y="278.0">Probability that k labeled outputs give the correct direction</text><line class="grid" x1="70" x2="660" y1="52.0" y2="52.0"></line><text class="lab" text-anchor="end" x="58.0" y="56.0">k = 10</text><g class="pt g-cal" data-tip="Strong, run 2, round 2
 54.0% with k = 10
-true net change +8 in 86 changed decisions" tabindex="0"><circle class="hit" cx="117.4" cy="52.0" r="11"></circle><circle class="mark filled" cx="117.4" cy="52.0" r="5"></circle></g><g class="pt g-cal" data-tip="Calibrated, run 1, round 3
+real net change +8 in 86 changed outputs" tabindex="0"><circle class="hit" cx="117.4" cy="52.0" r="11"></circle><circle class="mark filled" cx="117.4" cy="52.0" r="5"></circle></g><g class="pt g-cal" data-tip="Strong, run 1, round 3
 64.5% with k = 10
-true net change +10 in 50 changed decisions" tabindex="0"><circle class="hit" cx="241.1" cy="52.0" r="11"></circle><circle class="mark filled" cx="241.1" cy="52.0" r="5"></circle></g><g class="pt g-cal" data-tip="Calibrated, run 3, round 2
+real net change +10 in 50 changed outputs" tabindex="0"><circle class="hit" cx="241.1" cy="52.0" r="11"></circle><circle class="mark filled" cx="241.1" cy="52.0" r="5"></circle></g><g class="pt g-cal" data-tip="Strong, run 3, round 2
 69.3% with k = 10
-true net change +17 in 71 changed decisions" tabindex="0"><circle class="hit" cx="297.3" cy="52.0" r="11"></circle><circle class="mark filled" cx="297.3" cy="52.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 1, round 1
+real net change +17 in 71 changed outputs" tabindex="0"><circle class="hit" cx="297.3" cy="52.0" r="11"></circle><circle class="mark filled" cx="297.3" cy="52.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 1, round 1
 70.0% with k = 10
-true net change +13 in 69 changed decisions" tabindex="0"><circle class="hit" cx="305.5" cy="43.0" r="11"></circle><circle class="mark filled" cx="305.5" cy="43.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 2, round 1
+real net change +13 in 69 changed outputs" tabindex="0"><circle class="hit" cx="305.5" cy="43.0" r="11"></circle><circle class="mark filled" cx="305.5" cy="43.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 2, round 1
 70.1% with k = 10
-true net change +12 in 64 changed decisions" tabindex="0"><circle class="hit" cx="307.1" cy="61.0" r="11"></circle><circle class="mark filled" cx="307.1" cy="61.0" r="5"></circle></g><g class="pt g-key" data-tip="Answer key, round 2
+real net change +12 in 64 changed outputs" tabindex="0"><circle class="hit" cx="307.1" cy="61.0" r="11"></circle><circle class="mark filled" cx="307.1" cy="61.0" r="5"></circle></g><g class="pt g-key" data-tip="Answer key, round 2
 73.7% with k = 10
-true net change +27 in 97 changed decisions" tabindex="0"><circle class="hit" cx="349.5" cy="52.0" r="11"></circle><circle class="mark filled" cx="349.5" cy="52.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 3, round 1
+real net change +27 in 97 changed outputs" tabindex="0"><circle class="hit" cx="349.5" cy="52.0" r="11"></circle><circle class="mark filled" cx="349.5" cy="52.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 3, round 1
 80.5% with k = 10
-true net change +18 in 66 changed decisions" tabindex="0"><circle class="hit" cx="430.3" cy="52.0" r="11"></circle><circle class="mark filled" cx="430.3" cy="52.0" r="5"></circle></g><g class="pt g-cal" data-tip="Calibrated, run 2, round 1
+real net change +18 in 66 changed outputs" tabindex="0"><circle class="hit" cx="430.3" cy="52.0" r="11"></circle><circle class="mark filled" cx="430.3" cy="52.0" r="5"></circle></g><g class="pt g-cal" data-tip="Strong, run 2, round 1
 85.0% with k = 10
-true net change +19 in 61 changed decisions" tabindex="0"><circle class="hit" cx="482.8" cy="52.0" r="11"></circle><circle class="mark filled" cx="482.8" cy="52.0" r="5"></circle></g><g class="pt g-cal" data-tip="Calibrated, run 1, round 2
+real net change +19 in 61 changed outputs" tabindex="0"><circle class="hit" cx="482.8" cy="52.0" r="11"></circle><circle class="mark filled" cx="482.8" cy="52.0" r="5"></circle></g><g class="pt g-cal" data-tip="Strong, run 1, round 2
 87.7% with k = 10
-true net change −26 in 69 changed decisions" tabindex="0"><circle class="hit" cx="514.9" cy="52.0" r="11"></circle><circle class="mark filled" cx="514.9" cy="52.0" r="5"></circle></g><g class="pt g-key" data-tip="Answer key, round 1
+real net change −26 in 69 changed outputs" tabindex="0"><circle class="hit" cx="514.9" cy="52.0" r="11"></circle><circle class="mark filled" cx="514.9" cy="52.0" r="5"></circle></g><g class="pt g-key" data-tip="Answer key, round 1
 89.6% with k = 10
-true net change +23 in 63 changed decisions" tabindex="0"><circle class="hit" cx="537.5" cy="52.0" r="11"></circle><circle class="mark filled" cx="537.5" cy="52.0" r="5"></circle></g><g class="pt g-cal" data-tip="Calibrated, run 1, round 1
+real net change +23 in 63 changed outputs" tabindex="0"><circle class="hit" cx="537.5" cy="52.0" r="11"></circle><circle class="mark filled" cx="537.5" cy="52.0" r="5"></circle></g><g class="pt g-cal" data-tip="Strong, run 1, round 1
 90.8% with k = 10
-true net change +20 in 54 changed decisions" tabindex="0"><circle class="hit" cx="551.4" cy="52.0" r="11"></circle><circle class="mark filled" cx="551.4" cy="52.0" r="5"></circle></g><g class="pt g-cal" data-tip="Calibrated, run 3, round 1
+real net change +20 in 54 changed outputs" tabindex="0"><circle class="hit" cx="551.4" cy="52.0" r="11"></circle><circle class="mark filled" cx="551.4" cy="52.0" r="5"></circle></g><g class="pt g-cal" data-tip="Strong, run 3, round 1
 93.4% with k = 10
-true net change +24 in 58 changed decisions" tabindex="0"><circle class="hit" cx="582.4" cy="52.0" r="11"></circle><circle class="mark filled" cx="582.4" cy="52.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 3, round 2
+real net change +24 in 58 changed outputs" tabindex="0"><circle class="hit" cx="582.4" cy="52.0" r="11"></circle><circle class="mark filled" cx="582.4" cy="52.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 3, round 2
 94.7% with k = 10
-true net change +34 in 76 changed decisions" tabindex="0"><circle class="hit" cx="597.1" cy="52.0" r="11"></circle><circle class="mark filled" cx="597.1" cy="52.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 1, round 2
+real net change +34 in 76 changed outputs" tabindex="0"><circle class="hit" cx="597.1" cy="52.0" r="11"></circle><circle class="mark filled" cx="597.1" cy="52.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 1, round 2
 96.2% with k = 10
-true net change +26 in 56 changed decisions" tabindex="0"><circle class="hit" cx="615.1" cy="52.0" r="11"></circle><circle class="mark filled" cx="615.1" cy="52.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 2, round 2
+real net change +26 in 56 changed outputs" tabindex="0"><circle class="hit" cx="615.1" cy="52.0" r="11"></circle><circle class="mark filled" cx="615.1" cy="52.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 2, round 2
 97.1% with k = 10
-true net change +29 in 59 changed decisions" tabindex="0"><circle class="hit" cx="625.6" cy="43.0" r="11"></circle><circle class="mark filled" cx="625.6" cy="43.0" r="5"></circle></g><g class="pt g-weak" data-tip="Weak, round 1
+real net change +29 in 59 changed outputs" tabindex="0"><circle class="hit" cx="625.6" cy="43.0" r="11"></circle><circle class="mark filled" cx="625.6" cy="43.0" r="5"></circle></g><g class="pt g-weak" data-tip="Weak, round 1
 99.5% with k = 10
-true net change −58 in 94 changed decisions" tabindex="0"><circle class="hit" cx="653.7" cy="52.0" r="11"></circle><circle class="mark filled" cx="653.7" cy="52.0" r="5"></circle></g><g class="pt g-weak" data-tip="Weak, round 2
+real net change −58 in 94 changed outputs" tabindex="0"><circle class="hit" cx="653.7" cy="52.0" r="11"></circle><circle class="mark filled" cx="653.7" cy="52.0" r="5"></circle></g><g class="pt g-weak" data-tip="Weak, round 2
 99.5% with k = 10
-true net change −32 in 57 changed decisions" tabindex="0"><circle class="hit" cx="653.9" cy="43.0" r="11"></circle><circle class="mark filled" cx="653.9" cy="43.0" r="5"></circle></g><g class="pt g-key" data-tip="Answer key, round 3
+real net change −32 in 57 changed outputs" tabindex="0"><circle class="hit" cx="653.9" cy="43.0" r="11"></circle><circle class="mark filled" cx="653.9" cy="43.0" r="5"></circle></g><g class="pt g-key" data-tip="Answer key, round 3
 100.0% with k = 10
-true net change +40 in 44 changed decisions" tabindex="0"><circle class="hit" cx="660.0" cy="61.0" r="11"></circle><circle class="mark filled" cx="660.0" cy="61.0" r="5"></circle></g><line class="grid" x1="70" x2="660" y1="128.0" y2="128.0"></line><text class="lab" text-anchor="end" x="58.0" y="132.0">k = 20</text><g class="pt g-cal" data-tip="Calibrated, run 2, round 2
+real net change +40 in 44 changed outputs" tabindex="0"><circle class="hit" cx="660.0" cy="61.0" r="11"></circle><circle class="mark filled" cx="660.0" cy="61.0" r="5"></circle></g><line class="grid" x1="70" x2="660" y1="128.0" y2="128.0"></line><text class="lab" text-anchor="end" x="58.0" y="132.0">k = 20</text><g class="pt g-cal" data-tip="Strong, run 2, round 2
 63.7% with k = 20
-true net change +8 in 86 changed decisions" tabindex="0"><circle class="hit" cx="231.1" cy="128.0" r="11"></circle><circle class="mark filled" cx="231.1" cy="128.0" r="5"></circle></g><line class="leader" x1="231.1" x2="231.1" y1="135.0" y2="150.0"></line><text class="lab m" text-anchor="start" x="227.1" y="162.0">Calibrated, run 2, round 2: net +8 in 86 changed decisions</text><g class="pt g-cal" data-tip="Calibrated, run 1, round 3
+real net change +8 in 86 changed outputs" tabindex="0"><circle class="hit" cx="231.1" cy="128.0" r="11"></circle><circle class="mark filled" cx="231.1" cy="128.0" r="5"></circle></g><line class="leader" x1="231.1" x2="231.1" y1="135.0" y2="150.0"></line><text class="lab m" text-anchor="start" x="227.1" y="162.0">Strong, run 2, round 2: net +8 in 86 changed outputs</text><g class="pt g-cal" data-tip="Strong, run 1, round 3
 81.2% with k = 20
-true net change +10 in 50 changed decisions" tabindex="0"><circle class="hit" cx="437.8" cy="128.0" r="11"></circle><circle class="mark filled" cx="437.8" cy="128.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 1, round 1
+real net change +10 in 50 changed outputs" tabindex="0"><circle class="hit" cx="437.8" cy="128.0" r="11"></circle><circle class="mark filled" cx="437.8" cy="128.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 1, round 1
 82.9% with k = 20
-true net change +13 in 69 changed decisions" tabindex="0"><circle class="hit" cx="458.1" cy="128.0" r="11"></circle><circle class="mark filled" cx="458.1" cy="128.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 2, round 1
+real net change +13 in 69 changed outputs" tabindex="0"><circle class="hit" cx="458.1" cy="128.0" r="11"></circle><circle class="mark filled" cx="458.1" cy="128.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 2, round 1
 83.3% with k = 20
-true net change +12 in 64 changed decisions" tabindex="0"><circle class="hit" cx="462.9" cy="119.0" r="11"></circle><circle class="mark filled" cx="462.9" cy="119.0" r="5"></circle></g><g class="pt g-cal" data-tip="Calibrated, run 3, round 2
+real net change +12 in 64 changed outputs" tabindex="0"><circle class="hit" cx="462.9" cy="119.0" r="11"></circle><circle class="mark filled" cx="462.9" cy="119.0" r="5"></circle></g><g class="pt g-cal" data-tip="Strong, run 3, round 2
 84.8% with k = 20
-true net change +17 in 71 changed decisions" tabindex="0"><circle class="hit" cx="481.0" cy="128.0" r="11"></circle><circle class="mark filled" cx="481.0" cy="128.0" r="5"></circle></g><g class="pt g-key" data-tip="Answer key, round 2
+real net change +17 in 71 changed outputs" tabindex="0"><circle class="hit" cx="481.0" cy="128.0" r="11"></circle><circle class="mark filled" cx="481.0" cy="128.0" r="5"></circle></g><g class="pt g-key" data-tip="Answer key, round 2
 88.3% with k = 20
-true net change +27 in 97 changed decisions" tabindex="0"><circle class="hit" cx="521.7" cy="128.0" r="11"></circle><circle class="mark filled" cx="521.7" cy="128.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 3, round 1
+real net change +27 in 97 changed outputs" tabindex="0"><circle class="hit" cx="521.7" cy="128.0" r="11"></circle><circle class="mark filled" cx="521.7" cy="128.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 3, round 1
 93.2% with k = 20
-true net change +18 in 66 changed decisions" tabindex="0"><circle class="hit" cx="579.2" cy="128.0" r="11"></circle><circle class="mark filled" cx="579.2" cy="128.0" r="5"></circle></g><g class="pt g-cal" data-tip="Calibrated, run 2, round 1
+real net change +18 in 66 changed outputs" tabindex="0"><circle class="hit" cx="579.2" cy="128.0" r="11"></circle><circle class="mark filled" cx="579.2" cy="128.0" r="5"></circle></g><g class="pt g-cal" data-tip="Strong, run 2, round 1
 96.3% with k = 20
-true net change +19 in 61 changed decisions" tabindex="0"><circle class="hit" cx="616.5" cy="128.0" r="11"></circle><circle class="mark filled" cx="616.5" cy="128.0" r="5"></circle></g><g class="pt g-cal" data-tip="Calibrated, run 1, round 2
+real net change +19 in 61 changed outputs" tabindex="0"><circle class="hit" cx="616.5" cy="128.0" r="11"></circle><circle class="mark filled" cx="616.5" cy="128.0" r="5"></circle></g><g class="pt g-cal" data-tip="Strong, run 1, round 2
 97.8% with k = 20
-true net change −26 in 69 changed decisions" tabindex="0"><circle class="hit" cx="634.2" cy="128.0" r="11"></circle><circle class="mark filled" cx="634.2" cy="128.0" r="5"></circle></g><g class="pt g-key" data-tip="Answer key, round 1
+real net change −26 in 69 changed outputs" tabindex="0"><circle class="hit" cx="634.2" cy="128.0" r="11"></circle><circle class="mark filled" cx="634.2" cy="128.0" r="5"></circle></g><g class="pt g-key" data-tip="Answer key, round 1
 98.4% with k = 20
-true net change +23 in 63 changed decisions" tabindex="0"><circle class="hit" cx="641.1" cy="119.0" r="11"></circle><circle class="mark filled" cx="641.1" cy="119.0" r="5"></circle></g><g class="pt g-cal" data-tip="Calibrated, run 1, round 1
+real net change +23 in 63 changed outputs" tabindex="0"><circle class="hit" cx="641.1" cy="119.0" r="11"></circle><circle class="mark filled" cx="641.1" cy="119.0" r="5"></circle></g><g class="pt g-cal" data-tip="Strong, run 1, round 1
 99.0% with k = 20
-true net change +20 in 54 changed decisions" tabindex="0"><circle class="hit" cx="648.3" cy="128.0" r="11"></circle><circle class="mark filled" cx="648.3" cy="128.0" r="5"></circle></g><g class="pt g-cal" data-tip="Calibrated, run 3, round 1
+real net change +20 in 54 changed outputs" tabindex="0"><circle class="hit" cx="648.3" cy="128.0" r="11"></circle><circle class="mark filled" cx="648.3" cy="128.0" r="5"></circle></g><g class="pt g-cal" data-tip="Strong, run 3, round 1
 99.5% with k = 20
-true net change +24 in 58 changed decisions" tabindex="0"><circle class="hit" cx="654.5" cy="119.0" r="11"></circle><circle class="mark filled" cx="654.5" cy="119.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 3, round 2
+real net change +24 in 58 changed outputs" tabindex="0"><circle class="hit" cx="654.5" cy="119.0" r="11"></circle><circle class="mark filled" cx="654.5" cy="119.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 3, round 2
 99.6% with k = 20
-true net change +34 in 76 changed decisions" tabindex="0"><circle class="hit" cx="655.3" cy="137.0" r="11"></circle><circle class="mark filled" cx="655.3" cy="137.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 1, round 2
+real net change +34 in 76 changed outputs" tabindex="0"><circle class="hit" cx="655.3" cy="137.0" r="11"></circle><circle class="mark filled" cx="655.3" cy="137.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 1, round 2
 99.9% with k = 20
-true net change +26 in 56 changed decisions" tabindex="0"><circle class="hit" cx="658.8" cy="110.0" r="11"></circle><circle class="mark filled" cx="658.8" cy="110.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 2, round 2
+real net change +26 in 56 changed outputs" tabindex="0"><circle class="hit" cx="658.8" cy="110.0" r="11"></circle><circle class="mark filled" cx="658.8" cy="110.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 2, round 2
 99.9% with k = 20
-true net change +29 in 59 changed decisions" tabindex="0"><circle class="hit" cx="659.4" cy="128.0" r="11"></circle><circle class="mark filled" cx="659.4" cy="128.0" r="5"></circle></g><g class="pt g-weak" data-tip="Weak, round 1
+real net change +29 in 59 changed outputs" tabindex="0"><circle class="hit" cx="659.4" cy="128.0" r="11"></circle><circle class="mark filled" cx="659.4" cy="128.0" r="5"></circle></g><g class="pt g-weak" data-tip="Weak, round 1
 100.0% with k = 20
-true net change −58 in 94 changed decisions" tabindex="0"><circle class="hit" cx="660.0" cy="146.0" r="11"></circle><circle class="mark filled" cx="660.0" cy="146.0" r="5"></circle></g><g class="pt g-weak" data-tip="Weak, round 2
+real net change −58 in 94 changed outputs" tabindex="0"><circle class="hit" cx="660.0" cy="146.0" r="11"></circle><circle class="mark filled" cx="660.0" cy="146.0" r="5"></circle></g><g class="pt g-weak" data-tip="Weak, round 2
 100.0% with k = 20
-true net change −32 in 57 changed decisions" tabindex="0"><circle class="hit" cx="660.0" cy="101.0" r="11"></circle><circle class="mark filled" cx="660.0" cy="101.0" r="5"></circle></g><g class="pt g-key" data-tip="Answer key, round 3
+real net change −32 in 57 changed outputs" tabindex="0"><circle class="hit" cx="660.0" cy="101.0" r="11"></circle><circle class="mark filled" cx="660.0" cy="101.0" r="5"></circle></g><g class="pt g-key" data-tip="Answer key, round 3
 100.0% with k = 20
-true net change +40 in 44 changed decisions" tabindex="0"><circle class="hit" cx="660.0" cy="155.0" r="11"></circle><circle class="mark filled" cx="660.0" cy="155.0" r="5"></circle></g><line class="grid" x1="70" x2="660" y1="204.0" y2="204.0"></line><text class="lab" text-anchor="end" x="58.0" y="208.0">k = 30</text><g class="pt g-cal" data-tip="Calibrated, run 2, round 2
+real net change +40 in 44 changed outputs" tabindex="0"><circle class="hit" cx="660.0" cy="155.0" r="11"></circle><circle class="mark filled" cx="660.0" cy="155.0" r="5"></circle></g><line class="grid" x1="70" x2="660" y1="204.0" y2="204.0"></line><text class="lab" text-anchor="end" x="58.0" y="208.0">k = 30</text><g class="pt g-cal" data-tip="Strong, run 2, round 2
 70.2% with k = 30
-true net change +8 in 86 changed decisions" tabindex="0"><circle class="hit" cx="308.5" cy="204.0" r="11"></circle><circle class="mark filled" cx="308.5" cy="204.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 1, round 1
+real net change +8 in 86 changed outputs" tabindex="0"><circle class="hit" cx="308.5" cy="204.0" r="11"></circle><circle class="mark filled" cx="308.5" cy="204.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 1, round 1
 91.5% with k = 30
-true net change +13 in 69 changed decisions" tabindex="0"><circle class="hit" cx="559.6" cy="204.0" r="11"></circle><circle class="mark filled" cx="559.6" cy="204.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 2, round 1
+real net change +13 in 69 changed outputs" tabindex="0"><circle class="hit" cx="559.6" cy="204.0" r="11"></circle><circle class="mark filled" cx="559.6" cy="204.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 2, round 1
 92.2% with k = 30
-true net change +12 in 64 changed decisions" tabindex="0"><circle class="hit" cx="567.8" cy="195.0" r="11"></circle><circle class="mark filled" cx="567.8" cy="195.0" r="5"></circle></g><g class="pt g-cal" data-tip="Calibrated, run 1, round 3
+real net change +12 in 64 changed outputs" tabindex="0"><circle class="hit" cx="567.8" cy="195.0" r="11"></circle><circle class="mark filled" cx="567.8" cy="195.0" r="5"></circle></g><g class="pt g-cal" data-tip="Strong, run 1, round 3
 93.1% with k = 30
-true net change +10 in 50 changed decisions" tabindex="0"><circle class="hit" cx="578.3" cy="204.0" r="11"></circle><circle class="mark filled" cx="578.3" cy="204.0" r="5"></circle></g><g class="pt g-cal" data-tip="Calibrated, run 3, round 2
+real net change +10 in 50 changed outputs" tabindex="0"><circle class="hit" cx="578.3" cy="204.0" r="11"></circle><circle class="mark filled" cx="578.3" cy="204.0" r="5"></circle></g><g class="pt g-cal" data-tip="Strong, run 3, round 2
 93.7% with k = 30
-true net change +17 in 71 changed decisions" tabindex="0"><circle class="hit" cx="585.5" cy="195.0" r="11"></circle><circle class="mark filled" cx="585.5" cy="195.0" r="5"></circle></g><g class="pt g-key" data-tip="Answer key, round 2
+real net change +17 in 71 changed outputs" tabindex="0"><circle class="hit" cx="585.5" cy="195.0" r="11"></circle><circle class="mark filled" cx="585.5" cy="195.0" r="5"></circle></g><g class="pt g-key" data-tip="Answer key, round 2
 95.3% with k = 30
-true net change +27 in 97 changed decisions" tabindex="0"><circle class="hit" cx="604.2" cy="204.0" r="11"></circle><circle class="mark filled" cx="604.2" cy="204.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 3, round 1
+real net change +27 in 97 changed outputs" tabindex="0"><circle class="hit" cx="604.2" cy="204.0" r="11"></circle><circle class="mark filled" cx="604.2" cy="204.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 3, round 1
 98.4% with k = 30
-true net change +18 in 66 changed decisions" tabindex="0"><circle class="hit" cx="641.3" cy="204.0" r="11"></circle><circle class="mark filled" cx="641.3" cy="204.0" r="5"></circle></g><g class="pt g-cal" data-tip="Calibrated, run 2, round 1
+real net change +18 in 66 changed outputs" tabindex="0"><circle class="hit" cx="641.3" cy="204.0" r="11"></circle><circle class="mark filled" cx="641.3" cy="204.0" r="5"></circle></g><g class="pt g-cal" data-tip="Strong, run 2, round 1
 99.6% with k = 30
-true net change +19 in 61 changed decisions" tabindex="0"><circle class="hit" cx="655.2" cy="204.0" r="11"></circle><circle class="mark filled" cx="655.2" cy="204.0" r="5"></circle></g><g class="pt g-cal" data-tip="Calibrated, run 1, round 2
+real net change +19 in 61 changed outputs" tabindex="0"><circle class="hit" cx="655.2" cy="204.0" r="11"></circle><circle class="mark filled" cx="655.2" cy="204.0" r="5"></circle></g><g class="pt g-cal" data-tip="Strong, run 1, round 2
 99.8% with k = 30
-true net change −26 in 69 changed decisions" tabindex="0"><circle class="hit" cx="657.8" cy="195.0" r="11"></circle><circle class="mark filled" cx="657.8" cy="195.0" r="5"></circle></g><g class="pt g-key" data-tip="Answer key, round 1
+real net change −26 in 69 changed outputs" tabindex="0"><circle class="hit" cx="657.8" cy="195.0" r="11"></circle><circle class="mark filled" cx="657.8" cy="195.0" r="5"></circle></g><g class="pt g-key" data-tip="Answer key, round 1
 99.9% with k = 30
-true net change +23 in 63 changed decisions" tabindex="0"><circle class="hit" cx="659.1" cy="213.0" r="11"></circle><circle class="mark filled" cx="659.1" cy="213.0" r="5"></circle></g><g class="pt g-cal" data-tip="Calibrated, run 1, round 1
+real net change +23 in 63 changed outputs" tabindex="0"><circle class="hit" cx="659.1" cy="213.0" r="11"></circle><circle class="mark filled" cx="659.1" cy="213.0" r="5"></circle></g><g class="pt g-cal" data-tip="Strong, run 1, round 1
 100.0% with k = 30
-true net change +20 in 54 changed decisions" tabindex="0"><circle class="hit" cx="659.9" cy="186.0" r="11"></circle><circle class="mark filled" cx="659.9" cy="186.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 3, round 2
+real net change +20 in 54 changed outputs" tabindex="0"><circle class="hit" cx="659.9" cy="186.0" r="11"></circle><circle class="mark filled" cx="659.9" cy="186.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 3, round 2
 100.0% with k = 30
-true net change +34 in 76 changed decisions" tabindex="0"><circle class="hit" cx="659.9" cy="222.0" r="11"></circle><circle class="mark filled" cx="659.9" cy="222.0" r="5"></circle></g><g class="pt g-cal" data-tip="Calibrated, run 3, round 1
+real net change +34 in 76 changed outputs" tabindex="0"><circle class="hit" cx="659.9" cy="222.0" r="11"></circle><circle class="mark filled" cx="659.9" cy="222.0" r="5"></circle></g><g class="pt g-cal" data-tip="Strong, run 3, round 1
 100.0% with k = 30
-true net change +24 in 58 changed decisions" tabindex="0"><circle class="hit" cx="660.0" cy="177.0" r="11"></circle><circle class="mark filled" cx="660.0" cy="177.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 1, round 2
+real net change +24 in 58 changed outputs" tabindex="0"><circle class="hit" cx="660.0" cy="177.0" r="11"></circle><circle class="mark filled" cx="660.0" cy="177.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 1, round 2
 100.0% with k = 30
-true net change +26 in 56 changed decisions" tabindex="0"><circle class="hit" cx="660.0" cy="231.0" r="11"></circle><circle class="mark filled" cx="660.0" cy="231.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 2, round 2
+real net change +26 in 56 changed outputs" tabindex="0"><circle class="hit" cx="660.0" cy="231.0" r="11"></circle><circle class="mark filled" cx="660.0" cy="231.0" r="5"></circle></g><g class="pt g-len" data-tip="Lenient, run 2, round 2
 100.0% with k = 30
-true net change +29 in 59 changed decisions" tabindex="0"><circle class="hit" cx="660.0" cy="231.0" r="11"></circle><circle class="mark filled" cx="660.0" cy="231.0" r="5"></circle></g><g class="pt g-weak" data-tip="Weak, round 1
+real net change +29 in 59 changed outputs" tabindex="0"><circle class="hit" cx="660.0" cy="231.0" r="11"></circle><circle class="mark filled" cx="660.0" cy="231.0" r="5"></circle></g><g class="pt g-weak" data-tip="Weak, round 1
 100.0% with k = 30
-true net change −58 in 94 changed decisions" tabindex="0"><circle class="hit" cx="660.0" cy="231.0" r="11"></circle><circle class="mark filled" cx="660.0" cy="231.0" r="5"></circle></g><g class="pt g-key" data-tip="Answer key, round 3
+real net change −58 in 94 changed outputs" tabindex="0"><circle class="hit" cx="660.0" cy="231.0" r="11"></circle><circle class="mark filled" cx="660.0" cy="231.0" r="5"></circle></g><g class="pt g-key" data-tip="Answer key, round 3
 100.0% with k = 30
-true net change +40 in 44 changed decisions" tabindex="0"><circle class="hit" cx="660.0" cy="231.0" r="11"></circle><circle class="mark filled" cx="660.0" cy="231.0" r="5"></circle></g><g class="pt g-weak" data-tip="Weak, round 2
+real net change +40 in 44 changed outputs" tabindex="0"><circle class="hit" cx="660.0" cy="231.0" r="11"></circle><circle class="mark filled" cx="660.0" cy="231.0" r="5"></circle></g><g class="pt g-weak" data-tip="Weak, round 2
 100.0% with k = 30
-true net change −32 in 57 changed decisions" tabindex="0"><circle class="hit" cx="660.0" cy="231.0" r="11"></circle><circle class="mark filled" cx="660.0" cy="231.0" r="5"></circle></g></svg></div><figcaption><b>Fig 3</b> For each of the 18 rounds: the probability that k changed decisions, selected at random and labelled by a person, give the same direction as the true net change. These are exact probabilities. The one difficult round had a net change near zero.</figcaption><details class="data"><summary>Show the data</summary><div class="table-wrap"><table><thead><tr><th>Climb</th><th>Round</th><th>Changed decisions</th><th>True net change</th><th>k = 10</th><th>k = 20</th><th>k = 30</th></tr></thead><tbody><tr><td>Answer key</td><td>round 1</td><td class="n">63</td><td class="n">+23</td><td class="n">89.6%</td><td class="n">98.4%</td><td class="n">99.9%</td></tr><tr><td>Answer key</td><td>round 2</td><td class="n">97</td><td class="n">+27</td><td class="n">73.7%</td><td class="n">88.3%</td><td class="n">95.3%</td></tr><tr><td>Answer key</td><td>round 3</td><td class="n">44</td><td class="n">+40</td><td class="n">100.0%</td><td class="n">100.0%</td><td class="n">100.0%</td></tr><tr><td>Calibrated, run 1</td><td>round 1</td><td class="n">54</td><td class="n">+20</td><td class="n">90.8%</td><td class="n">99.0%</td><td class="n">100.0%</td></tr><tr><td>Calibrated, run 1</td><td>round 2</td><td class="n">69</td><td class="n">−26</td><td class="n">87.7%</td><td class="n">97.8%</td><td class="n">99.8%</td></tr><tr><td>Calibrated, run 1</td><td>round 3</td><td class="n">50</td><td class="n">+10</td><td class="n">64.5%</td><td class="n">81.2%</td><td class="n">93.1%</td></tr><tr><td>Calibrated, run 2</td><td>round 1</td><td class="n">61</td><td class="n">+19</td><td class="n">85.0%</td><td class="n">96.3%</td><td class="n">99.6%</td></tr><tr><td>Calibrated, run 2</td><td>round 2</td><td class="n">86</td><td class="n">+8</td><td class="n">54.0%</td><td class="n">63.7%</td><td class="n">70.2%</td></tr><tr><td>Calibrated, run 3</td><td>round 1</td><td class="n">58</td><td class="n">+24</td><td class="n">93.4%</td><td class="n">99.5%</td><td class="n">100.0%</td></tr><tr><td>Calibrated, run 3</td><td>round 2</td><td class="n">71</td><td class="n">+17</td><td class="n">69.3%</td><td class="n">84.8%</td><td class="n">93.7%</td></tr><tr><td>Lenient, run 1</td><td>round 1</td><td class="n">69</td><td class="n">+13</td><td class="n">70.0%</td><td class="n">82.9%</td><td class="n">91.5%</td></tr><tr><td>Lenient, run 1</td><td>round 2</td><td class="n">56</td><td class="n">+26</td><td class="n">96.2%</td><td class="n">99.9%</td><td class="n">100.0%</td></tr><tr><td>Lenient, run 2</td><td>round 1</td><td class="n">64</td><td class="n">+12</td><td class="n">70.1%</td><td class="n">83.3%</td><td class="n">92.2%</td></tr><tr><td>Lenient, run 2</td><td>round 2</td><td class="n">59</td><td class="n">+29</td><td class="n">97.1%</td><td class="n">99.9%</td><td class="n">100.0%</td></tr><tr><td>Lenient, run 3</td><td>round 1</td><td class="n">66</td><td class="n">+18</td><td class="n">80.5%</td><td class="n">93.2%</td><td class="n">98.4%</td></tr><tr><td>Lenient, run 3</td><td>round 2</td><td class="n">76</td><td class="n">+34</td><td class="n">94.7%</td><td class="n">99.6%</td><td class="n">100.0%</td></tr><tr><td>Weak</td><td>round 1</td><td class="n">94</td><td class="n">−58</td><td class="n">99.5%</td><td class="n">100.0%</td><td class="n">100.0%</td></tr><tr><td>Weak</td><td>round 2</td><td class="n">57</td><td class="n">−32</td><td class="n">99.5%</td><td class="n">100.0%</td><td class="n">100.0%</td></tr></tbody></table></div></details></figure>
-<p><strong>Extension to the primer (rule 4):</strong> in a hill climb, label a small sample of the changed outputs in each round. This is
-retrospective evidence from the completed climbs. It is not yet a tested procedure for a running loop.</p>
-<h3 id="rule-5">Rule 5 holds only if the change does not alter the kind of output</h3>
-<p>The primer says that a comparison of two versions with the same judge, on the same kind of data, is more reliable
-than one pass rate. The reason is that the judge's errors affect both versions in almost the same way. Each keep or
-revert choice is such a comparison.</p>
-<p>But a change in a hill climb usually changes the kind of data. It changes which kinds of output the app gives, on the
-same tickets. Thus the condition of the rule is not true, and the judge's errors do not affect both versions in the same
-way:</p>
+real net change −32 in 57 changed outputs" tabindex="0"><circle class="hit" cx="660.0" cy="231.0" r="11"></circle><circle class="mark filled" cx="660.0" cy="231.0" r="5"></circle></g></svg></div><figcaption><b>Fig 3</b> For each of the 18 rounds: the probability that k changed outputs, selected at random and labeled by a person, give the same direction as the real net change. These are exact probabilities. The one difficult round had a net change near zero.</figcaption><details class="data"><summary>Show the data</summary><div class="table-wrap"><table><thead><tr><th>Climb</th><th>Round</th><th>Changed outputs</th><th>Real net change</th><th>k = 10</th><th>k = 20</th><th>k = 30</th></tr></thead><tbody><tr><td>Answer key</td><td>round 1</td><td class="n">63</td><td class="n">+23</td><td class="n">89.6%</td><td class="n">98.4%</td><td class="n">99.9%</td></tr><tr><td>Answer key</td><td>round 2</td><td class="n">97</td><td class="n">+27</td><td class="n">73.7%</td><td class="n">88.3%</td><td class="n">95.3%</td></tr><tr><td>Answer key</td><td>round 3</td><td class="n">44</td><td class="n">+40</td><td class="n">100.0%</td><td class="n">100.0%</td><td class="n">100.0%</td></tr><tr><td>Strong, run 1</td><td>round 1</td><td class="n">54</td><td class="n">+20</td><td class="n">90.8%</td><td class="n">99.0%</td><td class="n">100.0%</td></tr><tr><td>Strong, run 1</td><td>round 2</td><td class="n">69</td><td class="n">−26</td><td class="n">87.7%</td><td class="n">97.8%</td><td class="n">99.8%</td></tr><tr><td>Strong, run 1</td><td>round 3</td><td class="n">50</td><td class="n">+10</td><td class="n">64.5%</td><td class="n">81.2%</td><td class="n">93.1%</td></tr><tr><td>Strong, run 2</td><td>round 1</td><td class="n">61</td><td class="n">+19</td><td class="n">85.0%</td><td class="n">96.3%</td><td class="n">99.6%</td></tr><tr><td>Strong, run 2</td><td>round 2</td><td class="n">86</td><td class="n">+8</td><td class="n">54.0%</td><td class="n">63.7%</td><td class="n">70.2%</td></tr><tr><td>Strong, run 3</td><td>round 1</td><td class="n">58</td><td class="n">+24</td><td class="n">93.4%</td><td class="n">99.5%</td><td class="n">100.0%</td></tr><tr><td>Strong, run 3</td><td>round 2</td><td class="n">71</td><td class="n">+17</td><td class="n">69.3%</td><td class="n">84.8%</td><td class="n">93.7%</td></tr><tr><td>Lenient, run 1</td><td>round 1</td><td class="n">69</td><td class="n">+13</td><td class="n">70.0%</td><td class="n">82.9%</td><td class="n">91.5%</td></tr><tr><td>Lenient, run 1</td><td>round 2</td><td class="n">56</td><td class="n">+26</td><td class="n">96.2%</td><td class="n">99.9%</td><td class="n">100.0%</td></tr><tr><td>Lenient, run 2</td><td>round 1</td><td class="n">64</td><td class="n">+12</td><td class="n">70.1%</td><td class="n">83.3%</td><td class="n">92.2%</td></tr><tr><td>Lenient, run 2</td><td>round 2</td><td class="n">59</td><td class="n">+29</td><td class="n">97.1%</td><td class="n">99.9%</td><td class="n">100.0%</td></tr><tr><td>Lenient, run 3</td><td>round 1</td><td class="n">66</td><td class="n">+18</td><td class="n">80.5%</td><td class="n">93.2%</td><td class="n">98.4%</td></tr><tr><td>Lenient, run 3</td><td>round 2</td><td class="n">76</td><td class="n">+34</td><td class="n">94.7%</td><td class="n">99.6%</td><td class="n">100.0%</td></tr><tr><td>Weak</td><td>round 1</td><td class="n">94</td><td class="n">−58</td><td class="n">99.5%</td><td class="n">100.0%</td><td class="n">100.0%</td></tr><tr><td>Weak</td><td>round 2</td><td class="n">57</td><td class="n">−32</td><td class="n">99.5%</td><td class="n">100.0%</td><td class="n">100.0%</td></tr></tbody></table></div></details></figure>
+<p><strong>Added to the primer (rule 4):</strong> in a hill climb, label a small sample of the changed outputs in each round. I tested
+this only on completed climbs, not in a running loop.</p>
+<h3 id="rule-5">Rule 5 holds only if the change keeps the same kinds of output</h3>
+<p>The primer says that a comparison of two versions with the same judge is more reliable than one pass rate. The reason
+is that the judge's mistakes affect both versions in almost the same way. Each keep or revert choice is such a
+comparison.</p>
+<p>But a change usually changes which kinds of output the agent gives on the same tickets. Then the judge's mistakes do
+not affect both versions in the same way:</p>
 <ul>
-<li>For the lenient judge, the fix moved decisions from incorrect to correct. For most of these decisions, the judge
-  failed both the old incorrect decision and the new correct decision. Thus the fix gave no increase. The breaks of
-  the same change did give a decrease. The judge showed a validation decrease of 2.5 to 4.6 points in all six rounds,
-  but each change truly fixed more decisions than it broke.</li>
-<li>For the calibrated judge, the judge counted breaks on one kind of ticket as fixes. In all three runs, the judge's
-  holdout pass rate showed a larger gain than the true gain. The judge showed +6.6, +11.6 and +9.4 points. The true
-  gains were +5.0, +6.9 and +7.8 points. Fig 4 shows the difference for each climb.</li>
+<li><strong>The lenient judge reverted a real fix.</strong> Each lenient round tried the same fix: apply the $500 limit to
+  out-of-stock refunds. The fix changed wrong refunds into correct escalations. The judge fails the correct
+  escalation, so most fixes got no credit. The breaks still decreased the pass rate. The judge showed a decrease of 2.5
+  to 4.6 points in all six rounds. But each change fixed more outputs than it broke.</li>
+<li><strong>The strong judge scored breaks as fixes.</strong> In the seven rounds of its three climbs, changes broke 43 outputs on the unclear damage
+  tickets, by the answer key. The judge scored all 43 as fixes. Each strong climb kept such a change. Thus the
+  judge's gain on holdout was larger than the real gain in all three climbs: +6.6, +11.6 and +9.4 points, against a
+  real +5.0, +6.9 and +7.8 points.</li>
 </ul>
-<figure class="fig fig-outcomes" id="figure-4"><div class="legend"><span class="k"><svg aria-hidden="true" class="sw-svg g-ink" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>true change (answer key)</span><span class="k"><svg aria-hidden="true" class="sw-svg g-ink" viewbox="0 0 14 14"><circle class="mark hollow" cx="7" cy="7" r="5"></circle></svg>change from the climb's own judge</span><span class="k"><svg aria-hidden="true" class="sw-svg g-ink" viewbox="0 0 14 14"><path class="mark hollow" d="M7 1.5 L12.5 7 L7 12.5 L1.5 7 Z"></path></svg>true gain of the best reverted change</span></div><div class="chart"><svg aria-label="Holdout gain per climb: the judge's change and the true change" role="img" viewbox="0 0 680 326"><line class="axis" x1="189.5" x2="189.5" y1="10" y2="290"></line><text class="tick" text-anchor="middle" x="189.5" y="306.0">0</text><line class="grid" x1="288.2" x2="288.2" y1="10" y2="290"></line><text class="tick" text-anchor="middle" x="288.2" y="306.0">+5</text><line class="grid" x1="387.0" x2="387.0" y1="10" y2="290"></line><text class="tick" text-anchor="middle" x="387.0" y="306.0">+10</text><line class="grid" x1="485.8" x2="485.8" y1="10" y2="290"></line><text class="tick" text-anchor="middle" x="485.8" y="306.0">+15</text><line class="grid" x1="584.5" x2="584.5" y1="10" y2="290"></line><text class="tick" text-anchor="middle" x="584.5" y="306.0">+20</text><text class="lab m" text-anchor="middle" x="387.0" y="322.0">Change in pass rate on the 160 holdout tickets (points)</text><text class="lab" text-anchor="end" x="138.0" y="29.0">Answer key</text><g class="g-key"><g class="pt" data-tip="Answer key
-true change +20.6 points
-change from the climb's own judge: +20.6" tabindex="0"><circle class="hit" cx="596.8" cy="25.0" r="12"></circle><circle class="mark filled" cx="596.8" cy="25.0" r="5"></circle></g><text class="lab m" text-anchor="start" x="608.8" y="29.0">+20.6</text></g><text class="lab" text-anchor="end" x="138.0" y="71.0">Calibrated, run 1</text><g class="g-cal"><line class="conn" x1="319.1" x2="288.3" y1="67.0" y2="67.0"></line><g class="pt" data-tip="Calibrated, run 1
-true change +5.0 points
-change from the climb's own judge: +6.6" tabindex="0"><circle class="hit" cx="288.3" cy="67.0" r="12"></circle><circle class="mark hollow" cx="319.1" cy="67.0" r="5"></circle><circle class="mark filled" cx="288.3" cy="67.0" r="5"></circle></g><text class="lab m" text-anchor="start" x="331.1" y="71.0">judge 1.6 points too high</text></g><text class="lab" text-anchor="end" x="138.0" y="101.0">Calibrated, run 2</text><g class="g-cal"><line class="conn" x1="417.9" x2="325.3" y1="97.0" y2="97.0"></line><g class="pt" data-tip="Calibrated, run 2
-true change +6.9 points
-change from the climb's own judge: +11.6" tabindex="0"><circle class="hit" cx="325.3" cy="97.0" r="12"></circle><circle class="mark hollow" cx="417.9" cy="97.0" r="5"></circle><circle class="mark filled" cx="325.3" cy="97.0" r="5"></circle></g><text class="lab m" text-anchor="start" x="429.9" y="101.0">judge 4.7 points too high</text></g><text class="lab" text-anchor="end" x="138.0" y="131.0">Calibrated, run 3</text><g class="g-cal"><line class="conn" x1="374.7" x2="343.8" y1="127.0" y2="127.0"></line><g class="pt" data-tip="Calibrated, run 3
-true change +7.8 points
+<figure class="fig fig-outcomes" id="figure-4"><div class="legend"><span class="k"><svg aria-hidden="true" class="sw-svg g-ink" viewbox="0 0 14 14"><circle class="mark filled" cx="7" cy="7" r="5"></circle></svg>real change (answer key)</span><span class="k"><svg aria-hidden="true" class="sw-svg g-ink" viewbox="0 0 14 14"><circle class="mark hollow" cx="7" cy="7" r="5"></circle></svg>change from the climb's own judge</span><span class="k"><svg aria-hidden="true" class="sw-svg g-ink" viewbox="0 0 14 14"><path class="mark hollow" d="M7 1.5 L12.5 7 L7 12.5 L1.5 7 Z"></path></svg>real gain of the best reverted change</span></div><div class="chart"><svg aria-label="Holdout gain per climb: the judge's change and the real change" role="img" viewbox="0 0 680 326"><line class="axis" x1="189.5" x2="189.5" y1="10" y2="290"></line><text class="tick" text-anchor="middle" x="189.5" y="306.0">0</text><line class="grid" x1="288.2" x2="288.2" y1="10" y2="290"></line><text class="tick" text-anchor="middle" x="288.2" y="306.0">+5</text><line class="grid" x1="387.0" x2="387.0" y1="10" y2="290"></line><text class="tick" text-anchor="middle" x="387.0" y="306.0">+10</text><line class="grid" x1="485.8" x2="485.8" y1="10" y2="290"></line><text class="tick" text-anchor="middle" x="485.8" y="306.0">+15</text><line class="grid" x1="584.5" x2="584.5" y1="10" y2="290"></line><text class="tick" text-anchor="middle" x="584.5" y="306.0">+20</text><text class="lab m" text-anchor="middle" x="387.0" y="322.0">Change in pass rate on the 160 holdout tickets (points)</text><text class="lab" text-anchor="end" x="138.0" y="29.0">Answer key</text><g class="g-key"><g class="pt" data-tip="Answer key
+real change +20.6 points
+change from the climb's own judge: +20.6" tabindex="0"><circle class="hit" cx="596.8" cy="25.0" r="12"></circle><circle class="mark filled" cx="596.8" cy="25.0" r="5"></circle></g><text class="lab m" text-anchor="start" x="608.8" y="29.0">+20.6</text></g><text class="lab" text-anchor="end" x="138.0" y="71.0">Strong, run 1</text><g class="g-cal"><line class="conn" x1="319.1" x2="288.3" y1="67.0" y2="67.0"></line><g class="pt" data-tip="Strong, run 1
+real change +5.0 points
+change from the climb's own judge: +6.6" tabindex="0"><circle class="hit" cx="288.3" cy="67.0" r="12"></circle><circle class="mark hollow" cx="319.1" cy="67.0" r="5"></circle><circle class="mark filled" cx="288.3" cy="67.0" r="5"></circle></g><text class="lab m" text-anchor="start" x="331.1" y="71.0">judge 1.6 points too high</text></g><text class="lab" text-anchor="end" x="138.0" y="101.0">Strong, run 2</text><g class="g-cal"><line class="conn" x1="417.9" x2="325.3" y1="97.0" y2="97.0"></line><g class="pt" data-tip="Strong, run 2
+real change +6.9 points
+change from the climb's own judge: +11.6" tabindex="0"><circle class="hit" cx="325.3" cy="97.0" r="12"></circle><circle class="mark hollow" cx="417.9" cy="97.0" r="5"></circle><circle class="mark filled" cx="325.3" cy="97.0" r="5"></circle></g><text class="lab m" text-anchor="start" x="429.9" y="101.0">judge 4.7 points too high</text></g><text class="lab" text-anchor="end" x="138.0" y="131.0">Strong, run 3</text><g class="g-cal"><line class="conn" x1="374.7" x2="343.8" y1="127.0" y2="127.0"></line><g class="pt" data-tip="Strong, run 3
+real change +7.8 points
 change from the climb's own judge: +9.4" tabindex="0"><circle class="hit" cx="343.8" cy="127.0" r="12"></circle><circle class="mark hollow" cx="374.7" cy="127.0" r="5"></circle><circle class="mark filled" cx="343.8" cy="127.0" r="5"></circle></g><text class="lab m" text-anchor="start" x="386.7" y="131.0">judge 1.6 points too high</text></g><text class="lab" text-anchor="end" x="138.0" y="173.0">Lenient, run 1</text><g class="g-len"><line class="ref" x1="189.5" x2="288.3" y1="169.0" y2="169.0"></line><g class="pt" data-tip="Lenient, run 1
-best change the loop reverted: true +5.0 points" tabindex="0"><circle class="hit" cx="288.3" cy="169.0" r="12"></circle><path class="mark hollow" d="M288.3 163.0 L294.3 169.0 L288.3 175.0 L282.3 169.0 Z"></path></g><text class="lab m" text-anchor="start" x="299.3" y="173.0">+5.0 reverted</text><g class="pt" data-tip="Lenient, run 1
-true change +0.0 points
+best change the loop reverted: real +5.0 points" tabindex="0"><circle class="hit" cx="288.3" cy="169.0" r="12"></circle><path class="mark hollow" d="M288.3 163.0 L294.3 169.0 L288.3 175.0 L282.3 169.0 Z"></path></g><text class="lab m" text-anchor="start" x="299.3" y="173.0">+5.0 reverted</text><g class="pt" data-tip="Lenient, run 1
+real change +0.0 points
 change from the climb's own judge: +0.0" tabindex="0"><circle class="hit" cx="189.5" cy="169.0" r="12"></circle><circle class="mark filled" cx="189.5" cy="169.0" r="5"></circle></g></g><text class="lab" text-anchor="end" x="138.0" y="203.0">Lenient, run 2</text><g class="g-len"><line class="ref" x1="189.5" x2="263.6" y1="199.0" y2="199.0"></line><g class="pt" data-tip="Lenient, run 2
-best change the loop reverted: true +3.8 points" tabindex="0"><circle class="hit" cx="263.6" cy="199.0" r="12"></circle><path class="mark hollow" d="M263.6 193.0 L269.6 199.0 L263.6 205.0 L257.6 199.0 Z"></path></g><text class="lab m" text-anchor="start" x="274.6" y="203.0">+3.8 reverted</text><g class="pt" data-tip="Lenient, run 2
-true change +0.0 points
+best change the loop reverted: real +3.8 points" tabindex="0"><circle class="hit" cx="263.6" cy="199.0" r="12"></circle><path class="mark hollow" d="M263.6 193.0 L269.6 199.0 L263.6 205.0 L257.6 199.0 Z"></path></g><text class="lab m" text-anchor="start" x="274.6" y="203.0">+3.8 reverted</text><g class="pt" data-tip="Lenient, run 2
+real change +0.0 points
 change from the climb's own judge: +0.0" tabindex="0"><circle class="hit" cx="189.5" cy="199.0" r="12"></circle><circle class="mark filled" cx="189.5" cy="199.0" r="5"></circle></g></g><text class="lab" text-anchor="end" x="138.0" y="233.0">Lenient, run 3</text><g class="g-len"><line class="ref" x1="189.5" x2="368.5" y1="229.0" y2="229.0"></line><g class="pt" data-tip="Lenient, run 3
-best change the loop reverted: true +9.1 points" tabindex="0"><circle class="hit" cx="368.5" cy="229.0" r="12"></circle><path class="mark hollow" d="M368.5 223.0 L374.5 229.0 L368.5 235.0 L362.5 229.0 Z"></path></g><text class="lab m" text-anchor="start" x="379.5" y="233.0">+9.1 reverted</text><g class="pt" data-tip="Lenient, run 3
-true change +0.0 points
+best change the loop reverted: real +9.1 points" tabindex="0"><circle class="hit" cx="368.5" cy="229.0" r="12"></circle><path class="mark hollow" d="M368.5 223.0 L374.5 229.0 L368.5 235.0 L362.5 229.0 Z"></path></g><text class="lab m" text-anchor="start" x="379.5" y="233.0">+9.1 reverted</text><g class="pt" data-tip="Lenient, run 3
+real change +0.0 points
 change from the climb's own judge: +0.0" tabindex="0"><circle class="hit" cx="189.5" cy="229.0" r="12"></circle><circle class="mark filled" cx="189.5" cy="229.0" r="5"></circle></g></g><text class="lab" text-anchor="end" x="138.0" y="275.0">Weak</text><g class="g-weak"><g class="pt" data-tip="Weak
-true change +0.0 points
-change from the climb's own judge: +0.0" tabindex="0"><circle class="hit" cx="189.5" cy="271.0" r="12"></circle><circle class="mark filled" cx="189.5" cy="271.0" r="5"></circle></g></g></svg></div><figcaption><b>Fig 4</b> The gain on the holdout tickets, from the baseline to the final version of each climb. The hollow marker is the change from the climb's own grader. The filled marker is the change from the answer key. The calibrated judge showed each gain as larger than the true gain. The lenient climbs kept no change, but each climb reverted a change that truly improved the agent.</figcaption><details class="data"><summary>Show the data</summary><div class="table-wrap"><table><thead><tr><th>Climb</th><th>Judge's change</th><th>True change</th><th>Best reverted change (true)</th></tr></thead><tbody><tr><td>Answer key</td><td class="n">+20.6</td><td class="n">+20.6</td><td class="n"></td></tr><tr><td>Calibrated, run 1</td><td class="n">+6.6</td><td class="n">+5.0</td><td class="n"></td></tr><tr><td>Calibrated, run 2</td><td class="n">+11.6</td><td class="n">+6.9</td><td class="n"></td></tr><tr><td>Calibrated, run 3</td><td class="n">+9.4</td><td class="n">+7.8</td><td class="n"></td></tr><tr><td>Lenient, run 1</td><td class="n">+0.0</td><td class="n">+0.0</td><td class="n">+5.0</td></tr><tr><td>Lenient, run 2</td><td class="n">+0.0</td><td class="n">+0.0</td><td class="n">+3.8</td></tr><tr><td>Lenient, run 3</td><td class="n">+0.0</td><td class="n">+0.0</td><td class="n">+9.1</td></tr><tr><td>Weak</td><td class="n">+0.0</td><td class="n">+0.0</td><td class="n"></td></tr></tbody></table></div></details></figure>
-<p>This is the main finding of the study. <strong>A judge can be accurate on the baseline and still make incorrect keep or
-revert choices.</strong> The cause is the judge's accuracy on the outputs that each change affects, not its average accuracy.</p>
-<p><strong>Extension to the primer (rule 5):</strong> a comparison with the same judge is more reliable only when the change keeps the
-same kinds of output. If the change alters the kinds of output, check a sample of the outputs that changed.</p>
+real change +0.0 points
+change from the climb's own judge: +0.0" tabindex="0"><circle class="hit" cx="189.5" cy="271.0" r="12"></circle><circle class="mark filled" cx="189.5" cy="271.0" r="5"></circle></g></g></svg></div><figcaption><b>Fig 4</b> The gain on the holdout tickets, from the baseline to the final version of each climb. The hollow marker is the change from the climb's own judge. The filled marker is the real change, from the answer key. The strong judge showed each gain as larger than the real gain. The lenient climbs kept no change, but each climb reverted a change that really improved the agent.</figcaption><details class="data"><summary>Show the data</summary><div class="table-wrap"><table><thead><tr><th>Climb</th><th>Judge's change</th><th>Real change</th><th>Best reverted change (real)</th></tr></thead><tbody><tr><td>Answer key</td><td class="n">+20.6</td><td class="n">+20.6</td><td class="n"></td></tr><tr><td>Strong, run 1</td><td class="n">+6.6</td><td class="n">+5.0</td><td class="n"></td></tr><tr><td>Strong, run 2</td><td class="n">+11.6</td><td class="n">+6.9</td><td class="n"></td></tr><tr><td>Strong, run 3</td><td class="n">+9.4</td><td class="n">+7.8</td><td class="n"></td></tr><tr><td>Lenient, run 1</td><td class="n">+0.0</td><td class="n">+0.0</td><td class="n">+5.0</td></tr><tr><td>Lenient, run 2</td><td class="n">+0.0</td><td class="n">+0.0</td><td class="n">+3.8</td></tr><tr><td>Lenient, run 3</td><td class="n">+0.0</td><td class="n">+0.0</td><td class="n">+9.1</td></tr><tr><td>Weak</td><td class="n">+0.0</td><td class="n">+0.0</td><td class="n"></td></tr></tbody></table></div></details></figure>
+<p>This is the main finding. <strong>A judge can calibrate well on the baseline and still make wrong keep or revert choices.</strong>
+The judge's accuracy on the outputs that each change affects decides the choice. Its overall accuracy does not.</p>
+<p><strong>Added to the primer (rule 5):</strong> a comparison with the same judge is reliable only if the change keeps the same kinds
+of output. If it does not, label a sample of the outputs that changed.</p>
 <h3 id="rule-6">Rule 6 holds, but the climb itself moved the rates</h3>
-<p>The climb changes which mistakes the agent makes. Thus the judge's rates on the final version can be different from
-its rates on the baseline. The calibrated climbs changed the types of the agent's mistakes, not only their number. On
-validation and holdout, the total number of incorrect decisions decreased, from 116 to 90, 84 and 74. But the number
-on the open kind of ticket increased, from 2 to 14, 16 and 12. The judge passes the decisions of that kind. Before the
-climbs, the judge passed 6% of the agent's incorrect decisions. After them, it passed 16%, 26% and 16%. Fig 5 shows
-this change.</p>
-<figure class="fig fig-drift" id="figure-5"><div class="chart"><svg aria-label="Incorrect decisions on the open tickets, and the fraction that the judge passed" role="img" viewbox="0 0 700 260"><text class="lab" text-anchor="start" x="36.0" y="14.0">Incorrect decisions on the open tickets</text><line class="axis" x1="44" x2="244" y1="226.0" y2="226.0"></line><text class="tick" text-anchor="end" x="38.0" y="230.0">0</text><line class="grid" x1="44" x2="244" y1="177.0" y2="177.0"></line><text class="tick" text-anchor="end" x="38.0" y="181.0">5</text><line class="grid" x1="44" x2="244" y1="128.0" y2="128.0"></line><text class="tick" text-anchor="end" x="38.0" y="132.0">10</text><line class="grid" x1="44" x2="244" y1="79.0" y2="79.0"></line><text class="tick" text-anchor="end" x="38.0" y="83.0">15</text><line class="grid" x1="44" x2="244" y1="30.0" y2="30.0"></line><text class="tick" text-anchor="end" x="38.0" y="34.0">20</text><text class="tick" text-anchor="middle" x="74.0" y="244.0">baseline</text><text class="tick" text-anchor="middle" x="224.0" y="244.0">final version</text><g class="g-cal"><line class="line" x1="74" x2="224" y1="206.4" y2="88.8"></line><g class="pt" data-tip="Calibrated, run 1
-Incorrect decisions on the open tickets: 2 at baseline, 14 at the final version" tabindex="0"><circle class="hit" cx="224" cy="88.8" r="12"></circle><circle class="mark filled" cx="224" cy="88.8" r="4.5"></circle></g></g><g class="g-cal"><line class="line" x1="74" x2="224" y1="206.4" y2="69.2"></line><g class="pt" data-tip="Calibrated, run 2
-Incorrect decisions on the open tickets: 2 at baseline, 16 at the final version" tabindex="0"><circle class="hit" cx="224" cy="69.2" r="12"></circle><circle class="mark filled" cx="224" cy="69.2" r="4.5"></circle></g></g><g class="g-cal"><line class="line" x1="74" x2="224" y1="206.4" y2="108.4"></line><g class="pt" data-tip="Calibrated, run 3
-Incorrect decisions on the open tickets: 2 at baseline, 12 at the final version" tabindex="0"><circle class="hit" cx="224" cy="108.4" r="12"></circle><circle class="mark filled" cx="224" cy="108.4" r="4.5"></circle></g></g><g class="g-cal"><circle class="mark filled" cx="74" cy="206.4" r="4.5"></circle></g><text class="lab m" text-anchor="end" x="64.0" y="210.4">2</text><text class="lab em" text-anchor="start" x="236.0" y="74.2">16 (run 2)</text><text class="lab em" text-anchor="start" x="236.0" y="93.8">14 (run 1)</text><text class="lab em" text-anchor="start" x="236.0" y="113.4">12 (run 3)</text><text class="lab" text-anchor="start" x="376.0" y="14.0">Incorrect decisions that the judge passed</text><line class="axis" x1="384" x2="584" y1="226.0" y2="226.0"></line><text class="tick" text-anchor="end" x="378.0" y="230.0">0%</text><line class="grid" x1="384" x2="584" y1="160.7" y2="160.7"></line><text class="tick" text-anchor="end" x="378.0" y="164.7">10%</text><line class="grid" x1="384" x2="584" y1="95.3" y2="95.3"></line><text class="tick" text-anchor="end" x="378.0" y="99.3">20%</text><line class="grid" x1="384" x2="584" y1="30.0" y2="30.0"></line><text class="tick" text-anchor="end" x="378.0" y="34.0">30%</text><text class="tick" text-anchor="middle" x="414.0" y="244.0">baseline</text><text class="tick" text-anchor="middle" x="564.0" y="244.0">final version</text><g class="g-cal"><line class="line" x1="414" x2="564" y1="186.6" y2="124.4"></line><g class="pt" data-tip="Calibrated, run 1
-Incorrect decisions that the judge passed: 6% at baseline, 16% at the final version" tabindex="0"><circle class="hit" cx="564" cy="124.4" r="12"></circle><circle class="mark filled" cx="564" cy="124.4" r="4.5"></circle></g></g><g class="g-cal"><line class="line" x1="414" x2="564" y1="186.6" y2="54.9"></line><g class="pt" data-tip="Calibrated, run 2
-Incorrect decisions that the judge passed: 6% at baseline, 26% at the final version" tabindex="0"><circle class="hit" cx="564" cy="54.9" r="12"></circle><circle class="mark filled" cx="564" cy="54.9" r="4.5"></circle></g></g><g class="g-cal"><line class="line" x1="414" x2="564" y1="186.6" y2="120.1"></line><g class="pt" data-tip="Calibrated, run 3
-Incorrect decisions that the judge passed: 6% at baseline, 16% at the final version" tabindex="0"><circle class="hit" cx="564" cy="120.1" r="12"></circle><circle class="mark filled" cx="564" cy="120.1" r="4.5"></circle></g></g><g class="g-cal"><circle class="mark filled" cx="414" cy="186.6" r="4.5"></circle></g><text class="lab m" text-anchor="end" x="404.0" y="190.6">6%</text><text class="lab em" text-anchor="start" x="576.0" y="59.9">26% (run 2)</text><text class="lab em" text-anchor="start" x="576.0" y="125.1">16% (runs 1 and 3)</text></svg></div><figcaption><b>Fig 5</b> Each calibrated climb changed the types of the agent's incorrect decisions, not only their number. The total decreased, from 116 to 90, 84 and 74. But more of them were on the open tickets, where this judge passes them. The data is the validation and holdout decisions. The fraction of all incorrect decisions that the judge passed (1 − TNR) increased in each run.</figcaption><details class="data"><summary>Show the data</summary><div class="table-wrap"><table><thead><tr><th>Measure</th><th>Baseline</th><th>Run 1</th><th>Run 2</th><th>Run 3</th></tr></thead><tbody><tr><td>Incorrect decisions on the open tickets</td><td class="n">2</td><td class="n">14</td><td class="n">16</td><td class="n">12</td></tr><tr><td>Incorrect decisions that the judge passed</td><td class="n">6%</td><td class="n">16%</td><td class="n">26%</td><td class="n">16%</td></tr></tbody></table></div></details></figure>
-<p>When I corrected the final pass rates with the baseline rates, the result was too high in all three runs. The
-corrected values were 86.7%, 92.4% and 89.9%. The true values were 84.4%, 86.2% and 87.2%. The raw pass rates were
-nearer to the true values.</p>
-<p>The primer already warns that the correction needs rates that are correct for the new outputs. A hill climb is a case
-where the rates change because of the optimization itself. This is a form of Goodhart's law: when the judge's pass rate
-becomes the target, the loop can move the app toward the judge's blind spots.</p>
-<p><strong>Extension to the primer (rule 4):</strong> after an optimization, measure TPR and TNR again on the final version before you correct
-or report its pass rate.</p>
+<p>The climb changed which mistakes the agent makes. On validation and holdout, the number of wrong outputs decreased
+from 116 to 90, 84 and 74. But on the unclear damage tickets, wrong outputs increased from 2 to 14, 16 and 12, and the
+judge passes them. Thus the judge's TNR decreased from 0.94 to 0.84, 0.74 and 0.84. The decrease has the same
+direction in all three climbs, but it is statistically significant only in the second climb.</p>
+<figure class="fig fig-drift" id="figure-5"><div class="chart"><svg aria-label="Wrong outputs on the unclear damage tickets, and the share that the judge passed" role="img" viewbox="0 0 700 260"><text class="lab" text-anchor="start" x="36.0" y="14.0">Wrong outputs on the unclear damage tickets</text><line class="axis" x1="44" x2="244" y1="226.0" y2="226.0"></line><text class="tick" text-anchor="end" x="38.0" y="230.0">0</text><line class="grid" x1="44" x2="244" y1="177.0" y2="177.0"></line><text class="tick" text-anchor="end" x="38.0" y="181.0">5</text><line class="grid" x1="44" x2="244" y1="128.0" y2="128.0"></line><text class="tick" text-anchor="end" x="38.0" y="132.0">10</text><line class="grid" x1="44" x2="244" y1="79.0" y2="79.0"></line><text class="tick" text-anchor="end" x="38.0" y="83.0">15</text><line class="grid" x1="44" x2="244" y1="30.0" y2="30.0"></line><text class="tick" text-anchor="end" x="38.0" y="34.0">20</text><text class="tick" text-anchor="middle" x="74.0" y="244.0">baseline</text><text class="tick" text-anchor="middle" x="224.0" y="244.0">final version</text><g class="g-cal"><line class="line" x1="74" x2="224" y1="206.4" y2="88.8"></line><g class="pt" data-tip="Strong, run 1
+Wrong outputs on the unclear damage tickets: 2 at baseline, 14 at the final version" tabindex="0"><circle class="hit" cx="224" cy="88.8" r="12"></circle><circle class="mark filled" cx="224" cy="88.8" r="4.5"></circle></g></g><g class="g-cal"><line class="line" x1="74" x2="224" y1="206.4" y2="69.2"></line><g class="pt" data-tip="Strong, run 2
+Wrong outputs on the unclear damage tickets: 2 at baseline, 16 at the final version" tabindex="0"><circle class="hit" cx="224" cy="69.2" r="12"></circle><circle class="mark filled" cx="224" cy="69.2" r="4.5"></circle></g></g><g class="g-cal"><line class="line" x1="74" x2="224" y1="206.4" y2="108.4"></line><g class="pt" data-tip="Strong, run 3
+Wrong outputs on the unclear damage tickets: 2 at baseline, 12 at the final version" tabindex="0"><circle class="hit" cx="224" cy="108.4" r="12"></circle><circle class="mark filled" cx="224" cy="108.4" r="4.5"></circle></g></g><g class="g-cal"><circle class="mark filled" cx="74" cy="206.4" r="4.5"></circle></g><text class="lab m" text-anchor="end" x="64.0" y="210.4">2</text><text class="lab em" text-anchor="start" x="236.0" y="74.2">16 (run 2)</text><text class="lab em" text-anchor="start" x="236.0" y="93.8">14 (run 1)</text><text class="lab em" text-anchor="start" x="236.0" y="113.4">12 (run 3)</text><text class="lab" text-anchor="start" x="376.0" y="14.0">Wrong outputs that the judge passed</text><line class="axis" x1="384" x2="584" y1="226.0" y2="226.0"></line><text class="tick" text-anchor="end" x="378.0" y="230.0">0%</text><line class="grid" x1="384" x2="584" y1="160.7" y2="160.7"></line><text class="tick" text-anchor="end" x="378.0" y="164.7">10%</text><line class="grid" x1="384" x2="584" y1="95.3" y2="95.3"></line><text class="tick" text-anchor="end" x="378.0" y="99.3">20%</text><line class="grid" x1="384" x2="584" y1="30.0" y2="30.0"></line><text class="tick" text-anchor="end" x="378.0" y="34.0">30%</text><text class="tick" text-anchor="middle" x="414.0" y="244.0">baseline</text><text class="tick" text-anchor="middle" x="564.0" y="244.0">final version</text><g class="g-cal"><line class="line" x1="414" x2="564" y1="186.6" y2="124.4"></line><g class="pt" data-tip="Strong, run 1
+Wrong outputs that the judge passed: 6% at baseline, 16% at the final version" tabindex="0"><circle class="hit" cx="564" cy="124.4" r="12"></circle><circle class="mark filled" cx="564" cy="124.4" r="4.5"></circle></g></g><g class="g-cal"><line class="line" x1="414" x2="564" y1="186.6" y2="54.9"></line><g class="pt" data-tip="Strong, run 2
+Wrong outputs that the judge passed: 6% at baseline, 26% at the final version" tabindex="0"><circle class="hit" cx="564" cy="54.9" r="12"></circle><circle class="mark filled" cx="564" cy="54.9" r="4.5"></circle></g></g><g class="g-cal"><line class="line" x1="414" x2="564" y1="186.6" y2="120.1"></line><g class="pt" data-tip="Strong, run 3
+Wrong outputs that the judge passed: 6% at baseline, 16% at the final version" tabindex="0"><circle class="hit" cx="564" cy="120.1" r="12"></circle><circle class="mark filled" cx="564" cy="120.1" r="4.5"></circle></g></g><g class="g-cal"><circle class="mark filled" cx="414" cy="186.6" r="4.5"></circle></g><text class="lab m" text-anchor="end" x="404.0" y="190.6">6%</text><text class="lab em" text-anchor="start" x="576.0" y="59.9">26% (run 2)</text><text class="lab em" text-anchor="start" x="576.0" y="125.1">16% (runs 1 and 3)</text></svg></div><figcaption><b>Fig 5</b> Each strong-judge climb changed the kinds of wrong output that the agent gave, not only their number. The total decreased, from 116 to 90, 84 and 74. But more of them were on the unclear damage tickets, where this judge passes them. The data is the validation and holdout outputs. The share of all wrong outputs that the judge passed (1 − TNR) increased in each climb.</figcaption><details class="data"><summary>Show the data</summary><div class="table-wrap"><table><thead><tr><th>Measure</th><th>Baseline</th><th>Run 1</th><th>Run 2</th><th>Run 3</th></tr></thead><tbody><tr><td>Wrong outputs on the unclear damage tickets</td><td class="n">2</td><td class="n">14</td><td class="n">16</td><td class="n">12</td></tr><tr><td>Wrong outputs that the judge passed</td><td class="n">6%</td><td class="n">16%</td><td class="n">26%</td><td class="n">16%</td></tr></tbody></table></div></details></figure>
+<p>I corrected the final pass rates with the baseline TPR and TNR. The result was too high in all three climbs: 86.7%,
+92.4% and 89.9%, against a real 84.4%, 86.2% and 87.2%. The raw pass rates were nearer to the real values.</p>
+<p>The primer already warns that the correction is wrong when the judge's rates drift. In a hill climb, the climb itself
+causes the drift. This is a form of Goodhart's law: when the judge's pass rate becomes the target, the loop moves the
+agent toward the judge's blind spots.</p>
+<p><strong>Added to the primer (rule 4):</strong> after a climb, calibrate the judge again on the final version. Do this before you
+correct or report its pass rate.</p>
 <h3 id="where-the-effects-come-from">Where the effects come from</h3>
-<p>The results show three sources of the effects. Each source has a different size.</p>
 <ul>
-<li><strong>The judge's error rates on the baseline.</strong> The order of the graders by J predicted the order of the outcomes. The
-  answer key improved the agent the most, the calibrated judge improved it less, and the lenient and weak judges kept
-  no change.</li>
-<li><strong>The decisions that each change affects.</strong> J on fixes and J on breaks were very different from the baseline J
-  (Fig 2). This source explains the specific incorrect choices: the lenient judge's reverts, and the calibrated
-  judge's larger reported gains.</li>
-<li><strong>The analyzer's proposals.</strong> The three runs of each judge had different proposals in different words. But each run
-  made the same kind of change. Each lenient round tried the $500 fix. Each calibrated run kept the $500 fix, and then
-  a change that applied policy rule 3 to the open kind of ticket. Thus the analyzer changed the size of the results, but not
-  their direction.</li>
+<li><strong>The judge's overall J.</strong> The order of the judges by J predicted the order of the results. The answer key improved
+  the agent the most, the strong judge less, and the lenient and weak judges kept no change.</li>
+<li><strong>The outputs that each change affects.</strong> J on fixes and J on breaks explain the specific wrong choices: the lenient
+  judge's reverts, and the strong judge's gains that were too large.</li>
+<li><strong>The analyzer.</strong> The three climbs with each judge used different words, but they made the same kinds of change.
+  Thus the analyzer changed the size of the results, but not their direction.</li>
 </ul>
-<h2 id="what-a-team-must-measure"><span class="num">6.</span> What a team must measure</h2>
+<h2 id="what-to-do-in-a-hill-climb"><span class="num">5.</span> What to do in a hill climb</h2>
 <div class="table-wrap"><table>
 <thead>
 <tr>
 <th>When</th>
-<th>What to measure</th>
+<th>What to do</th>
 <th>Why</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Before the climb</td>
-<td>TPR and TNR on labelled outputs, with at least 30 incorrect outputs</td>
-<td>The usual agreement checks do not show TNR</td>
+<td>Calibrate the judge, as in the primer. Include at least 30 wrong outputs</td>
+<td>A random sample is mostly correct outputs. It measures TPR, but not TNR</td>
 </tr>
 <tr>
 <td>Before the climb</td>
-<td>TPR and TNR for each kind of output, with a correct output for each kind</td>
+<td>Include a correct output for each important kind of case, also kinds that the app does not give yet</td>
 <td>A judge can have J near zero on one kind of output</td>
 </tr>
 <tr>
-<td>During the climb</td>
-<td>A small labelled sample of the outputs that each change affects</td>
-<td>Each keep or revert choice depends only on these outputs</td>
+<td>In each round</td>
+<td>Label a small sample of the outputs that the change affected</td>
+<td>The keep or revert choice depends only on these outputs</td>
 </tr>
 <tr>
-<td>During the climb</td>
-<td>Changes that break the specification, or that decide a case the specification leaves open</td>
+<td>In each round</td>
+<td>Examine each change that breaks the policy, or that decides a case the policy leaves open</td>
 <td>The loop can move the app toward the judge's blind spots</td>
 </tr>
 <tr>
 <td>After the climb</td>
-<td>TPR and TNR again, on the final version</td>
-<td>The climb can change the judge's error rates</td>
+<td>Calibrate the judge again on the final version</td>
+<td>The climb can change the judge's TPR and TNR</td>
 </tr>
 </tbody>
 </table></div>
-<h2 id="what-the-study-does-not-show"><span class="num">7.</span> What the study does not show</h2>
+<h2 id="what-the-study-does-not-show"><span class="num">6.</span> What the study does not show</h2>
 <ul>
-<li><strong>A mechanism, not its prevalence.</strong> The study used one task, one agent and one policy. It shows how these problems
-  occur. It does not show how frequently they occur in other tasks.</li>
-<li><strong>A small number of runs.</strong> Each judge ran in three climbs at most. Three runs show that the results repeat. They do
-  not show how frequently they repeat.</li>
-<li><strong>Unclear cases in the policy.</strong> For the open kind of ticket, the answer key gives one possible reading of the
-  policy. On these tickets, the calibrated judge's "errors" are disagreements with that reading. The size of the TNR
-  decrease depends on that reading. The argument does not: the loop decided an unclear case without a person.</li>
-<li><strong>Retrospective labelling.</strong> The labelling result in Section 5 comes from the completed climbs. It assumes random
-  samples and correct labels. It is not yet tested in a running loop.</li>
-<li><strong>Repeated use of the validation set.</strong> The loop used the same validation set in each round. Thus a gain on
-  validation is not an independent measure after many rounds. The holdout set is, because the loop did not use it.</li>
-<li><strong>One type of judge.</strong> The judges graded each output alone, with pass or fail. The article recommends that, for a
-  comparison with the baseline, a judge sees both outputs in random order. This study did not test that setup.</li>
+<li><strong>How often this occurs.</strong> I used one task, one agent and one policy. The study shows how these problems occur, not
+  how often they occur.</li>
+<li><strong>How often the results repeat.</strong> Each judge ran in three climbs at most.</li>
+<li><strong>Which reading of the unclear damage tickets is correct.</strong> The answer key gives one reading. The size of the TNR
+  decrease depends on it. The main point does not: the loop decided an unclear case, and no person saw the decision.</li>
+<li><strong>Whether the labels work in a running loop.</strong> I tested the labels only on completed climbs, with random samples and
+  correct labels.</li>
+<li><strong>An independent validation result.</strong> The loop used the same validation set in each round. Only the holdout set
+  gives an independent number.</li>
+<li><strong>Judges that compare two outputs.</strong> Each judge here scored one output at a time.</li>
 </ul>
-<h2 id="the-next-study"><span class="num">8.</span> The next study</h2>
-<p>The next study will test the extensions from Section 5 in a running loop. This study tested some of them only on the
-completed climbs. The next study will add the steps from Section 6 to the loop. Then it will run the same climbs
-again, with the same agent, tickets and judges. It will examine these questions:</p>
+<h2 id="the-next-study"><span class="num">7.</span> The next study</h2>
+<p>The next study will add the checks from Section 5 to the loop. Then it will run the same climbs again, with the same
+agent, tickets and judges. It will examine these questions:</p>
 <ul>
-<li>Does a measurement before the climb find the lenient judge's problem?</li>
-<li>With a labelled sample in each round, does the loop keep a true improvement that the judge does not detect?</li>
-<li>Can the loop stop a change that decides a case that the specification leaves open?</li>
+<li>Does a calibration before the climb find the lenient judge's problem?</li>
+<li>With labels in each round, does the loop keep a real fix that the judge does not see?</li>
+<li>Can the loop stop a change that decides an unclear case?</li>
 <li>How many labels does each round need?</li>
 </ul>
-<h2 id="the-practical-result-check-the-judge-three-times"><span class="num">9.</span> The practical result: check the judge three times</h2>
-<p>The article checks the grader before the first round and again when the score stalls. The results add a check on the
-decisions that each change affects, and a new measurement after the climb. Together, they give three principles.</p>
-<ol>
-<li><strong>Measure the judge before the optimization.</strong> One agreement number is not sufficient. Measure both types of error,
-   and measure them for each important kind of output. <em>This study shows this.</em></li>
-<li><strong>Measure the changes, not only the versions.</strong> A change affects a small set of decisions, and these decisions
-   decide whether the change stays. <em>This study supports this with retrospective evidence. It is not yet tested in a
-   running loop.</em></li>
-<li><strong>Measure the judge again after the optimization.</strong> The final version can have a different mix of errors. Thus the
-   rates from the baseline do not automatically apply to it. <em>This study shows this in three runs, and the decrease is
-   significant in one of them.</em></li>
-</ol>
-<p>A judge that controls an optimization does more than measure quality. Its errors decide which changes stay. That
-selection can make the judge's own blind spots more important with each round.</p>
 <h2 id="sources">Sources</h2>
 <ul>
 <li>Falkowski. <a href="https://bfalkowski.github.io/writing/judge-score.html">Can You Trust Your Judge's Score? A Primer on TPR and TNR for LLM Judges</a>. bfalkowski.github.io, October 2026.</li>
